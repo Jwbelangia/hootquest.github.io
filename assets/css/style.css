@@ -1302,6 +1302,16 @@ body {
   transition: border-color var(--transition), background-color var(--transition), transform var(--transition);
 }
 
+.order-field select {
+  background-color: hsl(280, 8%, 30%);
+  color: var(--white);
+}
+
+.order-field select option {
+  background-color: hsl(280, 8%, 30%);
+  color: var(--white);
+}
+
 .order-field input::placeholder,
 .order-field textarea::placeholder {
   color: hsla(0, 0%, 100%, 0.64);
@@ -1318,6 +1328,10 @@ body {
   border-color: var(--marigold);
   background-color: hsla(0, 0%, 100%, 0.16);
   transform: translateY(-1px);
+}
+
+.order-field select:focus {
+  background-color: hsl(280, 8%, 34%);
 }
 
 .order-field-full {

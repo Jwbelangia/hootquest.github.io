@@ -538,14 +538,22 @@ body {
 .brand {
   --section-padding: 60px;
   background-image: var(--gradient);
+  display: flex;
+  align-items: center;
 }
 
-.brand .has-scrollbar { padding-block-end: 0; }
+.brand .has-scrollbar {
+  padding-block-end: 0;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
 
 .brand .has-scrollbar::-webkit-scrollbar { display: none; }
 
 .brand-item {
-  min-width: calc(50% - 10px);
+  min-width: auto;
   scroll-snap-align: start;
 }
 

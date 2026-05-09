@@ -1,39 +1,63 @@
 function doGet(e) {
   return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, version: "orders-v1" }))
+    .createTextOutput(JSON.stringify({ ok: true, version: "orders-v2" }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
-  var payload = parsePayload_(e);
-  var action = payload.action || "";
+  const payload = parsePayload_(e);
 
-  if (action === "createOrder") {
-    return createOrder_(payload);
+  if (payload.action === "createOrder") {
+    return createProductRequest_(payload);
   }
 
-  if (action === "getOrderStatus") {
-    return getOrderStatus_(payload);
+  if (payload.action === "getOrderStatus") {
+    return getProductRequestStatus_(payload);
   }
 
-  if (payload.email || payload.email_address) {
-    return saveNewsletter_(payload);
+  let email = "";
+
+  if (e && e.parameter) {
+    email = e.parameter.email || e.parameter.email_address || "";
   }
 
-  return json_({ ok: false, message: "Unknown action." });
+  if (!email && e && e.postData && e.postData.contents) {
+    try {
+      const body = JSON.parse(e.postData.contents);
+      email = body.email || body.email_address || "";
+    } catch (err) {}
+  }
+
+  if (!email) {
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        ok: false,
+        message: "Missing email",
+        parameter: e ? e.parameter : null,
+        postData: e && e.postData ? e.postData.contents : null
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Email Collection");
+  sheet.appendRow([email, new Date()]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true, email: email }))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
-function createOrder_(payload) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Orders");
+function createProductRequest_(payload) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ProductRequest");
 
   if (!sheet) {
-    return json_({ ok: false, message: "Orders sheet not found." });
+    return json_({ ok: false, message: "ProductRequest sheet not found." });
   }
 
-  var invoiceNumber = generateUniqueInvoiceNumber_(sheet);
+  const invoiceNumber = generateUniqueInvoiceNumber_(sheet);
 
   sheet.appendRow([
-    payload.name || "",
+    payload.email || "",
     payload.address || "",
     payload.contact || "",
     payload.package || "",
@@ -52,22 +76,22 @@ function createOrder_(payload) {
   });
 }
 
-function getOrderStatus_(payload) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Orders");
+function getProductRequestStatus_(payload) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("ProductRequest");
 
   if (!sheet) {
-    return json_({ ok: false, message: "Orders sheet not found." });
+    return json_({ ok: false, message: "ProductRequest sheet not found." });
   }
 
-  var invoiceNumber = String(payload.invoiceNumber || "").trim();
+  const invoiceNumber = String(payload.invoiceNumber || "").trim();
 
   if (!invoiceNumber) {
     return json_({ ok: false, message: "Invoice number is required." });
   }
 
-  var data = sheet.getDataRange().getValues();
+  const data = sheet.getDataRange().getValues();
 
-  for (var i = 1; i < data.length; i++) {
+  for (let i = 1; i < data.length; i++) {
     if (String(data[i][9]).trim() === invoiceNumber) {
       return json_({
         ok: true,
@@ -82,44 +106,31 @@ function getOrderStatus_(payload) {
   return json_({ ok: false, message: "Order invoice number not found." });
 }
 
-function saveNewsletter_(payload) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
-  var email = payload.email || payload.email_address || "";
-
-  if (!email) {
-    return json_({ ok: false, message: "Missing email" });
-  }
-
-  sheet.appendRow([email, new Date()]);
-
-  return json_({ ok: true });
-}
-
 function generateUniqueInvoiceNumber_(sheet) {
-  var existing = {};
-  var data = sheet.getDataRange().getValues();
+  const data = sheet.getDataRange().getValues();
+  const existing = {};
 
-  for (var i = 1; i < data.length; i++) {
+  for (let i = 1; i < data.length; i++) {
     existing[String(data[i][9]).trim()] = true;
   }
 
-  var invoice = "";
+  let invoiceNumber = "";
 
   do {
-    invoice = Utilities.getUuid().replace(/-/g, "").toUpperCase();
-  } while (existing[invoice]);
+    invoiceNumber = Utilities.getUuid().replace(/-/g, "").toUpperCase();
+  } while (existing[invoiceNumber]);
 
-  return invoice;
+  return invoiceNumber;
 }
 
 function parsePayload_(e) {
   if (e && e.postData && e.postData.contents) {
     try {
       return JSON.parse(e.postData.contents);
-    } catch (error) {}
+    } catch (err) {}
   }
 
-  return (e && e.parameter) ? e.parameter : {};
+  return e && e.parameter ? e.parameter : {};
 }
 
 function json_(payload) {

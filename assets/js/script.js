@@ -103,26 +103,32 @@ if (newsletterFrame) {
 const orderHub = document.querySelector("[data-order-hub]");
 const orderForm = document.querySelector("[data-order-form]");
 const orderStatusForm = document.querySelector("[data-order-status-form]");
+const cartBadge = document.querySelector("[data-cart-badge]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
+const orderDraftKey = "hootquest-order-draft";
+const abandonedCartDelayMs = 5 * 60 * 1000;
+let abandonedCartTimerId = null;
+let draftHoldSent = false;
+let lastDraftHash = "";
 
 const packageCatalog = [
   {
     id: "core-game",
     name: "Core Game Module",
-    price: 49.99,
-    description: "Base HootQuest box with core encounter content."
+    price: 89.99,
+    description: "Base HootQuest box with core encounter content. Includes Swarm of the Rat King expansion."
   },
   {
     id: "rat-king-expansion",
     name: "Swarm of the Rat King Expansion",
-    price: 24.99,
-    description: "Expansion content pack for late-campaign encounters."
+    price: 39.99,
+    description: "Expansion content pack with Rat figurings, Campaign booklet, Campaign Pattern."
   },
   {
-    id: "owlcrest-pin",
-    name: "Owlcrest Enamel Pin",
-    price: 9.99,
-    description: "Collectible pin add-on for supporters."
+    id: "owlcrest-collectible",
+    name: "Owlcrest Medium Figurine",
+    price: 14.99,
+    description: "Collectible figuring. Larger than play pieces. A staff member will email you the selection we have for print."
   }
   // Example item format for future uploads:
   // {
@@ -142,14 +148,29 @@ if (orderHub && orderForm) {
   const orderStatus = orderForm.querySelector("[data-order-form-status]");
   const invoiceCard = orderForm.querySelector("[data-order-invoice-card]");
   const invoiceValue = orderForm.querySelector("[data-order-invoice-value]");
+  const emailField = orderForm.querySelector('input[name="email"]');
 
   renderPackageCatalog(packageList, packageCatalog);
+  restoreOrderDraft();
   syncOrderSummary();
+  refreshCartState();
 
   packageList?.addEventListener("input", function (event) {
     if (event.target.matches("[data-package-quantity]")) {
       syncOrderSummary();
+      persistOrderDraft();
+      refreshCartState();
     }
+  });
+
+  orderForm.addEventListener("input", function () {
+    persistOrderDraft();
+    refreshCartState();
+  });
+
+  orderForm.addEventListener("change", function () {
+    persistOrderDraft();
+    refreshCartState();
   });
 
   orderForm.addEventListener("submit", async function (event) {
@@ -177,15 +198,7 @@ if (orderHub && orderForm) {
     }
 
     try {
-      const response = await fetch(orderEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const result = await response.json();
+      const result = await postOrderPayload(payload);
 
       if (!result.ok) {
         throw new Error(result.message || "Unable to submit order request.");
@@ -194,8 +207,10 @@ if (orderHub && orderForm) {
       orderStatus.textContent = "Request received. Save your invoice number below.";
       invoiceValue.textContent = result.invoiceNumber;
       invoiceCard.hidden = false;
+      clearOrderDraft();
       orderForm.reset();
       syncOrderSummary();
+      refreshCartState();
     } catch (error) {
       orderStatus.textContent = error.message || "Unable to submit order request.";
     } finally {
@@ -205,9 +220,21 @@ if (orderHub && orderForm) {
     }
   });
 
+  window.addEventListener("beforeunload", function (event) {
+    if (!hasDraftCart()) {
+      return;
+    }
+
+    persistOrderDraft();
+    sendAbandonedCartHold(true);
+    event.preventDefault();
+    event.returnValue = "Your cart hold will be saved for 72 hours if you leave now.";
+  });
+
   function syncOrderSummary() {
     const selectedItems = [];
     let pretaxTotal = 0;
+    let itemCount = 0;
     const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
 
     for (let i = 0; i < quantityFields.length; i++) {
@@ -223,6 +250,7 @@ if (orderHub && orderForm) {
 
       const lineTotal = product.price * quantity;
       pretaxTotal += lineTotal;
+      itemCount += quantity;
       selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
     }
 
@@ -230,6 +258,167 @@ if (orderHub && orderForm) {
     pretaxField.value = pretaxTotal.toFixed(2);
     pretaxDisplay.value = `$${pretaxTotal.toFixed(2)}`;
     packageSummary.textContent = selectedItems.length ? selectedItems.join(", ") : "No items selected yet.";
+
+    if (cartBadge) {
+      cartBadge.textContent = String(itemCount);
+    }
+  }
+
+  function refreshCartState() {
+    syncOrderSummary();
+    scheduleAbandonedCartHold();
+  }
+
+  function collectOrderDraft() {
+    const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
+    const quantities = {};
+
+    for (let i = 0; i < quantityFields.length; i++) {
+      const field = quantityFields[i];
+      quantities[field.dataset.packageId] = String(field.value || "0");
+    }
+
+    return {
+      email: orderForm.querySelector('input[name="email"]')?.value?.trim() || "",
+      address: orderForm.querySelector('textarea[name="address"]')?.value || "",
+      contact: orderForm.querySelector('input[name="contact"]')?.value || "",
+      paymentMethod: orderForm.querySelector('select[name="paymentMethod"]')?.value || "",
+      package: packageField.value,
+      pretaxSales: pretaxField.value,
+      quantities: quantities
+    };
+  }
+
+  function persistOrderDraft() {
+    const draft = collectOrderDraft();
+    localStorage.setItem(orderDraftKey, JSON.stringify(draft));
+  }
+
+  function restoreOrderDraft() {
+    const rawDraft = localStorage.getItem(orderDraftKey);
+
+    if (!rawDraft) {
+      return;
+    }
+
+    try {
+      const draft = JSON.parse(rawDraft);
+
+      if (draft.email) {
+        orderForm.querySelector('input[name="email"]').value = draft.email;
+      }
+
+      if (draft.address) {
+        orderForm.querySelector('textarea[name="address"]').value = draft.address;
+      }
+
+      if (draft.contact) {
+        orderForm.querySelector('input[name="contact"]').value = draft.contact;
+      }
+
+      if (draft.paymentMethod) {
+        orderForm.querySelector('select[name="paymentMethod"]').value = draft.paymentMethod;
+      }
+
+      const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
+      for (let i = 0; i < quantityFields.length; i++) {
+        const field = quantityFields[i];
+        if (draft.quantities && Object.prototype.hasOwnProperty.call(draft.quantities, field.dataset.packageId)) {
+          field.value = draft.quantities[field.dataset.packageId];
+        }
+      }
+    } catch (error) {
+      localStorage.removeItem(orderDraftKey);
+    }
+  }
+
+  function clearOrderDraft() {
+    localStorage.removeItem(orderDraftKey);
+    draftHoldSent = false;
+    lastDraftHash = "";
+    clearTimeout(abandonedCartTimerId);
+  }
+
+  function hasDraftCart() {
+    return isValidEmail(emailField?.value || "") && getCartQuantity() > 0;
+  }
+
+  function getCartQuantity() {
+    const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
+    let total = 0;
+
+    for (let i = 0; i < quantityFields.length; i++) {
+      total += Number(quantityFields[i].value || 0);
+    }
+
+    return total;
+  }
+
+  function scheduleAbandonedCartHold() {
+    clearTimeout(abandonedCartTimerId);
+
+    if (!hasDraftCart()) {
+      draftHoldSent = false;
+      lastDraftHash = "";
+      return;
+    }
+
+    abandonedCartTimerId = window.setTimeout(function () {
+      sendAbandonedCartHold(false);
+    }, abandonedCartDelayMs);
+  }
+
+  function sendAbandonedCartHold(useBeacon) {
+    if (!hasDraftCart() || !orderEndpoint) {
+      return;
+    }
+
+    const payload = buildAbandonedCartPayload();
+    const payloadHash = JSON.stringify(payload);
+
+    if (draftHoldSent && payloadHash === lastDraftHash) {
+      return;
+    }
+
+    draftHoldSent = true;
+    lastDraftHash = payloadHash;
+
+    if (useBeacon && navigator.sendBeacon) {
+      const blob = new Blob([JSON.stringify(payload)], { type: "text/plain;charset=utf-8" });
+      navigator.sendBeacon(orderEndpoint, blob);
+      return;
+    }
+
+    fetch(orderEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(function () {
+      draftHoldSent = false;
+    });
+  }
+
+  function buildAbandonedCartPayload() {
+    return {
+      action: "createOrder",
+      email: orderForm.querySelector('input[name="email"]')?.value?.trim() || "",
+      address: orderForm.querySelector('textarea[name="address"]')?.value || "",
+      contact: orderForm.querySelector('input[name="contact"]')?.value || "",
+      package: packageField.value,
+      pretaxSales: pretaxField.value,
+      buildStatus: "Cart Hold Request",
+      shippingLabel: "",
+      paymentMethod: orderForm.querySelector('select[name="paymentMethod"]')?.value || "",
+      paymentStatus: "",
+      holdOnly: true
+    };
+  }
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
   }
 }
 
@@ -262,18 +451,10 @@ if (orderHub && orderStatusForm) {
     }
 
     try {
-      const response = await fetch(orderEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify({
-          action: "getOrderStatus",
-          invoiceNumber: invoiceNumber
-        })
+      const result = await postOrderPayload({
+        action: "getOrderStatus",
+        invoiceNumber: invoiceNumber
       });
-
-      const result = await response.json();
 
       if (!result.ok) {
         throw new Error(result.message || "Order not found.");
@@ -310,6 +491,18 @@ if (orderHub && orderStatusForm) {
       }
     }
   });
+}
+
+async function postOrderPayload(payload) {
+  const response = await fetch(orderEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return response.json();
 }
 
 function renderPackageCatalog(container, items) {

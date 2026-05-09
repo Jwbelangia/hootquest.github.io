@@ -1273,6 +1273,11 @@ body {
   text-align: center;
 }
 
+.cart-badge[data-cart-badge] {
+  min-width: 20px;
+  text-align: center;
+}
+
 .order-invoice-card,
 .order-status-result {
   margin-block-start: 20px;

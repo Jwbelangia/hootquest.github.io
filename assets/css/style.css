@@ -590,6 +590,27 @@ body {
 .latest-game-card {
   position: relative;
   box-shadow: var(--shadow-2);
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(180deg, hsl(277, 25%, 16%) 0%, hsl(280, 11%, 11%) 100%);
+  border: 1px solid var(--white_10);
+}
+
+.latest-game-card .card-banner {
+  background:
+    radial-gradient(circle at top, hsla(42, 99%, 46%, 0.22), transparent 48%),
+    linear-gradient(180deg, hsl(277, 25%, 18%) 0%, hsl(280, 11%, 11%) 100%);
+  padding: 20px 20px 0;
+}
+
+.latest-game-card .img-holder {
+  aspect-ratio: 5 / 7;
+}
+
+.latest-game-card .img-cover {
+  object-fit: contain;
+  object-position: center top;
+  filter: drop-shadow(0 14px 24px hsla(0, 0%, 0%, 0.35));
 }
 
 .latest-game-card .card-content {
@@ -597,8 +618,8 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--xiketic_90);
-  padding: 35px 25px;
+  background: linear-gradient(180deg, transparent 0%, hsla(280, 37%, 8%, 0.45) 20%, var(--xiketic_90) 55%);
+  padding: 55px 25px 25px;
 }
 
 .latest-game-card .card-badge {

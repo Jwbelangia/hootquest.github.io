@@ -152,7 +152,7 @@ const packageCatalog = [
   {
     id: "hero-rogue",
     name: "Rogue Figurine",
-    price: 18.99,
+    price: 14.99,
     description: "Made-to-order rogue figurine for OwlCrest supporters.",
     heroName: "Rogue",
     fallbackImage: "./assets/images/RogueV3.png",
@@ -163,7 +163,8 @@ const packageCatalog = [
     id: "hero-mage",
     name: "Mage Figurine",
       price: 14.99,
-    description: "Made-to-order mage figurine for OwlCrest supporters.",
+      description: "Made-to-order mage figurine for OwlCrest supporters.",
+      heroName: "Mage",
     fallbackImage: "./assets/images/MageV3.png",
     modelSrc: "",
     hiddenFromForm: true

@@ -286,6 +286,8 @@ if (orderHub && orderForm) {
   const pretaxField = orderForm.querySelector("[data-pretax-field]");
   const pretaxDisplay = orderForm.querySelector("[data-pretax-display]");
   const packageSummary = orderForm.querySelector("[data-package-summary]");
+  const heroCartSummary = orderForm.querySelector("[data-hero-cart-summary]");
+  const heroCartList = orderForm.querySelector("[data-hero-cart-list]");
   const orderStatus = orderForm.querySelector("[data-order-form-status]");
   const invoiceCard = orderForm.querySelector("[data-order-invoice-card]");
   const invoiceValue = orderForm.querySelector("[data-order-invoice-value]");
@@ -393,6 +395,7 @@ if (orderHub && orderForm) {
 
   function syncOrderSummary() {
     const selectedItems = [];
+    const heroItems = [];
     let pretaxTotal = 0;
     let itemCount = 0;
     const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
@@ -431,12 +434,29 @@ if (orderHub && orderForm) {
       pretaxTotal += lineTotal;
       itemCount += quantity;
       selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
+      heroItems.push({
+        name: product.name,
+        quantity: quantity,
+        total: lineTotal
+      });
     }
 
     packageField.value = selectedItems.join(" | ");
     pretaxField.value = pretaxTotal.toFixed(2);
     pretaxDisplay.value = `$${pretaxTotal.toFixed(2)}`;
     packageSummary.textContent = selectedItems.length ? selectedItems.join(", ") : "No items selected yet.";
+
+    if (heroCartSummary && heroCartList) {
+      if (heroItems.length) {
+        heroCartList.innerHTML = heroItems.map(function (item) {
+          return `<li><span>${item.name} x${item.quantity}</span><span>$${item.total.toFixed(2)}</span></li>`;
+        }).join("");
+        heroCartSummary.hidden = false;
+      } else {
+        heroCartList.innerHTML = "";
+        heroCartSummary.hidden = true;
+      }
+    }
 
     if (cartBadge) {
       cartBadge.textContent = String(itemCount);

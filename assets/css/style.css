@@ -1441,6 +1441,28 @@ body {
   line-height: 1.8;
 }
 
+.hero-cart-summary {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background-color: hsla(0, 0%, 100%, 0.04);
+  border: 1px solid hsla(42, 99%, 46%, 0.12);
+}
+
+.hero-cart-list {
+  display: grid;
+  gap: 8px;
+}
+
+.hero-cart-list li {
+  color: var(--platinum);
+  font-size: var(--fs-9);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .order-submit-btn {
   display: flex;
   align-items: center;

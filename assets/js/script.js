@@ -162,7 +162,7 @@ const packageCatalog = [
   {
     id: "hero-mage",
     name: "Mage Figurine",
-    price: 18.99,
+      price: 14.99,
     description: "Made-to-order mage figurine for OwlCrest supporters.",
     fallbackImage: "./assets/images/MageV3.png",
     modelSrc: "",
@@ -171,7 +171,7 @@ const packageCatalog = [
   {
     id: "hero-healer",
     name: "Healer Figurine",
-    price: 18.99,
+      price: 14.99,
     description: "Made-to-order healer figurine for OwlCrest supporters.",
     heroName: "Healer",
     fallbackImage: "./assets/images/HealerV3.png",
@@ -181,7 +181,7 @@ const packageCatalog = [
   {
     id: "hero-tank",
     name: "Tank Figurine",
-    price: 18.99,
+      price: 14.99,
     description: "Made-to-order tank figurine for OwlCrest supporters.",
     heroName: "Tank",
     fallbackImage: "./assets/images/TankV3.png",
@@ -191,7 +191,7 @@ const packageCatalog = [
   {
     id: "hero-archer",
     name: "Archer Figurine",
-    price: 18.99,
+      price: 14.99,
     description: "Made-to-order archer figurine for OwlCrest supporters.",
     heroName: "Archer",
     fallbackImage: "./assets/images/ArcherV3.png",

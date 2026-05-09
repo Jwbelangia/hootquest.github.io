@@ -148,6 +148,7 @@ if (orderHub && orderForm) {
   const orderStatus = orderForm.querySelector("[data-order-form-status]");
   const invoiceCard = orderForm.querySelector("[data-order-invoice-card]");
   const invoiceValue = orderForm.querySelector("[data-order-invoice-value]");
+  const invoiceField = orderForm.querySelector("[data-invoice-field]");
   const emailField = orderForm.querySelector('input[name="email"]');
 
   renderPackageCatalog(packageList, packageCatalog);
@@ -204,11 +205,17 @@ if (orderHub && orderForm) {
         throw new Error(result.message || "Unable to submit order request.");
       }
 
+      if (result.invoiceNumber) {
+        invoiceField.value = result.invoiceNumber;
+        invoiceValue.textContent = result.invoiceNumber;
+      }
+
       orderStatus.textContent = "Request received. Save your invoice number below.";
-      invoiceValue.textContent = result.invoiceNumber;
       invoiceCard.hidden = false;
+      persistOrderDraft();
       clearOrderDraft();
       orderForm.reset();
+      invoiceField.value = "";
       syncOrderSummary();
       refreshCartState();
     } catch (error) {
@@ -279,6 +286,7 @@ if (orderHub && orderForm) {
     }
 
     return {
+      invoiceNumber: invoiceField.value || "",
       email: orderForm.querySelector('input[name="email"]')?.value?.trim() || "",
       address: orderForm.querySelector('textarea[name="address"]')?.value || "",
       contact: orderForm.querySelector('input[name="contact"]')?.value || "",
@@ -303,6 +311,10 @@ if (orderHub && orderForm) {
 
     try {
       const draft = JSON.parse(rawDraft);
+
+      if (draft.invoiceNumber) {
+        invoiceField.value = draft.invoiceNumber;
+      }
 
       if (draft.email) {
         orderForm.querySelector('input[name="email"]').value = draft.email;
@@ -404,6 +416,7 @@ if (orderHub && orderForm) {
   function buildAbandonedCartPayload() {
     return {
       action: "createOrder",
+      invoiceNumber: invoiceField.value || "",
       email: orderForm.querySelector('input[name="email"]')?.value?.trim() || "",
       address: orderForm.querySelector('textarea[name="address"]')?.value || "",
       contact: orderForm.querySelector('input[name="contact"]')?.value || "",

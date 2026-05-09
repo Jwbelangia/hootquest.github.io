@@ -1,6 +1,6 @@
 function doGet(e) {
   return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, version: "orders-v2" }))
+    .createTextOutput(JSON.stringify({ ok: true, version: "orders-v3" }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -54,9 +54,9 @@ function createProductRequest_(payload) {
     return json_({ ok: false, message: "ProductRequest sheet not found." });
   }
 
-  const invoiceNumber = generateUniqueInvoiceNumber_(sheet);
-
-  sheet.appendRow([
+  const invoiceNumber = String(payload.invoiceNumber || "").trim() || generateUniqueInvoiceNumber_(sheet);
+  const existingRow = findProductRequestRow_(sheet, invoiceNumber);
+  const rowValues = [
     payload.email || "",
     payload.address || "",
     payload.contact || "",
@@ -67,7 +67,13 @@ function createProductRequest_(payload) {
     payload.paymentMethod || "",
     payload.paymentStatus || "",
     invoiceNumber
-  ]);
+  ];
+
+  if (existingRow > 0) {
+    sheet.getRange(existingRow, 1, 1, rowValues.length).setValues([rowValues]);
+  } else {
+    sheet.appendRow(rowValues);
+  }
 
   return json_({
     ok: true,
@@ -104,6 +110,18 @@ function getProductRequestStatus_(payload) {
   }
 
   return json_({ ok: false, message: "Order invoice number not found." });
+}
+
+function findProductRequestRow_(sheet, invoiceNumber) {
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][9]).trim() === invoiceNumber) {
+      return i + 1;
+    }
+  }
+
+  return 0;
 }
 
 function generateUniqueInvoiceNumber_(sheet) {

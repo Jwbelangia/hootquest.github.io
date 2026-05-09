@@ -669,6 +669,141 @@
         </div>
       </section>
 
+      <section class="section order-hub" aria-label="order request and tracking" data-order-hub data-order-endpoint="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec">
+        <div class="container">
+
+          <p class="section-subtitle">Kickstarter Request Desk</p>
+
+          <h2 class="h2 section-title">
+            Order Request <span class="span">Center</span>
+          </h2>
+
+          <div class="order-hub-grid">
+
+            <form class="order-card order-form-panel" data-order-form>
+              <input type="hidden" name="action" value="createOrder">
+              <input type="hidden" name="package" value="" data-package-field>
+              <input type="hidden" name="pretaxSales" value="0.00" data-pretax-field>
+              <input type="hidden" name="buildStatus" value="Build Prep Request">
+              <input type="hidden" name="shippingLabel" value="">
+              <input type="hidden" name="paymentStatus" value="">
+
+              <div class="order-card-header">
+                <h3 class="h3">Place an Order Request</h3>
+                <p class="order-card-copy">Build out the request below and we will send it into the order sheet for review.</p>
+              </div>
+
+              <div class="order-field-grid">
+                <label class="order-field">
+                  <span class="order-label">Name</span>
+                  <input type="text" name="name" placeholder="Enter your full name" required>
+                </label>
+
+                <label class="order-field order-field-full">
+                  <span class="order-label">Address</span>
+                  <textarea name="address" placeholder="Street, city, state, zip" required></textarea>
+                </label>
+
+                <label class="order-field">
+                  <span class="order-label">Contact</span>
+                  <input type="tel" name="contact" placeholder="Best phone number" required>
+                </label>
+
+                <label class="order-field">
+                  <span class="order-label">Payment Method</span>
+                  <select name="paymentMethod" required>
+                    <option value="" selected disabled>Select payment method</option>
+                    <option value="Venmo">Venmo</option>
+                    <option value="PayPal">PayPal</option>
+                    <option value="Facebook">Facebook</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="order-package-builder">
+                <div class="order-package-heading">
+                  <div>
+                    <p class="order-label">Package</p>
+                    <p class="order-card-copy">Choose items and quantities. Pretax sales updates automatically.</p>
+                  </div>
+                </div>
+
+                <div class="package-list" data-package-list></div>
+
+                <div class="order-summary-box">
+                  <div>
+                    <p class="order-label">Selected Package</p>
+                    <p class="order-summary-text" data-package-summary>No items selected yet.</p>
+                  </div>
+
+                  <label class="order-field">
+                    <span class="order-label">Pretax Sales</span>
+                    <input type="text" value="$0.00" readonly data-pretax-display>
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" class="btn skewBg order-submit-btn">
+                <span class="span">Submit Request</span>
+                <ion-icon name="document-text" aria-hidden="true"></ion-icon>
+              </button>
+
+              <p class="order-form-status" data-order-form-status aria-live="polite"></p>
+
+              <div class="order-invoice-card" data-order-invoice-card hidden>
+                <p class="order-label">Order Invoice Number</p>
+                <p class="order-invoice-value" data-order-invoice-value></p>
+                <p class="order-card-copy">Save this invoice number to check your build status later.</p>
+              </div>
+            </form>
+
+            <div class="order-card order-status-panel">
+              <div class="order-card-header">
+                <h3 class="h3">Order Status Lookup</h3>
+                <p class="order-card-copy">Please allow 72 hours for us to begin processing. Questions can be sent to playforgeentertainment@gmail.com or +3365616880.</p>
+              </div>
+
+              <form class="order-status-form" data-order-status-form>
+                <label class="order-field">
+                  <span class="order-label">Order Invoice Number</span>
+                  <input type="text" name="invoiceNumber" placeholder="Paste your invoice GUID" required>
+                </label>
+
+                <button type="submit" class="btn skewBg order-submit-btn">
+                  <span class="span">Check Status</span>
+                  <ion-icon name="search" aria-hidden="true"></ion-icon>
+                </button>
+              </form>
+
+              <p class="order-form-status" data-order-status-message aria-live="polite"></p>
+
+              <div class="order-status-result" data-order-status-result hidden>
+                <div class="order-status-row">
+                  <span>Order Invoice Number</span>
+                  <strong data-status-invoice></strong>
+                </div>
+
+                <div class="order-status-row">
+                  <span>Build Status</span>
+                  <strong data-status-build></strong>
+                </div>
+
+                <div class="order-status-row" data-status-shipping-row hidden>
+                  <span>Shipping</span>
+                  <strong data-status-shipping></strong>
+                </div>
+
+                <div class="order-status-row">
+                  <span>Payment Status</span>
+                  <strong data-status-payment></strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
     </article>
   </main>
 

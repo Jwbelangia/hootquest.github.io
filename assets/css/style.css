@@ -1064,6 +1064,225 @@ body {
 
 
 
+/*-----------------------------------*\
+  #ORDER HUB
+\*-----------------------------------*/
+
+.order-hub {
+  background-color: var(--raisin-black-3);
+}
+
+.order-hub-grid {
+  display: grid;
+  gap: 30px;
+  margin-block-start: 60px;
+}
+
+.order-card {
+  background: linear-gradient(180deg, hsl(280, 11%, 13%) 0%, hsl(277, 25%, 10%) 100%);
+  border: 1px solid var(--white_10);
+  border-radius: 28px;
+  padding: 28px 22px;
+  box-shadow: var(--shadow-2);
+}
+
+.order-card-header {
+  margin-block-end: 24px;
+}
+
+.order-card-copy {
+  color: var(--silver);
+  font-size: var(--fs-9);
+  line-height: 1.8;
+  margin-block-start: 10px;
+}
+
+.order-field-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.order-field {
+  display: grid;
+  gap: 8px;
+}
+
+.order-label {
+  color: var(--platinum);
+  font-size: var(--fs-10);
+  font-weight: var(--fw-700);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.order-field input,
+.order-field textarea,
+.order-field select {
+  width: 100%;
+  background-color: var(--raisin-black-4);
+  border: 1px solid var(--white_10);
+  border-radius: 16px;
+  color: var(--white);
+  font-size: var(--fs-9);
+  padding: 15px 18px;
+  outline: none;
+}
+
+.order-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.order-field input:focus,
+.order-field textarea:focus,
+.order-field select:focus {
+  border-color: var(--marigold);
+}
+
+.order-field-full {
+  grid-column: 1 / -1;
+}
+
+.order-package-builder {
+  margin-block: 28px;
+  display: grid;
+  gap: 18px;
+}
+
+.package-list {
+  display: grid;
+  gap: 14px;
+}
+
+.package-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  background-color: var(--raisin-black-4);
+  border: 1px solid var(--white_10);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.package-item-copy {
+  color: var(--silver);
+  font-size: var(--fs-10);
+  margin-block-start: 4px;
+}
+
+.package-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.package-price {
+  color: var(--marigold);
+  font-family: var(--ff-oxanium);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-700);
+}
+
+.package-quantity {
+  width: 90px;
+}
+
+.order-summary-box {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 20px;
+  background-color: var(--raisin-black-4);
+  border: 1px solid var(--white_10);
+}
+
+.order-summary-text {
+  color: var(--silver);
+  font-size: var(--fs-9);
+  line-height: 1.8;
+}
+
+.order-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.order-form-status {
+  min-height: 24px;
+  margin-block-start: 14px;
+  color: var(--platinum);
+  font-size: var(--fs-9);
+}
+
+.order-invoice-card,
+.order-status-result {
+  margin-block-start: 20px;
+  padding: 18px;
+  border-radius: 20px;
+  background-color: var(--raisin-black-4);
+  border: 1px solid var(--white_10);
+}
+
+.order-invoice-value {
+  color: var(--marigold);
+  font-family: var(--ff-oxanium);
+  font-size: var(--fs-6);
+  letter-spacing: 1px;
+  word-break: break-all;
+  margin-block: 8px 10px;
+}
+
+.order-status-form {
+  display: grid;
+  gap: 18px;
+}
+
+.order-status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 10px;
+  border-block-end: 1px solid var(--white_10);
+  color: var(--silver);
+}
+
+.order-status-row:last-child {
+  border-block-end: 0;
+}
+
+.order-status-row strong {
+  color: var(--white);
+  text-align: right;
+}
+
+.status-paid {
+  color: hsl(128, 72%, 62%);
+}
+
+.status-pending {
+  color: var(--marigold);
+}
+
+
+
 
 
 /*-----------------------------------*\
@@ -1380,6 +1599,16 @@ body {
 
 
   /**
+   * ORDER HUB
+   */
+
+  .order-field-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+
+
+  /**
    * NEWSLETTER
    */
 
@@ -1452,6 +1681,17 @@ body {
   :is(.header, .hero, .live-match) .container { max-width: unset; }
 
   .scrollbar-item { min-width: calc(33.33% - 20px); }
+
+
+
+  /**
+   * ORDER HUB
+   */
+
+  .order-hub-grid {
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: start;
+  }
 
 
 

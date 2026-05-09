@@ -306,21 +306,15 @@ if (orderHub && orderForm) {
     }
 
     try {
-      const result = await postOrderPayload(payload);
+      await submitOrderPayload(payload);
 
-      if (!result.ok) {
-        throw new Error(result.message || "Unable to submit order request.");
-      }
-
-      if (result.invoiceNumber) {
-        invoiceField.value = result.invoiceNumber;
-        invoiceValue.textContent = result.invoiceNumber;
-      }
+      invoiceField.value = payload.invoiceNumber;
+      invoiceValue.textContent = payload.invoiceNumber;
 
       orderStatus.textContent = "Request received. Save your invoice number below.";
       invoiceCard.hidden = false;
       handlePaymentWorkflow(payload.paymentMethod, {
-        invoiceNumber: invoiceValue.textContent || invoiceField.value,
+        invoiceNumber: payload.invoiceNumber,
         packageSummary: packageField.value,
         pretaxSales: pretaxField.value,
         email: emailField.value.trim()
@@ -611,10 +605,7 @@ if (orderHub && orderStatusForm) {
     }
 
     try {
-      const result = await postOrderPayload({
-        action: "getOrderStatus",
-        invoiceNumber: invoiceNumber
-      });
+      const result = await getOrderStatusPayload(invoiceNumber);
 
       if (!result.ok) {
         throw new Error(result.message || "Order not found.");
@@ -653,16 +644,60 @@ if (orderHub && orderStatusForm) {
   });
 }
 
-async function postOrderPayload(payload) {
-  const response = await fetch(orderEndpoint, {
+async function submitOrderPayload(payload) {
+  await fetch(orderEndpoint, {
     method: "POST",
+    mode: "no-cors",
     headers: {
       "Content-Type": "text/plain;charset=utf-8"
     },
     body: JSON.stringify(payload)
   });
+}
 
-  return response.json();
+function getOrderStatusPayload(invoiceNumber) {
+  return new Promise(function (resolve, reject) {
+    const callbackName = `hootquestStatus_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    const script = document.createElement("script");
+    const url = new URL(orderEndpoint);
+
+    url.searchParams.set("action", "getOrderStatus");
+    url.searchParams.set("invoiceNumber", invoiceNumber);
+    url.searchParams.set("callback", callbackName);
+
+    let settled = false;
+
+    window[callbackName] = function (payload) {
+      settled = true;
+      cleanup();
+      resolve(payload);
+    };
+
+    script.onerror = function () {
+      cleanup();
+      reject(new Error("Unable to retrieve order status."));
+    };
+
+    script.src = url.toString();
+    document.body.appendChild(script);
+
+    window.setTimeout(function () {
+      if (settled) {
+        return;
+      }
+
+      cleanup();
+      reject(new Error("Order status request timed out."));
+    }, 10000);
+
+    function cleanup() {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+
+      delete window[callbackName];
+    }
+  });
 }
 
 function renderPackageCatalog(container, items) {

@@ -645,7 +645,7 @@
               Our <span class="span">Newsletter</span>
             </h2>
 
-            <form action="" class="newsletter-form">
+            <form action="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec" method="post" target="newsletter-submit-frame" class="newsletter-form" data-newsletter-form>
 
               <div class="input-wrapper skewBg">
                 <input type="email" name="email_address" aria-label="email" placeholder="Enter your email..." required
@@ -661,6 +661,8 @@
               </button>
 
             </form>
+
+            <p class="newsletter-status" data-newsletter-status aria-live="polite"></p>
 
           </div>
 
@@ -819,7 +821,7 @@
 
             <p class="footer-list-title">Newsletter Sign Up</p>
 
-            <form action="" class="footer-newsletter">
+            <form action="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec" method="post" target="newsletter-submit-frame" class="footer-newsletter" data-newsletter-form>
               <input type="email" name="email_address" aria-label="email" placeholder="Enter your email" required
                 class="email-field">
 
@@ -827,6 +829,8 @@
                 <ion-icon name="rocket"></ion-icon>
               </button>
             </form>
+
+            <p class="newsletter-status footer-newsletter-status" data-newsletter-status aria-live="polite"></p>
 
           </div>
 
@@ -862,6 +866,8 @@
     <ion-icon name="caret-up"></ion-icon>
   </a>
 
+  <iframe name="newsletter-submit-frame" hidden title="Newsletter submission"></iframe>
+
 
 
 
@@ -876,25 +882,6 @@
   -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-
-  <script>
-    function doPost(e) {
-      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Sheet1");
-      const email = e.parameter.email || "";
-
-      if (!email) {
-        return ContentService
-          .createTextOutput(JSON.stringify({ ok: false, message: "Missing email" }))
-          .setMimeType(ContentService.MimeType.JSON);
-      }
-
-      sheet.appendRow([email, new Date()]);
-
-      return ContentService
-        .createTextOutput(JSON.stringify({ ok: true }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
-  </script>
 
 </body>
 

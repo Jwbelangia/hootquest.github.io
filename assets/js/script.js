@@ -51,3 +51,49 @@ window.addEventListener("scroll", function () {
     backTopBtn.classList.remove("active");
   }
 });
+
+
+
+const newsletterForms = document.querySelectorAll("[data-newsletter-form]");
+const newsletterFrame = document.querySelector('iframe[name="newsletter-submit-frame"]');
+let activeNewsletterForm = null;
+
+for (let i = 0; i < newsletterForms.length; i++) {
+  newsletterForms[i].addEventListener("submit", function () {
+    const status = this.nextElementSibling;
+    const button = this.querySelector('button[type="submit"]');
+
+    activeNewsletterForm = this;
+
+    if (status?.hasAttribute("data-newsletter-status")) {
+      status.textContent = "Submitting...";
+    }
+
+    if (button) {
+      button.disabled = true;
+    }
+  });
+}
+
+if (newsletterFrame) {
+  newsletterFrame.addEventListener("load", function () {
+    if (!activeNewsletterForm) {
+      return;
+    }
+
+    const status = activeNewsletterForm.nextElementSibling;
+    const button = activeNewsletterForm.querySelector('button[type="submit"]');
+
+    if (status?.hasAttribute("data-newsletter-status")) {
+      status.textContent = "Thanks for subscribing!";
+    }
+
+    activeNewsletterForm.reset();
+
+    if (button) {
+      button.disabled = false;
+    }
+
+    activeNewsletterForm = null;
+  });
+}

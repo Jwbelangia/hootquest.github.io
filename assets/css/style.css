@@ -1053,6 +1053,15 @@ body {
 
 .newsletter-btn:is(:hover, :focus)::before { background-color: var(--white); }
 
+.newsletter-status {
+  min-height: 24px;
+  margin-block-start: 12px;
+  text-align: center;
+  color: var(--platinum);
+  font-size: var(--fs-9);
+  font-weight: var(--fw-500);
+}
+
 
 
 
@@ -1160,6 +1169,11 @@ body {
   color: var(--xiketic);
   display: grid;
   place-content: center;
+}
+
+.footer-newsletter-status {
+  text-align: left;
+  margin-block-start: 10px;
 }
 
 .footer-bottom-img { display: none; }

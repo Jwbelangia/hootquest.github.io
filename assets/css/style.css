@@ -587,24 +587,42 @@ body {
   scroll-padding-inline-start: 15px;
 }
 
+.latest-game .latest-game-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-inline: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.latest-game .latest-game-list::-webkit-scrollbar { display: none; }
+
+.latest-game .scrollbar-item { min-width: 0; }
+
 .latest-game-card {
   position: relative;
   box-shadow: var(--shadow-2);
-  border-radius: 24px;
+  border-radius: 28px;
   overflow: hidden;
   background: linear-gradient(180deg, hsl(277, 25%, 16%) 0%, hsl(280, 11%, 11%) 100%);
   border: 1px solid var(--white_10);
+  transition: transform var(--transition), box-shadow var(--transition);
 }
 
 .latest-game-card .card-banner {
   background:
     radial-gradient(circle at top, hsla(42, 99%, 46%, 0.22), transparent 48%),
     linear-gradient(180deg, hsl(277, 25%, 18%) 0%, hsl(280, 11%, 11%) 100%);
-  padding: 20px 20px 0;
+  padding: 14px 14px 0;
+  border-radius: 28px;
+  overflow: hidden;
 }
 
 .latest-game-card .img-holder {
   aspect-ratio: 5 / 7;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .latest-game-card .img-cover {
@@ -619,7 +637,10 @@ body {
   left: 0;
   right: 0;
   background: linear-gradient(180deg, transparent 0%, hsla(280, 37%, 8%, 0.45) 20%, var(--xiketic_90) 55%);
-  padding: 55px 25px 25px;
+  padding: 55px 18px 18px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--transition), transform var(--transition);
 }
 
 .latest-game-card .card-badge {
@@ -642,6 +663,16 @@ body {
 }
 
 .latest-game-card .card-price .span { margin-inline-start: 5px; }
+
+.latest-game-card:is(:hover, :focus-within) {
+  transform: translateY(-6px);
+  box-shadow: 0px 14px 26px 1px hsla(0, 0%, 0%, 0.35);
+}
+
+.latest-game-card:is(:hover, :focus-within) .card-content {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 
 

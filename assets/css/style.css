@@ -958,6 +958,39 @@ body {
 
 .featured-game-card:is(:hover, :focus-within) .card-content-overlay { opacity: 1; }
 
+.featured-game-card[data-release-status="pending"] .card-banner {
+  position: relative;
+}
+
+.featured-game-card[data-release-status="pending"] .card-banner::after {
+  content: "Pending";
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: hsla(280, 37%, 8%, 0.85);
+  color: var(--white);
+  font-size: var(--fs-11);
+  font-weight: var(--fw-700);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  z-index: 1;
+}
+
+.featured-game-card[data-release-status="pending"] .img-cover {
+  filter: grayscale(1) brightness(0.7);
+}
+
+.featured-game-card[data-release-status="pending"] .card-content {
+  background-color: hsla(280, 18%, 10%, 0.92);
+}
+
+.featured-game-card[data-release-status="pending"] .card-content .card-meta,
+.featured-game-card[data-release-status="pending"] .card-content .card-title {
+  color: var(--quick-silver);
+}
+
 
 
 

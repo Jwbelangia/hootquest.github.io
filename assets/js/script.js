@@ -106,6 +106,7 @@ const orderStatusForm = document.querySelector("[data-order-status-form]");
 const cartBadge = document.querySelector("[data-cart-badge]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
+const orderDraftIdKey = "hootquest-order-draft-id";
 const abandonedCartDelayMs = 5 * 60 * 1000;
 let abandonedCartTimerId = null;
 let draftHoldSent = false;
@@ -185,6 +186,7 @@ if (orderHub && orderForm) {
     const submitButton = orderForm.querySelector('button[type="submit"]');
     const formData = new FormData(orderForm);
     const payload = Object.fromEntries(formData.entries());
+    payload.invoiceNumber = ensureDraftInvoiceNumber();
 
     if (!payload.package) {
       orderStatus.textContent = "Please add at least one package item before submitting.";
@@ -212,7 +214,6 @@ if (orderHub && orderForm) {
 
       orderStatus.textContent = "Request received. Save your invoice number below.";
       invoiceCard.hidden = false;
-      persistOrderDraft();
       clearOrderDraft();
       orderForm.reset();
       invoiceField.value = "";
@@ -273,6 +274,11 @@ if (orderHub && orderForm) {
 
   function refreshCartState() {
     syncOrderSummary();
+
+    if (hasDraftCart()) {
+      ensureDraftInvoiceNumber();
+    }
+
     scheduleAbandonedCartHold();
   }
 
@@ -286,7 +292,7 @@ if (orderHub && orderForm) {
     }
 
     return {
-      invoiceNumber: invoiceField.value || "",
+      invoiceNumber: invoiceField.value || localStorage.getItem(orderDraftIdKey) || "",
       email: orderForm.querySelector('input[name="email"]')?.value?.trim() || "",
       address: orderForm.querySelector('textarea[name="address"]')?.value || "",
       contact: orderForm.querySelector('input[name="contact"]')?.value || "",
@@ -298,6 +304,10 @@ if (orderHub && orderForm) {
   }
 
   function persistOrderDraft() {
+    if (hasDraftCart()) {
+      ensureDraftInvoiceNumber();
+    }
+
     const draft = collectOrderDraft();
     localStorage.setItem(orderDraftKey, JSON.stringify(draft));
   }
@@ -314,6 +324,13 @@ if (orderHub && orderForm) {
 
       if (draft.invoiceNumber) {
         invoiceField.value = draft.invoiceNumber;
+        localStorage.setItem(orderDraftIdKey, draft.invoiceNumber);
+      } else {
+        const storedInvoiceNumber = localStorage.getItem(orderDraftIdKey);
+
+        if (storedInvoiceNumber) {
+          invoiceField.value = storedInvoiceNumber;
+        }
       }
 
       if (draft.email) {
@@ -346,6 +363,7 @@ if (orderHub && orderForm) {
 
   function clearOrderDraft() {
     localStorage.removeItem(orderDraftKey);
+    localStorage.removeItem(orderDraftIdKey);
     draftHoldSent = false;
     lastDraftHash = "";
     clearTimeout(abandonedCartTimerId);
@@ -374,6 +392,8 @@ if (orderHub && orderForm) {
       lastDraftHash = "";
       return;
     }
+
+    ensureDraftInvoiceNumber();
 
     abandonedCartTimerId = window.setTimeout(function () {
       sendAbandonedCartHold(false);
@@ -416,7 +436,7 @@ if (orderHub && orderForm) {
   function buildAbandonedCartPayload() {
     return {
       action: "createOrder",
-      invoiceNumber: invoiceField.value || "",
+      invoiceNumber: ensureDraftInvoiceNumber(),
       email: orderForm.querySelector('input[name="email"]')?.value?.trim() || "",
       address: orderForm.querySelector('textarea[name="address"]')?.value || "",
       contact: orderForm.querySelector('input[name="contact"]')?.value || "",
@@ -432,6 +452,27 @@ if (orderHub && orderForm) {
 
   function isValidEmail(value) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
+  }
+
+  function ensureDraftInvoiceNumber() {
+    let invoiceNumber = invoiceField.value || localStorage.getItem(orderDraftIdKey) || "";
+
+    if (!invoiceNumber) {
+      invoiceNumber = generateDraftInvoiceNumber();
+    }
+
+    invoiceField.value = invoiceNumber;
+    localStorage.setItem(orderDraftIdKey, invoiceNumber);
+
+    return invoiceNumber;
+  }
+
+  function generateDraftInvoiceNumber() {
+    if (window.crypto?.randomUUID) {
+      return window.crypto.randomUUID().replace(/-/g, "").toUpperCase();
+    }
+
+    return `${Date.now().toString(16)}${Math.random().toString(16).slice(2, 18)}`.toUpperCase();
   }
 }
 

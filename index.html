@@ -1015,6 +1015,37 @@
     </div>
   </div>
 
+  <div class="hero-modal payment-modal" data-figurine-modal hidden>
+    <div class="hero-modal-overlay" data-figurine-modal-close></div>
+
+    <div class="hero-modal-dialog payment-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="figurine-modal-title">
+      <button class="hero-modal-close" type="button" aria-label="Close figurine modal" data-figurine-modal-close>
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+      <div class="hero-modal-content payment-modal-content">
+        <p class="hero-modal-subtitle">Pick Your Figurines</p>
+        <h3 class="h3" id="figurine-modal-title">Owlcrest Medium Figurine</h3>
+        <p class="hero-modal-text">Select which made-to-order figurines you want to add. Each click adds one figurine to your cart.</p>
+
+        <div class="figurine-picker-grid" data-figurine-picker-grid>
+          <button type="button" class="figurine-picker-btn" data-figurine-option="Rogue">Rogue</button>
+          <button type="button" class="figurine-picker-btn" data-figurine-option="Mage">Mage</button>
+          <button type="button" class="figurine-picker-btn" data-figurine-option="Healer">Healer</button>
+          <button type="button" class="figurine-picker-btn" data-figurine-option="Tank">Tank</button>
+          <button type="button" class="figurine-picker-btn" data-figurine-option="Archer">Archer</button>
+        </div>
+
+        <p class="hero-modal-note">A staff member will email you to confirm the made-to-order figurine request and details.</p>
+
+        <button type="button" class="btn skewBg hero-modal-btn" data-figurine-modal-close>
+          <span class="span">Done</span>
+          <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <iframe name="newsletter-submit-frame" hidden title="Newsletter submission"></iframe>
 
 

@@ -812,6 +812,46 @@ body {
   padding-block-start: 24px;
 }
 
+.figurine-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-block: 24px 20px;
+}
+
+.figurine-picker-btn {
+  min-height: 52px;
+  border-radius: 16px;
+  background-color: hsla(0, 0%, 100%, 0.08);
+  border: 1px solid hsla(42, 99%, 46%, 0.16);
+  color: var(--white);
+  font-family: var(--ff-oxanium);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-700);
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+
+.figurine-picker-btn:is(:hover, :focus) {
+  background-color: var(--marigold);
+  color: var(--xiketic);
+}
+
+.package-item-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 999px;
+  background-color: hsla(42, 99%, 46%, 0.16);
+  color: var(--marigold);
+  font-size: var(--fs-10);
+  font-weight: var(--fw-700);
+  text-transform: uppercase;
+  border: 1px solid hsla(42, 99%, 46%, 0.18);
+}
+
 
 
 

@@ -119,6 +119,9 @@ const paymentModal = document.querySelector("[data-payment-modal]");
 const paymentModalTitle = document.querySelector("[data-payment-modal-title]");
 const paymentModalText = document.querySelector("[data-payment-modal-text]");
 const paymentModalCloseButtons = document.querySelectorAll("[data-payment-modal-close]");
+const figurineModal = document.querySelector("[data-figurine-modal]");
+const figurineModalCloseButtons = document.querySelectorAll("[data-figurine-modal-close]");
+const figurineOptions = document.querySelectorAll("[data-figurine-option]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
 const orderDraftIdKey = "hootquest-order-draft-id";
@@ -129,6 +132,7 @@ let draftHoldSent = false;
 let lastDraftHash = "";
 let activeHeroProductId = "";
 const heroCartSelections = {};
+const figurineCartSelections = {};
 
 const packageCatalog = [
   {
@@ -147,7 +151,48 @@ const packageCatalog = [
     id: "owlcrest-collectible",
     name: "Owlcrest Medium Figurine",
     price: 14.99,
-    description: "Collectible figuring. Larger than play pieces. A staff member will email you the selection we have for print."
+    description: "Pick which medium figurines you want and add them into your cart.",
+    pickerOnly: true
+  },
+  {
+    id: "figurine-rogue",
+    name: "Rogue Medium Figurine",
+    price: 14.99,
+    description: "Made-to-order rogue medium figurine.",
+    figurineName: "Rogue",
+    hiddenFromForm: true
+  },
+  {
+    id: "figurine-mage",
+    name: "Mage Medium Figurine",
+    price: 14.99,
+    description: "Made-to-order mage medium figurine.",
+    figurineName: "Mage",
+    hiddenFromForm: true
+  },
+  {
+    id: "figurine-healer",
+    name: "Healer Medium Figurine",
+    price: 14.99,
+    description: "Made-to-order healer medium figurine.",
+    figurineName: "Healer",
+    hiddenFromForm: true
+  },
+  {
+    id: "figurine-tank",
+    name: "Tank Medium Figurine",
+    price: 14.99,
+    description: "Made-to-order tank medium figurine.",
+    figurineName: "Tank",
+    hiddenFromForm: true
+  },
+  {
+    id: "figurine-archer",
+    name: "Archer Medium Figurine",
+    price: 14.99,
+    description: "Made-to-order archer medium figurine.",
+    figurineName: "Archer",
+    hiddenFromForm: true
   },
   {
     id: "hero-rogue",
@@ -162,9 +207,9 @@ const packageCatalog = [
   {
     id: "hero-mage",
     name: "Mage Figurine",
-      price: 14.99,
-      description: "Made-to-order mage figurine for OwlCrest supporters.",
-      heroName: "Mage",
+    price: 14.99,
+    description: "Made-to-order mage figurine for OwlCrest supporters.",
+    heroName: "Mage",
     fallbackImage: "./assets/images/MageV3.png",
     modelSrc: "",
     hiddenFromForm: true
@@ -172,7 +217,7 @@ const packageCatalog = [
   {
     id: "hero-healer",
     name: "Healer Figurine",
-      price: 14.99,
+    price: 14.99,
     description: "Made-to-order healer figurine for OwlCrest supporters.",
     heroName: "Healer",
     fallbackImage: "./assets/images/HealerV3.png",
@@ -182,7 +227,7 @@ const packageCatalog = [
   {
     id: "hero-tank",
     name: "Tank Figurine",
-      price: 14.99,
+    price: 14.99,
     description: "Made-to-order tank figurine for OwlCrest supporters.",
     heroName: "Tank",
     fallbackImage: "./assets/images/TankV3.png",
@@ -192,7 +237,7 @@ const packageCatalog = [
   {
     id: "hero-archer",
     name: "Archer Figurine",
-      price: 14.99,
+    price: 14.99,
     description: "Made-to-order archer figurine for OwlCrest supporters.",
     heroName: "Archer",
     fallbackImage: "./assets/images/ArcherV3.png",
@@ -248,17 +293,9 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
       return;
     }
 
-    const quantityField = orderForm.querySelector(`[data-package-quantity][data-package-id="${activeHeroProductId}"]`);
-
-    if (quantityField) {
-      quantityField.value = String(Number(quantityField.value || 0) + 1);
-    } else {
-      heroCartSelections[activeHeroProductId] = Number(heroCartSelections[activeHeroProductId] || 0) + 1;
-    }
-
+    heroCartSelections[activeHeroProductId] = Number(heroCartSelections[activeHeroProductId] || 0) + 1;
     orderForm.dispatchEvent(new Event("input", { bubbles: true }));
     scrollToElement(document.querySelector("#order-request-center"));
-
     closeHeroModal();
   });
 }
@@ -266,6 +303,27 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
 if (paymentModal) {
   for (let i = 0; i < paymentModalCloseButtons.length; i++) {
     paymentModalCloseButtons[i].addEventListener("click", closePaymentModal);
+  }
+}
+
+if (figurineModal) {
+  for (let i = 0; i < figurineModalCloseButtons.length; i++) {
+    figurineModalCloseButtons[i].addEventListener("click", closeFigurineModal);
+  }
+
+  for (let i = 0; i < figurineOptions.length; i++) {
+    figurineOptions[i].addEventListener("click", function () {
+      const figurineName = this.dataset.figurineOption;
+      const product = findFigurineProduct(figurineName);
+
+      if (!product || !orderForm) {
+        return;
+      }
+
+      figurineCartSelections[product.id] = Number(figurineCartSelections[product.id] || 0) + 1;
+      orderForm.dispatchEvent(new Event("input", { bubbles: true }));
+      scrollToElement(document.querySelector("#order-request-center"));
+    });
   }
 }
 
@@ -277,6 +335,10 @@ document.addEventListener("keydown", function (event) {
 
     if (paymentModal && !paymentModal.hidden) {
       closePaymentModal();
+    }
+
+    if (figurineModal && !figurineModal.hidden) {
+      closeFigurineModal();
     }
   }
 });
@@ -298,6 +360,7 @@ if (orderHub && orderForm) {
   const orderStatusInvoiceInput = document.querySelector('[data-order-status-form] input[name="invoiceNumber"]');
 
   renderPackageCatalog(packageList, packageCatalog);
+  bindPackageActions(packageList);
   restoreOrderDraft();
   prefillStoredInvoice();
   syncOrderSummary();
@@ -418,6 +481,30 @@ if (orderHub && orderForm) {
       selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
     }
 
+    const figurineSelectionIds = Object.keys(figurineCartSelections);
+
+    for (let i = 0; i < figurineSelectionIds.length; i++) {
+      const figurineProductId = figurineSelectionIds[i];
+      const quantity = Number(figurineCartSelections[figurineProductId] || 0);
+      const product = packageCatalog.find(function (item) {
+        return item.id === figurineProductId;
+      });
+
+      if (!product || quantity <= 0) {
+        continue;
+      }
+
+      const lineTotal = product.price * quantity;
+      pretaxTotal += lineTotal;
+      itemCount += quantity;
+      selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
+      heroItems.push({
+        name: product.name,
+        quantity: quantity,
+        total: lineTotal
+      });
+    }
+
     const heroSelectionIds = Object.keys(heroCartSelections);
 
     for (let i = 0; i < heroSelectionIds.length; i++) {
@@ -492,6 +579,7 @@ if (orderHub && orderForm) {
       package: packageField.value,
       pretaxSales: pretaxField.value,
       heroSelections: heroCartSelections,
+      figurineSelections: figurineCartSelections,
       quantities: quantities
     };
   }
@@ -551,12 +639,21 @@ if (orderHub && orderForm) {
       }
 
       clearHeroSelections();
+      clearFigurineSelections();
 
       if (draft.heroSelections) {
         const heroSelectionIds = Object.keys(draft.heroSelections);
 
         for (let i = 0; i < heroSelectionIds.length; i++) {
           heroCartSelections[heroSelectionIds[i]] = Number(draft.heroSelections[heroSelectionIds[i]] || 0);
+        }
+      }
+
+      if (draft.figurineSelections) {
+        const figurineSelectionIds = Object.keys(draft.figurineSelections);
+
+        for (let i = 0; i < figurineSelectionIds.length; i++) {
+          figurineCartSelections[figurineSelectionIds[i]] = Number(draft.figurineSelections[figurineSelectionIds[i]] || 0);
         }
       }
     } catch (error) {
@@ -571,6 +668,7 @@ if (orderHub && orderForm) {
     lastDraftHash = "";
     clearTimeout(abandonedCartTimerId);
     clearHeroSelections();
+    clearFigurineSelections();
   }
 
   function hasDraftCart() {
@@ -589,6 +687,12 @@ if (orderHub && orderForm) {
 
     for (let i = 0; i < heroSelectionIds.length; i++) {
       total += Number(heroCartSelections[heroSelectionIds[i]] || 0);
+    }
+
+    const figurineSelectionIds = Object.keys(figurineCartSelections);
+
+    for (let i = 0; i < figurineSelectionIds.length; i++) {
+      total += Number(figurineCartSelections[figurineSelectionIds[i]] || 0);
     }
 
     return total;
@@ -826,55 +930,45 @@ function renderPackageCatalog(container, items) {
   container.innerHTML = items.filter(function (item) {
     return !item.hiddenFromForm;
   }).map(function (item) {
-    return `
-      <div class="package-item">
-        <div>
-          <p class="order-label">${item.name}</p>
-          <p class="package-item-copy">${item.description}</p>
-        </div>
-
-        <div class="package-item-meta">
-          <span class="package-price">$${item.price.toFixed(2)}</span>
-          <label class="order-field package-quantity">
+    const metaControl = item.pickerOnly
+      ? `<button type="button" class="package-item-action" data-package-picker="${item.id}">Pick Figurines</button>`
+      : `<label class="order-field package-quantity">
             <span class="sr-only">${item.name} quantity</span>
             <input type="number" min="0" value="0" data-package-quantity data-package-id="${item.id}">
-          </label>
-        </div>
-      </div>
-    `;
+          </label>`;
+
+    return `
+       <div class="package-item">
+         <div>
+           <p class="order-label">${item.name}</p>
+           <p class="package-item-copy">${item.description}</p>
+         </div>
+
+         <div class="package-item-meta">
+           <span class="package-price">$${item.price.toFixed(2)}</span>
+-          <label class="order-field package-quantity">
+-            <span class="sr-only">${item.name} quantity</span>
+-            <input type="number" min="0" value="0" data-package-quantity data-package-id="${item.id}">
+-          </label>
++          ${metaControl}
+         </div>
+       </div>
+     `;
   }).join("");
 }
 
-function scrollToElement(element, callback) {
-  if (!element) {
+function bindPackageActions(container) {
+  if (!container) {
     return;
   }
 
-  element.scrollIntoView({ behavior: "smooth", block: "start" });
+  const pickerButtons = container.querySelectorAll("[data-package-picker]");
 
-  if (typeof callback === "function") {
-    window.setTimeout(callback, 500);
+  for (let i = 0; i < pickerButtons.length; i++) {
+    pickerButtons[i].addEventListener("click", function () {
+      openFigurineModal();
+    });
   }
-}
-
-function setCookie(name, value, days) {
-  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
-}
-
-function getCookie(name) {
-  const cookieName = `${name}=`;
-  const cookies = document.cookie.split(';');
-
-  for (let i = 0; i < cookies.length; i++) {
-    const cookie = cookies[i].trim();
-
-    if (cookie.startsWith(cookieName)) {
-      return decodeURIComponent(cookie.substring(cookieName.length));
-    }
-  }
-
-  return "";
 }
 
 function findHeroProduct(heroName) {
@@ -882,6 +976,14 @@ function findHeroProduct(heroName) {
 
   return packageCatalog.find(function (item) {
     return item.heroName && item.heroName.toLowerCase() === normalizedHeroName;
+  });
+}
+
+function findFigurineProduct(figurineName) {
+  const normalizedFigurineName = String(figurineName || "").trim().toLowerCase();
+
+  return packageCatalog.find(function (item) {
+    return item.figurineName && item.figurineName.toLowerCase() === normalizedFigurineName;
   });
 }
 
@@ -942,6 +1044,24 @@ function closePaymentModal() {
   }
 
   paymentModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+function openFigurineModal() {
+  if (!figurineModal) {
+    return;
+  }
+
+  figurineModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeFigurineModal() {
+  if (!figurineModal) {
+    return;
+  }
+
+  figurineModal.hidden = true;
   document.body.style.overflow = "";
 }
 

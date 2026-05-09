@@ -122,11 +122,13 @@ const paymentModalCloseButtons = document.querySelectorAll("[data-payment-modal-
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
 const orderDraftIdKey = "hootquest-order-draft-id";
+const orderInvoiceCookieKey = "hootquest-last-invoice";
 const abandonedCartDelayMs = 5 * 60 * 1000;
 let abandonedCartTimerId = null;
 let draftHoldSent = false;
 let lastDraftHash = "";
 let activeHeroProductId = "";
+const heroCartSelections = {};
 
 const packageCatalog = [
   {
@@ -148,22 +150,53 @@ const packageCatalog = [
     description: "Collectible figuring. Larger than play pieces. A staff member will email you the selection we have for print."
   },
   {
-    id: "hero-melee",
-    name: "Melee Hero Figurine",
+    id: "hero-rogue",
+    name: "Rogue Figurine",
     price: 18.99,
-    description: "Made-to-order melee hero figurine for OwlCrest supporters.",
-    heroName: "Melee Hero",
+    description: "Made-to-order rogue figurine for OwlCrest supporters.",
+    heroName: "Rogue",
     fallbackImage: "./assets/images/RogueV3.png",
-    modelSrc: ""
+    modelSrc: "",
+    hiddenFromForm: true
   },
   {
-    id: "hero-ranged",
-    name: "Ranged Hero Figurine",
+    id: "hero-mage",
+    name: "Mage Figurine",
     price: 18.99,
-    description: "Made-to-order ranged hero figurine for OwlCrest supporters.",
-    heroName: "Ranged Hero",
+    description: "Made-to-order mage figurine for OwlCrest supporters.",
     fallbackImage: "./assets/images/MageV3.png",
-    modelSrc: ""
+    modelSrc: "",
+    hiddenFromForm: true
+  },
+  {
+    id: "hero-healer",
+    name: "Healer Figurine",
+    price: 18.99,
+    description: "Made-to-order healer figurine for OwlCrest supporters.",
+    heroName: "Healer",
+    fallbackImage: "./assets/images/HealerV3.png",
+    modelSrc: "",
+    hiddenFromForm: true
+  },
+  {
+    id: "hero-tank",
+    name: "Tank Figurine",
+    price: 18.99,
+    description: "Made-to-order tank figurine for OwlCrest supporters.",
+    heroName: "Tank",
+    fallbackImage: "./assets/images/TankV3.png",
+    modelSrc: "",
+    hiddenFromForm: true
+  },
+  {
+    id: "hero-archer",
+    name: "Archer Figurine",
+    price: 18.99,
+    description: "Made-to-order archer figurine for OwlCrest supporters.",
+    heroName: "Archer",
+    fallbackImage: "./assets/images/ArcherV3.png",
+    modelSrc: "",
+    hiddenFromForm: true
   }
   // Example item format for future uploads:
   // {
@@ -197,11 +230,11 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
     heroTriggers[i].addEventListener("click", function (event) {
       event.preventDefault();
       const card = this.closest(".latest-game-card");
-      const title = card?.querySelector(".card-title")?.textContent?.trim() || "Hero";
+      const heroName = card?.querySelector("img")?.getAttribute("alt")?.trim() || "Hero";
       const image = card?.querySelector("img")?.getAttribute("src") || "";
-      const product = findHeroProduct(title, image);
+      const product = findHeroProduct(heroName);
 
-      openHeroModal(product, title, image);
+      openHeroModal(product, heroName, image);
     });
   }
 
@@ -218,9 +251,12 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
 
     if (quantityField) {
       quantityField.value = String(Number(quantityField.value || 0) + 1);
-      orderForm.dispatchEvent(new Event("input", { bubbles: true }));
-      scrollToElement(document.querySelector("#order-request-center"));
+    } else {
+      heroCartSelections[activeHeroProductId] = Number(heroCartSelections[activeHeroProductId] || 0) + 1;
     }
+
+    orderForm.dispatchEvent(new Event("input", { bubbles: true }));
+    scrollToElement(document.querySelector("#order-request-center"));
 
     closeHeroModal();
   });
@@ -256,9 +292,11 @@ if (orderHub && orderForm) {
   const invoiceField = orderForm.querySelector("[data-invoice-field]");
   const emailField = orderForm.querySelector('input[name="email"]');
   const paymentMethodField = orderForm.querySelector('select[name="paymentMethod"]');
+  const orderStatusInvoiceInput = document.querySelector('[data-order-status-form] input[name="invoiceNumber"]');
 
   renderPackageCatalog(packageList, packageCatalog);
   restoreOrderDraft();
+  prefillStoredInvoice();
   syncOrderSummary();
   refreshCartState();
 
@@ -310,6 +348,11 @@ if (orderHub && orderForm) {
 
       invoiceField.value = payload.invoiceNumber;
       invoiceValue.textContent = payload.invoiceNumber;
+      setCookie(orderInvoiceCookieKey, payload.invoiceNumber, 30);
+
+      if (orderStatusInvoiceInput) {
+        orderStatusInvoiceInput.value = payload.invoiceNumber;
+      }
 
       orderStatus.textContent = "Request received. Save your invoice number below.";
       invoiceCard.hidden = false;
@@ -319,6 +362,15 @@ if (orderHub && orderForm) {
         pretaxSales: pretaxField.value,
         email: emailField.value.trim()
       });
+      orderForm.reset();
+      clearOrderDraft();
+      invoiceField.value = "";
+      packageField.value = "";
+      pretaxField.value = "0.00";
+      pretaxDisplay.value = "$0.00";
+      packageSummary.textContent = "No items selected yet.";
+      syncOrderSummary();
+      refreshCartState();
     } catch (error) {
       orderStatus.textContent = error.message || "Unable to submit order request.";
     } finally {
@@ -350,6 +402,25 @@ if (orderHub && orderForm) {
       const quantity = Number(field.value || 0);
       const product = packageCatalog.find(function (item) {
         return item.id === field.dataset.packageId;
+      });
+
+      if (!product || quantity <= 0) {
+        continue;
+      }
+
+      const lineTotal = product.price * quantity;
+      pretaxTotal += lineTotal;
+      itemCount += quantity;
+      selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
+    }
+
+    const heroSelectionIds = Object.keys(heroCartSelections);
+
+    for (let i = 0; i < heroSelectionIds.length; i++) {
+      const heroProductId = heroSelectionIds[i];
+      const quantity = Number(heroCartSelections[heroProductId] || 0);
+      const product = packageCatalog.find(function (item) {
+        return item.id === heroProductId;
       });
 
       if (!product || quantity <= 0) {
@@ -399,6 +470,7 @@ if (orderHub && orderForm) {
       paymentMethod: orderForm.querySelector('select[name="paymentMethod"]')?.value || "",
       package: packageField.value,
       pretaxSales: pretaxField.value,
+      heroSelections: heroCartSelections,
       quantities: quantities
     };
   }
@@ -456,6 +528,16 @@ if (orderHub && orderForm) {
           field.value = draft.quantities[field.dataset.packageId];
         }
       }
+
+      clearHeroSelections();
+
+      if (draft.heroSelections) {
+        const heroSelectionIds = Object.keys(draft.heroSelections);
+
+        for (let i = 0; i < heroSelectionIds.length; i++) {
+          heroCartSelections[heroSelectionIds[i]] = Number(draft.heroSelections[heroSelectionIds[i]] || 0);
+        }
+      }
     } catch (error) {
       localStorage.removeItem(orderDraftKey);
     }
@@ -467,6 +549,7 @@ if (orderHub && orderForm) {
     draftHoldSent = false;
     lastDraftHash = "";
     clearTimeout(abandonedCartTimerId);
+    clearHeroSelections();
   }
 
   function hasDraftCart() {
@@ -479,6 +562,12 @@ if (orderHub && orderForm) {
 
     for (let i = 0; i < quantityFields.length; i++) {
       total += Number(quantityFields[i].value || 0);
+    }
+
+    const heroSelectionIds = Object.keys(heroCartSelections);
+
+    for (let i = 0; i < heroSelectionIds.length; i++) {
+      total += Number(heroCartSelections[heroSelectionIds[i]] || 0);
     }
 
     return total;
@@ -574,6 +663,14 @@ if (orderHub && orderForm) {
 
     return `${Date.now().toString(16)}${Math.random().toString(16).slice(2, 18)}`.toUpperCase();
   }
+
+  function prefillStoredInvoice() {
+    const storedInvoice = getCookie(orderInvoiceCookieKey);
+
+    if (storedInvoice && orderStatusInvoiceInput) {
+      orderStatusInvoiceInput.value = storedInvoice;
+    }
+  }
 }
 
 if (orderHub && orderStatusForm) {
@@ -592,6 +689,26 @@ if (orderHub && orderStatusForm) {
       statusMessage.textContent = "Order endpoint is not configured yet.";
       return;
     }
+
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function getCookie(name) {
+  const cookieName = `${name}=`;
+  const cookies = document.cookie.split(';');
+
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+
+    if (cookie.startsWith(cookieName)) {
+      return decodeURIComponent(cookie.substring(cookieName.length));
+    }
+  }
+
+  return "";
+}
 
     const submitButton = orderStatusForm.querySelector('button[type="submit"]');
     const formData = new FormData(orderStatusForm);
@@ -705,7 +822,9 @@ function renderPackageCatalog(container, items) {
     return;
   }
 
-  container.innerHTML = items.map(function (item) {
+  container.innerHTML = items.filter(function (item) {
+    return !item.hiddenFromForm;
+  }).map(function (item) {
     return `
       <div class="package-item">
         <div>
@@ -737,14 +856,12 @@ function scrollToElement(element, callback) {
   }
 }
 
-function findHeroProduct(title) {
-  const normalizedTitle = String(title || "").toLowerCase();
+function findHeroProduct(heroName) {
+  const normalizedHeroName = String(heroName || "").trim().toLowerCase();
 
-  if (normalizedTitle.includes("melee")) {
-    return packageCatalog.find(function (item) { return item.id === "hero-melee"; });
-  }
-
-  return packageCatalog.find(function (item) { return item.id === "hero-ranged"; });
+  return packageCatalog.find(function (item) {
+    return item.heroName && item.heroName.toLowerCase() === normalizedHeroName;
+  });
 }
 
 function openHeroModal(product, title, image) {

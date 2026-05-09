@@ -1026,17 +1026,37 @@
       <div class="hero-modal-content payment-modal-content">
         <p class="hero-modal-subtitle">Pick Your Figurines</p>
         <h3 class="h3" id="figurine-modal-title">Owlcrest Medium Figurine</h3>
-        <p class="hero-modal-text">Select which made-to-order figurines you want to add. Each click adds one figurine to your cart.</p>
+        <p class="hero-modal-text">Select which made-to-order figurines you want to add, then submit them to the cart.</p>
 
         <div class="figurine-picker-grid" data-figurine-picker-grid>
-          <button type="button" class="figurine-picker-btn" data-figurine-option="Rogue">Rogue</button>
-          <button type="button" class="figurine-picker-btn" data-figurine-option="Mage">Mage</button>
-          <button type="button" class="figurine-picker-btn" data-figurine-option="Healer">Healer</button>
-          <button type="button" class="figurine-picker-btn" data-figurine-option="Tank">Tank</button>
-          <button type="button" class="figurine-picker-btn" data-figurine-option="Archer">Archer</button>
+          <label class="figurine-picker-row">
+            <span class="figurine-picker-name">Rogue</span>
+            <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Rogue">
+          </label>
+          <label class="figurine-picker-row">
+            <span class="figurine-picker-name">Mage</span>
+            <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Mage">
+          </label>
+          <label class="figurine-picker-row">
+            <span class="figurine-picker-name">Healer</span>
+            <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Healer">
+          </label>
+          <label class="figurine-picker-row">
+            <span class="figurine-picker-name">Tank</span>
+            <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Tank">
+          </label>
+          <label class="figurine-picker-row">
+            <span class="figurine-picker-name">Archer</span>
+            <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Archer">
+          </label>
         </div>
 
         <p class="hero-modal-note">A staff member will email you to confirm the made-to-order figurine request and details.</p>
+
+        <button type="button" class="btn skewBg hero-modal-btn" data-figurine-submit>
+          <span class="span">Add Selected to Cart</span>
+          <ion-icon name="bag-handle" aria-hidden="true"></ion-icon>
+        </button>
 
         <button type="button" class="btn skewBg hero-modal-btn" data-figurine-modal-close>
           <span class="span">Done</span>

@@ -121,7 +121,8 @@ const paymentModalText = document.querySelector("[data-payment-modal-text]");
 const paymentModalCloseButtons = document.querySelectorAll("[data-payment-modal-close]");
 const figurineModal = document.querySelector("[data-figurine-modal]");
 const figurineModalCloseButtons = document.querySelectorAll("[data-figurine-modal-close]");
-const figurineOptions = document.querySelectorAll("[data-figurine-option]");
+const figurineOptionInputs = document.querySelectorAll("[data-figurine-option]");
+const figurineSubmitButton = document.querySelector("[data-figurine-submit]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
 const orderDraftIdKey = "hootquest-order-draft-id";
@@ -311,20 +312,30 @@ if (figurineModal) {
     figurineModalCloseButtons[i].addEventListener("click", closeFigurineModal);
   }
 
-  for (let i = 0; i < figurineOptions.length; i++) {
-    figurineOptions[i].addEventListener("click", function () {
-      const figurineName = this.dataset.figurineOption;
-      const product = findFigurineProduct(figurineName);
+  figurineSubmitButton?.addEventListener("click", function () {
+    let hasSelection = false;
 
-      if (!product || !orderForm) {
-        return;
+    for (let i = 0; i < figurineOptionInputs.length; i++) {
+      const input = figurineOptionInputs[i];
+      const quantity = Number(input.value || 0);
+      const product = findFigurineProduct(input.dataset.figurineOption);
+
+      if (!product || quantity <= 0) {
+        continue;
       }
 
-      figurineCartSelections[product.id] = Number(figurineCartSelections[product.id] || 0) + 1;
+      figurineCartSelections[product.id] = Number(figurineCartSelections[product.id] || 0) + quantity;
+      input.value = "0";
+      hasSelection = true;
+    }
+
+    if (hasSelection && orderForm) {
       orderForm.dispatchEvent(new Event("input", { bubbles: true }));
       scrollToElement(document.querySelector("#order-request-center"));
-    });
-  }
+    }
+
+    closeFigurineModal();
+  });
 }
 
 document.addEventListener("keydown", function (event) {
@@ -796,6 +807,22 @@ if (orderHub && orderForm) {
       orderStatusInvoiceInput.value = storedInvoice;
     }
   }
+
+  function clearHeroSelections() {
+    const heroSelectionIds = Object.keys(heroCartSelections);
+
+    for (let i = 0; i < heroSelectionIds.length; i++) {
+      delete heroCartSelections[heroSelectionIds[i]];
+    }
+  }
+
+  function clearFigurineSelections() {
+    const figurineSelectionIds = Object.keys(figurineCartSelections);
+
+    for (let i = 0; i < figurineSelectionIds.length; i++) {
+      delete figurineCartSelections[figurineSelectionIds[i]];
+    }
+  }
 }
 
 if (orderHub && orderStatusForm) {
@@ -938,22 +965,18 @@ function renderPackageCatalog(container, items) {
           </label>`;
 
     return `
-       <div class="package-item">
-         <div>
-           <p class="order-label">${item.name}</p>
-           <p class="package-item-copy">${item.description}</p>
-         </div>
+      <div class="package-item">
+        <div>
+          <p class="order-label">${item.name}</p>
+          <p class="package-item-copy">${item.description}</p>
+        </div>
 
-         <div class="package-item-meta">
-           <span class="package-price">$${item.price.toFixed(2)}</span>
--          <label class="order-field package-quantity">
--            <span class="sr-only">${item.name} quantity</span>
--            <input type="number" min="0" value="0" data-package-quantity data-package-id="${item.id}">
--          </label>
-+          ${metaControl}
-         </div>
-       </div>
-     `;
+        <div class="package-item-meta">
+          <span class="package-price">$${item.price.toFixed(2)}</span>
+          ${metaControl}
+        </div>
+      </div>
+    `;
   }).join("");
 }
 
@@ -969,6 +992,38 @@ function bindPackageActions(container) {
       openFigurineModal();
     });
   }
+}
+
+function scrollToElement(element, callback) {
+  if (!element) {
+    return;
+  }
+
+  element.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (typeof callback === "function") {
+    window.setTimeout(callback, 500);
+  }
+}
+
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function getCookie(name) {
+  const cookieName = `${name}=`;
+  const cookies = document.cookie.split(';');
+
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+
+    if (cookie.startsWith(cookieName)) {
+      return decodeURIComponent(cookie.substring(cookieName.length));
+    }
+  }
+
+  return "";
 }
 
 function findHeroProduct(heroName) {

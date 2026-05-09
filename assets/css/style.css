@@ -814,27 +814,39 @@ body {
 
 .figurine-picker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-block: 24px 20px;
 }
 
-.figurine-picker-btn {
+.figurine-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   min-height: 52px;
+  padding: 12px 16px;
   border-radius: 16px;
   background-color: hsla(0, 0%, 100%, 0.08);
   border: 1px solid hsla(42, 99%, 46%, 0.16);
+}
+
+.figurine-picker-name {
   color: var(--white);
   font-family: var(--ff-oxanium);
   font-size: var(--fs-8);
   font-weight: var(--fw-700);
   text-transform: uppercase;
-  transition: var(--transition);
 }
 
-.figurine-picker-btn:is(:hover, :focus) {
-  background-color: var(--marigold);
-  color: var(--xiketic);
+.figurine-picker-input {
+  width: 88px;
+  min-height: 40px;
+  border-radius: 12px;
+  background-color: hsla(0, 0%, 100%, 0.12);
+  border: 1px solid hsla(42, 99%, 46%, 0.16);
+  color: var(--white);
+  text-align: center;
 }
 
 .package-item-action {

@@ -690,26 +690,6 @@ if (orderHub && orderStatusForm) {
       return;
     }
 
-function setCookie(name, value, days) {
-  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
-}
-
-function getCookie(name) {
-  const cookieName = `${name}=`;
-  const cookies = document.cookie.split(';');
-
-  for (let i = 0; i < cookies.length; i++) {
-    const cookie = cookies[i].trim();
-
-    if (cookie.startsWith(cookieName)) {
-      return decodeURIComponent(cookie.substring(cookieName.length));
-    }
-  }
-
-  return "";
-}
-
     const submitButton = orderStatusForm.querySelector('button[type="submit"]');
     const formData = new FormData(orderStatusForm);
     const invoiceNumber = formData.get("invoiceNumber");
@@ -854,6 +834,26 @@ function scrollToElement(element, callback) {
   if (typeof callback === "function") {
     window.setTimeout(callback, 500);
   }
+}
+
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function getCookie(name) {
+  const cookieName = `${name}=`;
+  const cookies = document.cookie.split(';');
+
+  for (let i = 0; i < cookies.length; i++) {
+    const cookie = cookies[i].trim();
+
+    if (cookie.startsWith(cookieName)) {
+      return decodeURIComponent(cookie.substring(cookieName.length));
+    }
+  }
+
+  return "";
 }
 
 function findHeroProduct(heroName) {

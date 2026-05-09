@@ -55,24 +55,6 @@
               </a>
             </li>
 
-            <li>
-              <a href="#" class="social-link">
-                <ion-icon name="logo-twitter"></ion-icon>
-              </a>
-            </li>
-
-            <li>
-              <a href="#" class="social-link">
-                <ion-icon name="logo-pinterest"></ion-icon>
-              </a>
-            </li>
-
-            <li>
-              <a href="#" class="social-link">
-                <ion-icon name="logo-linkedin"></ion-icon>
-              </a>
-            </li>
-
           </ul>
 
         </div>
@@ -101,7 +83,7 @@
             </li>
 
             <li class="navbar-item">
-              <a href="#" class="navbar-link skewBg" data-nav-link>Contact</a>
+              <a href="#contact-signup" class="navbar-link skewBg" data-nav-link data-contact-scroll>Contact</a>
             </li>
 
           </ul>
@@ -109,7 +91,7 @@
 
         <div class="header-actions">
 
-          <button class="cart-btn" aria-label="cart">
+          <button class="cart-btn" aria-label="cart" data-cart-scroll>
             <ion-icon name="cart"></ion-icon>
 
             <span class="cart-badge" data-cart-badge>0</span>
@@ -258,7 +240,7 @@
 
                   <div class="card-content">
 
-                    <a href="#" class="card-badge skewBg">Hero</a>
+                    <a href="#" class="card-badge skewBg" data-hero-trigger>Hero</a>
 
                     <h3 class="h3">
                         <a href="#" class="card-title">Melee</a>
@@ -283,7 +265,7 @@
 
                   <div class="card-content">
 
-                    <a href="#" class="card-badge skewBg">Hero</a>
+                    <a href="#" class="card-badge skewBg" data-hero-trigger>Hero</a>
 
                     <h3 class="h3">
                       <a href="#" class="card-title">Ranged</a>
@@ -308,7 +290,7 @@
 
                   <div class="card-content">
 
-                    <a href="#" class="card-badge skewBg">Hero</a>
+                    <a href="#" class="card-badge skewBg" data-hero-trigger>Hero</a>
 
                     <h3 class="h3">
                       <a href="#" class="card-title">Ranged</a>
@@ -333,7 +315,7 @@
 
                   <div class="card-content">
 
-                    <a href="#" class="card-badge skewBg">Hero</a>
+                    <a href="#" class="card-badge skewBg" data-hero-trigger>Hero</a>
 
                     <h3 class="h3">
                         <a href="#" class="card-title">Melee</a>
@@ -358,7 +340,7 @@
 
                   <div class="card-content">
 
-                    <a href="#" class="card-badge skewBg">Hero</a>
+                    <a href="#" class="card-badge skewBg" data-hero-trigger>Hero</a>
 
                     <h3 class="h3">
                       <a href="#" class="card-title">Ranged</a>
@@ -665,7 +647,7 @@
         </div>
       </section>
 
-      <section class="section order-hub" aria-label="order request and tracking" data-order-hub data-order-endpoint="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec">
+      <section class="section order-hub" id="order-request-center" aria-label="order request and tracking" data-order-hub data-order-endpoint="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec">
         <div class="container">
 
           <p class="section-subtitle">Kickstarter Request Desk</p>
@@ -926,35 +908,16 @@
                   <ion-icon name="logo-facebook"></ion-icon>
                 </a>
               </li>
-
-              <li>
-                <a href="#" class="social-link" style="background-color: #55acee">
-                  <ion-icon name="logo-twitter"></ion-icon>
-                </a>
-              </li>
-
-              <li>
-                <a href="#" class="social-link" style="background-color: #d71e18">
-                  <ion-icon name="logo-pinterest"></ion-icon>
-                </a>
-              </li>
-
-              <li>
-                <a href="#" class="social-link" style="background-color: #1565c0">
-                  <ion-icon name="logo-linkedin"></ion-icon>
-                </a>
-              </li>
-
             </ul>
 
           </div>
 
-          <div class="footer-newsletter">
+          <div class="footer-newsletter" id="contact-signup">
 
             <p class="footer-list-title">KickStarter Sub</p>
 
             <form action="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec" method="post" target="newsletter-submit-frame" class="footer-newsletter" data-newsletter-form>
-              <input type="email" name="email_address" aria-label="email" placeholder="Enter your email" required
+              <input type="email" name="email_address" aria-label="email" placeholder="Enter your email" required data-contact-email
                 class="email-field">
 
               <button type="submit" class="footer-btn" aria-label="submit">
@@ -998,6 +961,55 @@
     <ion-icon name="caret-up"></ion-icon>
   </a>
 
+  <div class="hero-modal" data-hero-modal hidden>
+    <div class="hero-modal-overlay" data-hero-modal-close></div>
+
+    <div class="hero-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="hero-modal-title">
+      <button class="hero-modal-close" type="button" aria-label="Close hero modal" data-hero-modal-close>
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+      <div class="hero-modal-media">
+        <model-viewer data-hero-model-viewer camera-controls auto-rotate rotation-per-second="12deg" shadow-intensity="1" exposure="1" hidden></model-viewer>
+        <img src="" alt="" class="hero-modal-fallback" data-hero-model-fallback hidden>
+        <p class="hero-modal-format-note" data-hero-format-note hidden>Upload a hero model in GLB format to enable live rotation here.</p>
+      </div>
+
+      <div class="hero-modal-content">
+        <p class="hero-modal-subtitle">Support Owlcrest</p>
+        <h3 class="h3" id="hero-modal-title" data-hero-modal-title></h3>
+        <p class="hero-modal-text">Supporting OwlCrest by purchasing a Hero helps us keep building the world, its stories, and its made-to-order figurines.</p>
+        <p class="hero-modal-note">After checkout, a staff member will email you so you can request which figurine you would like made. Each hero figurine is made to order.</p>
+
+        <button type="button" class="btn skewBg hero-modal-btn" data-hero-add-to-cart>
+          <span class="span">Add to Cart</span>
+          <ion-icon name="bag-handle" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-modal payment-modal" data-payment-modal hidden>
+    <div class="hero-modal-overlay" data-payment-modal-close></div>
+
+    <div class="hero-modal-dialog payment-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="payment-modal-title">
+      <button class="hero-modal-close" type="button" aria-label="Close payment modal" data-payment-modal-close>
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+
+      <div class="hero-modal-content payment-modal-content">
+        <p class="hero-modal-subtitle">Payment Workflow</p>
+        <h3 class="h3" id="payment-modal-title" data-payment-modal-title></h3>
+        <p class="hero-modal-text" data-payment-modal-text></p>
+
+        <button type="button" class="btn skewBg hero-modal-btn" data-payment-modal-close>
+          <span class="span">Back to Order</span>
+          <ion-icon name="arrow-back" aria-hidden="true"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <iframe name="newsletter-submit-frame" hidden title="Newsletter submission"></iframe>
 
 
@@ -1008,6 +1020,8 @@
     - custom js link
   -->
   <script src="./assets/js/script.js" defer></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script nomodule src="https://unpkg.com/@google/model-viewer/dist/model-viewer-legacy.js"></script>
 
   <!-- 
     - ionicon link

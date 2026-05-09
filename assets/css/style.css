@@ -657,6 +657,10 @@ body {
   left: 25px;
 }
 
+.latest-game-card .card-badge {
+  cursor: pointer;
+}
+
 .latest-game-card .card-title {
   margin-block-end: 12px;
   transition: var(--transition);
@@ -680,6 +684,132 @@ body {
 .latest-game-card:is(:hover, :focus-within) .card-content {
   opacity: 1;
   transform: translateY(0);
+}
+
+
+
+/*-----------------------------------*\
+  #HERO MODAL
+\*-----------------------------------*/
+
+.hero-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.hero-modal[hidden] {
+  display: none;
+}
+
+.hero-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: hsla(280, 37%, 8%, 0.86);
+  backdrop-filter: blur(6px);
+}
+
+.hero-modal-dialog {
+  position: relative;
+  width: min(960px, 100%);
+  display: grid;
+  gap: 24px;
+  background: linear-gradient(180deg, hsl(280, 11%, 15%) 0%, hsl(277, 25%, 9%) 100%);
+  border: 1px solid hsla(42, 99%, 46%, 0.18);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 20px 40px hsla(0, 0%, 0%, 0.4);
+}
+
+.hero-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--white);
+  background-color: hsla(0, 0%, 100%, 0.08);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.hero-modal-close ion-icon {
+  font-size: 24px;
+}
+
+.hero-modal-media,
+.hero-modal-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-modal-media {
+  min-height: 320px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top, hsla(42, 99%, 46%, 0.16), transparent 46%),
+    linear-gradient(180deg, hsl(277, 25%, 18%) 0%, hsl(280, 11%, 11%) 100%);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.hero-modal-media model-viewer,
+.hero-modal-fallback {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+}
+
+.hero-modal-fallback {
+  object-fit: contain;
+}
+
+.hero-modal-subtitle {
+  color: var(--marigold);
+  font-size: var(--fs-10);
+  font-weight: var(--fw-700);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-block-end: 12px;
+}
+
+.hero-modal-text,
+.hero-modal-note,
+.hero-modal-format-note {
+  color: var(--platinum);
+  font-size: var(--fs-8);
+  line-height: 1.8;
+}
+
+.hero-modal-note {
+  margin-block: 14px 24px;
+}
+
+.hero-modal-format-note {
+  text-align: center;
+  max-width: 42ch;
+}
+
+.hero-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-modal-dialog {
+  max-width: 560px;
+  grid-template-columns: 1fr;
+}
+
+.payment-modal-content {
+  padding-block-start: 24px;
 }
 
 
@@ -1665,6 +1795,17 @@ body {
 
 
   /**
+   * HERO MODAL
+   */
+
+  .hero-modal-dialog {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+
+
+  /**
    * NEWSLETTER
    */
 
@@ -1747,6 +1888,10 @@ body {
   .order-hub-grid {
     grid-template-columns: 1.15fr 0.85fr;
     align-items: start;
+  }
+
+  .hero-modal-media {
+    min-height: 420px;
   }
 
 

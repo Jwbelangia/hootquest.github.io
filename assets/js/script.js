@@ -104,6 +104,21 @@ const orderHub = document.querySelector("[data-order-hub]");
 const orderForm = document.querySelector("[data-order-form]");
 const orderStatusForm = document.querySelector("[data-order-status-form]");
 const cartBadge = document.querySelector("[data-cart-badge]");
+const cartScrollButton = document.querySelector("[data-cart-scroll]");
+const contactScrollLink = document.querySelector("[data-contact-scroll]");
+const contactEmailField = document.querySelector("[data-contact-email]");
+const heroTriggers = document.querySelectorAll("[data-hero-trigger]");
+const heroModal = document.querySelector("[data-hero-modal]");
+const heroModalTitle = document.querySelector("[data-hero-modal-title]");
+const heroModalViewer = document.querySelector("[data-hero-model-viewer]");
+const heroModalFallback = document.querySelector("[data-hero-model-fallback]");
+const heroFormatNote = document.querySelector("[data-hero-format-note]");
+const heroAddToCartButton = document.querySelector("[data-hero-add-to-cart]");
+const heroModalCloseButtons = document.querySelectorAll("[data-hero-modal-close]");
+const paymentModal = document.querySelector("[data-payment-modal]");
+const paymentModalTitle = document.querySelector("[data-payment-modal-title]");
+const paymentModalText = document.querySelector("[data-payment-modal-text]");
+const paymentModalCloseButtons = document.querySelectorAll("[data-payment-modal-close]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
 const orderDraftIdKey = "hootquest-order-draft-id";
@@ -111,6 +126,7 @@ const abandonedCartDelayMs = 5 * 60 * 1000;
 let abandonedCartTimerId = null;
 let draftHoldSent = false;
 let lastDraftHash = "";
+let activeHeroProductId = "";
 
 const packageCatalog = [
   {
@@ -130,15 +146,103 @@ const packageCatalog = [
     name: "Owlcrest Medium Figurine",
     price: 14.99,
     description: "Collectible figuring. Larger than play pieces. A staff member will email you the selection we have for print."
+  },
+  {
+    id: "hero-melee",
+    name: "Melee Hero Figurine",
+    price: 18.99,
+    description: "Made-to-order melee hero figurine for OwlCrest supporters.",
+    heroName: "Melee Hero",
+    fallbackImage: "./assets/images/RogueV3.png",
+    modelSrc: ""
+  },
+  {
+    id: "hero-ranged",
+    name: "Ranged Hero Figurine",
+    price: 18.99,
+    description: "Made-to-order ranged hero figurine for OwlCrest supporters.",
+    heroName: "Ranged Hero",
+    fallbackImage: "./assets/images/MageV3.png",
+    modelSrc: ""
   }
   // Example item format for future uploads:
   // {
   //   id: "item-slug",
   //   name: "Item Name",
   //   price: 19.99,
-  //   description: "Short item description."
+  //   description: "Short item description.",
+  //   heroName: "Hero Name",
+  //   fallbackImage: "./assets/images/HeroImage.png",
+  //   modelSrc: "./assets/models/hero-name.glb"
   // }
 ];
+
+if (cartScrollButton) {
+  cartScrollButton.addEventListener("click", function () {
+    scrollToElement(document.querySelector("#order-request-center"));
+  });
+}
+
+if (contactScrollLink && contactEmailField) {
+  contactScrollLink.addEventListener("click", function (event) {
+    event.preventDefault();
+    scrollToElement(document.querySelector("#contact-signup"), function () {
+      contactEmailField.focus();
+    });
+  });
+}
+
+if (heroTriggers.length && heroModal && heroAddToCartButton) {
+  for (let i = 0; i < heroTriggers.length; i++) {
+    heroTriggers[i].addEventListener("click", function (event) {
+      event.preventDefault();
+      const card = this.closest(".latest-game-card");
+      const title = card?.querySelector(".card-title")?.textContent?.trim() || "Hero";
+      const image = card?.querySelector("img")?.getAttribute("src") || "";
+      const product = findHeroProduct(title, image);
+
+      openHeroModal(product, title, image);
+    });
+  }
+
+  for (let i = 0; i < heroModalCloseButtons.length; i++) {
+    heroModalCloseButtons[i].addEventListener("click", closeHeroModal);
+  }
+
+  heroAddToCartButton.addEventListener("click", function () {
+    if (!orderForm || !activeHeroProductId) {
+      return;
+    }
+
+    const quantityField = orderForm.querySelector(`[data-package-quantity][data-package-id="${activeHeroProductId}"]`);
+
+    if (quantityField) {
+      quantityField.value = String(Number(quantityField.value || 0) + 1);
+      orderForm.dispatchEvent(new Event("input", { bubbles: true }));
+      scrollToElement(document.querySelector("#order-request-center"));
+    }
+
+    closeHeroModal();
+  });
+}
+
+if (paymentModal) {
+  for (let i = 0; i < paymentModalCloseButtons.length; i++) {
+    paymentModalCloseButtons[i].addEventListener("click", closePaymentModal);
+  }
+}
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    if (heroModal && !heroModal.hidden) {
+      closeHeroModal();
+    }
+
+    if (paymentModal && !paymentModal.hidden) {
+      closePaymentModal();
+    }
+  }
+});
 
 if (orderHub && orderForm) {
   const packageList = orderForm.querySelector("[data-package-list]");
@@ -151,6 +255,7 @@ if (orderHub && orderForm) {
   const invoiceValue = orderForm.querySelector("[data-order-invoice-value]");
   const invoiceField = orderForm.querySelector("[data-invoice-field]");
   const emailField = orderForm.querySelector('input[name="email"]');
+  const paymentMethodField = orderForm.querySelector('select[name="paymentMethod"]');
 
   renderPackageCatalog(packageList, packageCatalog);
   restoreOrderDraft();
@@ -214,11 +319,12 @@ if (orderHub && orderForm) {
 
       orderStatus.textContent = "Request received. Save your invoice number below.";
       invoiceCard.hidden = false;
-      clearOrderDraft();
-      orderForm.reset();
-      invoiceField.value = "";
-      syncOrderSummary();
-      refreshCartState();
+      handlePaymentWorkflow(payload.paymentMethod, {
+        invoiceNumber: invoiceValue.textContent || invoiceField.value,
+        packageSummary: packageField.value,
+        pretaxSales: pretaxField.value,
+        email: emailField.value.trim()
+      });
     } catch (error) {
       orderStatus.textContent = error.message || "Unable to submit order request.";
     } finally {
@@ -346,7 +452,7 @@ if (orderHub && orderForm) {
       }
 
       if (draft.paymentMethod) {
-        orderForm.querySelector('select[name="paymentMethod"]').value = draft.paymentMethod;
+        paymentMethodField.value = draft.paymentMethod;
       }
 
       const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
@@ -582,4 +688,112 @@ function renderPackageCatalog(container, items) {
       </div>
     `;
   }).join("");
+}
+
+function scrollToElement(element, callback) {
+  if (!element) {
+    return;
+  }
+
+  element.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (typeof callback === "function") {
+    window.setTimeout(callback, 500);
+  }
+}
+
+function findHeroProduct(title) {
+  const normalizedTitle = String(title || "").toLowerCase();
+
+  if (normalizedTitle.includes("melee")) {
+    return packageCatalog.find(function (item) { return item.id === "hero-melee"; });
+  }
+
+  return packageCatalog.find(function (item) { return item.id === "hero-ranged"; });
+}
+
+function openHeroModal(product, title, image) {
+  if (!heroModal || !product) {
+    return;
+  }
+
+  activeHeroProductId = product.id;
+  heroModal.hidden = false;
+  document.body.style.overflow = "hidden";
+  heroModalTitle.textContent = title;
+
+  if (heroModalViewer) {
+    if (product.modelSrc) {
+      heroModalViewer.src = product.modelSrc;
+      heroModalViewer.poster = image || product.fallbackImage || "";
+      heroModalViewer.hidden = false;
+      heroFormatNote.hidden = true;
+    } else {
+      heroModalViewer.removeAttribute("src");
+      heroModalViewer.hidden = true;
+      heroFormatNote.hidden = false;
+    }
+  }
+
+  if (heroModalFallback) {
+    heroModalFallback.src = product.fallbackImage || image || "";
+    heroModalFallback.alt = title;
+    heroModalFallback.hidden = false;
+  }
+}
+
+function closeHeroModal() {
+  if (!heroModal) {
+    return;
+  }
+
+  heroModal.hidden = true;
+  document.body.style.overflow = "";
+  activeHeroProductId = "";
+}
+
+function openPaymentModal(title, message) {
+  if (!paymentModal) {
+    return;
+  }
+
+  paymentModalTitle.textContent = title;
+  paymentModalText.textContent = message;
+  paymentModal.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closePaymentModal() {
+  if (!paymentModal) {
+    return;
+  }
+
+  paymentModal.hidden = true;
+  document.body.style.overflow = "";
+}
+
+function handlePaymentWorkflow(method, details) {
+  const normalizedMethod = String(method || "").toLowerCase();
+
+  if (normalizedMethod === "facebook") {
+    const message = encodeURIComponent([
+      "Hello Playforge Entertainment!",
+      `I would like to complete a Facebook payment request for invoice ${details.invoiceNumber || "pending-invoice"}.`,
+      `Package: ${details.packageSummary || "No package summary provided"}`,
+      `Pretax Total: $${details.pretaxSales || "0.00"}`,
+      `Email: ${details.email || "No email provided"}`
+    ].join("\n"));
+
+    window.open(`https://www.facebook.com/PlayforgeEntertainment/?sk=messages&app=fbl${message ? `&ref=${message}` : ""}`, "_blank", "noopener");
+    return;
+  }
+
+  if (normalizedMethod === "venmo") {
+    openPaymentModal("Venmo", "Venmo payment flow is coming soon. For now, please save your invoice number and we will keep your request ready while we finish this checkout path.");
+    return;
+  }
+
+  if (normalizedMethod === "paypal") {
+    openPaymentModal("PayPal", "PayPal payment flow is coming soon. For now, please save your invoice number and we will keep your request ready while we finish this checkout path.");
+  }
 }

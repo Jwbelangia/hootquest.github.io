@@ -1142,7 +1142,20 @@ function animateHeroCardToModal(sourceImage) {
     }
 
     floatingCard.style.opacity = "0";
-    revealHeroModalContent();
+
+    window.setTimeout(function () {
+      revealHeroModalContent();
+
+      window.setTimeout(function () {
+        if (floatingCard.parentNode) {
+          floatingCard.parentNode.removeChild(floatingCard);
+        }
+
+        if (activeHeroTransition === floatingCard) {
+          activeHeroTransition = null;
+        }
+      }, 120);
+    }, 280);
 
     window.setTimeout(function () {
       if (floatingCard.parentNode) {
@@ -1152,7 +1165,7 @@ function animateHeroCardToModal(sourceImage) {
       if (activeHeroTransition === floatingCard) {
         activeHeroTransition = null;
       }
-    }, 220);
+    }, 520);
   }, 420);
 }
 

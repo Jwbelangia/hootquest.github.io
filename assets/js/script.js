@@ -1291,26 +1291,6 @@ function animateHeroCardToModal(sourceImage, revealToken) {
       return;
     }
 
-function getHeroTransitionTargetRect(sourceRect, targetRect) {
-  const sourceAspectRatio = sourceRect.width / sourceRect.height;
-  const maxWidth = targetRect.width * 0.82;
-  const maxHeight = targetRect.height * 0.92;
-  let width = Math.min(maxWidth, maxHeight * sourceAspectRatio);
-  let height = width / sourceAspectRatio;
-
-  if (height > maxHeight) {
-    height = maxHeight;
-    width = height * sourceAspectRatio;
-  }
-
-  return {
-    left: targetRect.left + (targetRect.width - width) / 2,
-    top: targetRect.top + (targetRect.height - height) / 2,
-    width: width,
-    height: height
-  };
-}
-
     waitForHeroModalReveal(revealToken, function () {
       if (floatingCard !== activeHeroTransition) {
         return;
@@ -1333,6 +1313,26 @@ function getHeroTransitionTargetRect(sourceRect, targetRect) {
       }, 620);
     });
   }, 420);
+}
+
+function getHeroTransitionTargetRect(sourceRect, targetRect) {
+  const sourceAspectRatio = sourceRect.width / sourceRect.height;
+  const maxWidth = targetRect.width * 0.82;
+  const maxHeight = targetRect.height * 0.92;
+  let width = Math.min(maxWidth, maxHeight * sourceAspectRatio);
+  let height = width / sourceAspectRatio;
+
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = height * sourceAspectRatio;
+  }
+
+  return {
+    left: targetRect.left + (targetRect.width - width) / 2,
+    top: targetRect.top + (targetRect.height - height) / 2,
+    width: width,
+    height: height
+  };
 }
 
 function waitForHeroModalReveal(revealToken, callback) {

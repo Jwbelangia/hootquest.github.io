@@ -533,6 +533,11 @@ body {
   margin-block-end: 45px;
 }
 
+.hero-cta-group {
+  display: inline-grid;
+  gap: 14px;
+}
+
 
 
 
@@ -782,10 +787,25 @@ body {
   isolation: isolate;
 }
 
+.hero-modal-media::before {
+  content: "";
+  position: absolute;
+  width: min(100%, 320px);
+  aspect-ratio: 5 / 7;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top, hsla(42, 99%, 46%, 0.14), transparent 48%),
+    linear-gradient(180deg, hsla(277, 25%, 26%, 0.92) 0%, hsla(280, 11%, 12%, 0.96) 100%);
+  border: 1px solid hsla(42, 99%, 46%, 0.16);
+  box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.04), 0 18px 30px hsla(0, 0%, 0%, 0.22);
+  z-index: 0;
+}
+
 .hero-modal-media model-viewer,
 .hero-modal-fallback {
   width: min(100%, 320px);
   max-width: 100%;
+  aspect-ratio: 5 / 7;
   max-height: min(64vh, 700px);
 }
 
@@ -798,13 +818,13 @@ body {
 
 .hero-modal-fallback {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: 50% auto auto 50%;
+  width: min(100%, 320px);
   height: auto;
   object-fit: cover;
   opacity: 0.16;
   filter: grayscale(0.3) brightness(0.55);
+  transform: translate(-50%, -50%);
   z-index: 1;
 }
 
@@ -873,18 +893,22 @@ body {
   }
 
   .hero-modal-media {
-    min-height: min(360px, 52vh);
-    max-height: 52vh;
+    min-height: min(560px, 76vh);
+    max-height: 76vh;
+  }
+
+  .hero-modal-media::before {
+    width: min(100%, 360px);
   }
 
   .hero-modal-media model-viewer,
   .hero-modal-fallback {
-    width: min(100%, 420px);
-    max-height: min(48vh, 520px);
+    width: min(100%, 360px);
+    max-height: min(70vh, 760px);
   }
 
   .hero-modal-media model-viewer {
-    height: min(48vh, 520px);
+    height: min(70vh, 760px);
   }
 }
 
@@ -900,20 +924,24 @@ body {
   }
 
   .hero-modal-media {
-    min-height: min(260px, 34vh);
-    max-height: 34vh;
+    min-height: min(360px, 56vh);
+    max-height: 56vh;
     padding: 14px;
+  }
+
+  .hero-modal-media::before {
+    width: min(100%, 280px);
   }
 
   .hero-modal-media model-viewer,
   .hero-modal-fallback {
     width: min(100%, 280px);
-    max-height: min(30vh, 300px);
+    max-height: min(50vh, 520px);
   }
 
   .hero-modal-media model-viewer {
-    height: min(30vh, 300px);
-    min-height: 180px;
+    height: min(50vh, 520px);
+    min-height: 320px;
   }
 }
 
@@ -1063,6 +1091,19 @@ body {
   transform: translate(-50%, -50%);
   color: var(--marigold);
   font-size: 60px;
+}
+
+.live-match-actions {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 26px;
+}
+
+.live-story-btn {
+  min-width: min(100%, 320px);
+  justify-content: center;
+  padding-inline: 32px;
+  min-height: 56px;
 }
 
 .campaign-story-modal {

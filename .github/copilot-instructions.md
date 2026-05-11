@@ -1,4 +1,4 @@
 # Copilot Instructions
 
 ## Project Guidelines
-- User prefers the top hero-section buttons to keep their original size; only the live-section Learn our story button should be enlarged.
+- Top hero-section buttons should be only slightly taller than their text; only the live-section Learn our story button should be larger.

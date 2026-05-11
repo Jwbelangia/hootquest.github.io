@@ -538,6 +538,11 @@ body {
   gap: 9px;
 }
 
+.hero-cta-group .btn {
+  min-height: 44px;
+  padding-inline: 28px;
+}
+
 
 
 

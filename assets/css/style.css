@@ -717,11 +717,13 @@ body {
   width: min(960px, 100%);
   display: grid;
   gap: 24px;
+  max-height: calc(100vh - 40px);
   background: linear-gradient(180deg, hsl(280, 11%, 15%) 0%, hsl(277, 25%, 9%) 100%);
   border: 1px solid hsla(42, 99%, 46%, 0.18);
   border-radius: 28px;
   padding: 28px;
   box-shadow: 0 20px 40px hsla(0, 0%, 0%, 0.4);
+  overflow-y: auto;
 }
 
 .hero-modal-close {
@@ -749,7 +751,8 @@ body {
 }
 
 .hero-modal-media {
-  min-height: 320px;
+  min-height: min(320px, 42vh);
+  max-height: 52vh;
   border-radius: 24px;
   background:
     radial-gradient(circle at top, hsla(42, 99%, 46%, 0.16), transparent 46%),
@@ -762,12 +765,18 @@ body {
 
 .hero-modal-media model-viewer,
 .hero-modal-fallback {
-  width: 100%;
-  height: 100%;
-  min-height: 280px;
+  width: min(100%, 320px);
+  max-width: 100%;
+  max-height: min(48vh, 480px);
+}
+
+.hero-modal-media model-viewer {
+  height: min(48vh, 480px);
+  min-height: 220px;
 }
 
 .hero-modal-fallback {
+  height: auto;
   object-fit: contain;
 }
 
@@ -801,6 +810,28 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .hero-modal-dialog {
+    grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+  }
+
+  .hero-modal-media {
+    min-height: min(420px, 60vh);
+    max-height: 60vh;
+  }
+
+  .hero-modal-media model-viewer,
+  .hero-modal-fallback {
+    width: min(100%, 360px);
+    max-height: min(56vh, 560px);
+  }
+
+  .hero-modal-media model-viewer {
+    height: min(56vh, 560px);
+  }
 }
 
 .payment-modal-dialog {

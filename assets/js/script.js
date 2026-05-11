@@ -202,7 +202,7 @@ const packageCatalog = [
     description: "Made-to-order rogue figurine for OwlCrest supporters.",
     heroName: "Rogue",
     fallbackImage: "./assets/images/RogueV3.png",
-    modelSrc: "",
+    modelSrc: "./assets/models/Rogue.glb",
     hiddenFromForm: true
   },
   {
@@ -212,7 +212,7 @@ const packageCatalog = [
     description: "Made-to-order mage figurine for OwlCrest supporters.",
     heroName: "Mage",
     fallbackImage: "./assets/images/MageV3.png",
-    modelSrc: "",
+    modelSrc: "./assets/models/Mage.glb",
     hiddenFromForm: true
   },
   {
@@ -222,7 +222,7 @@ const packageCatalog = [
     description: "Made-to-order healer figurine for OwlCrest supporters.",
     heroName: "Healer",
     fallbackImage: "./assets/images/HealerV3.png",
-    modelSrc: "",
+    modelSrc: "./assets/models/Healer.glb",
     hiddenFromForm: true
   },
   {
@@ -232,7 +232,7 @@ const packageCatalog = [
     description: "Made-to-order tank figurine for OwlCrest supporters.",
     heroName: "Tank",
     fallbackImage: "./assets/images/TankV3.png",
-    modelSrc: "",
+    modelSrc: "./assets/models/Tank.glb",
     hiddenFromForm: true
   },
   {
@@ -242,7 +242,7 @@ const packageCatalog = [
     description: "Made-to-order archer figurine for OwlCrest supporters.",
     heroName: "Archer",
     fallbackImage: "./assets/images/ArcherV3.png",
-    modelSrc: "",
+    modelSrc: "./assets/models/Archer.glb",
     hiddenFromForm: true
   }
   // Example item format for future uploads:

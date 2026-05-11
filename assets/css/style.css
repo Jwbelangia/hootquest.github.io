@@ -701,6 +701,11 @@ body {
   padding: 20px;
 }
 
+.hero-modal.is-entering .hero-modal-overlay,
+.hero-modal.is-entering .hero-modal-dialog {
+  opacity: 0;
+}
+
 .hero-modal[hidden] {
   display: none;
 }
@@ -710,11 +715,12 @@ body {
   inset: 0;
   background-color: hsla(280, 37%, 8%, 0.86);
   backdrop-filter: blur(6px);
+  transition: opacity 220ms ease;
 }
 
 .hero-modal-dialog {
   position: relative;
-  width: min(960px, 100%);
+  width: min(1040px, 100%);
   display: grid;
   gap: 24px;
   max-height: calc(100vh - 40px);
@@ -724,6 +730,7 @@ body {
   padding: 28px;
   box-shadow: 0 20px 40px hsla(0, 0%, 0%, 0.4);
   overflow-y: auto;
+  transition: opacity 220ms ease;
 }
 
 .hero-modal-close {
@@ -751,8 +758,8 @@ body {
 }
 
 .hero-modal-media {
-  min-height: min(320px, 42vh);
-  max-height: 52vh;
+  min-height: min(300px, 38vh);
+  max-height: 46vh;
   border-radius: 24px;
   background:
     radial-gradient(circle at top, hsla(42, 99%, 46%, 0.16), transparent 46%),
@@ -765,19 +772,45 @@ body {
 
 .hero-modal-media model-viewer,
 .hero-modal-fallback {
-  width: min(100%, 320px);
+  width: min(100%, 340px);
   max-width: 100%;
-  max-height: min(48vh, 480px);
+  max-height: min(42vh, 420px);
 }
 
 .hero-modal-media model-viewer {
-  height: min(48vh, 480px);
-  min-height: 220px;
+  height: min(42vh, 420px);
+  min-height: 200px;
 }
 
 .hero-modal-fallback {
   height: auto;
   object-fit: contain;
+}
+
+.hero-modal-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-modal-floating-card {
+  position: fixed;
+  z-index: 10;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 18px 36px hsla(0, 0%, 0%, 0.35);
+  pointer-events: none;
+  transform-origin: top left;
+  transition:
+    transform 460ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease;
+}
+
+.hero-modal-floating-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .hero-modal-subtitle {
@@ -814,23 +847,52 @@ body {
 
 @media (min-width: 768px) {
   .hero-modal-dialog {
-    grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
     align-items: center;
   }
 
   .hero-modal-media {
-    min-height: min(420px, 60vh);
-    max-height: 60vh;
+    min-height: min(360px, 52vh);
+    max-height: 52vh;
   }
 
   .hero-modal-media model-viewer,
   .hero-modal-fallback {
-    width: min(100%, 360px);
-    max-height: min(56vh, 560px);
+    width: min(100%, 420px);
+    max-height: min(48vh, 520px);
   }
 
   .hero-modal-media model-viewer {
-    height: min(56vh, 560px);
+    height: min(48vh, 520px);
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-modal {
+    padding: 12px;
+  }
+
+  .hero-modal-dialog {
+    padding: 20px;
+    gap: 18px;
+    max-height: calc(100vh - 24px);
+  }
+
+  .hero-modal-media {
+    min-height: min(260px, 34vh);
+    max-height: 34vh;
+    padding: 14px;
+  }
+
+  .hero-modal-media model-viewer,
+  .hero-modal-fallback {
+    width: min(100%, 280px);
+    max-height: min(30vh, 300px);
+  }
+
+  .hero-modal-media model-viewer {
+    height: min(30vh, 300px);
+    min-height: 180px;
   }
 }
 

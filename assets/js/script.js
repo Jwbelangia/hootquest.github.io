@@ -115,6 +115,8 @@ const heroModalFallback = document.querySelector("[data-hero-model-fallback]");
 const heroFormatNote = document.querySelector("[data-hero-format-note]");
 const heroAddToCartButton = document.querySelector("[data-hero-add-to-cart]");
 const heroModalCloseButtons = document.querySelectorAll("[data-hero-modal-close]");
+const heroModalDialog = heroModal?.querySelector(".hero-modal-dialog");
+const heroModalMedia = heroModal?.querySelector(".hero-modal-media");
 const paymentModal = document.querySelector("[data-payment-modal]");
 const paymentModalTitle = document.querySelector("[data-payment-modal-title]");
 const paymentModalText = document.querySelector("[data-payment-modal-text]");
@@ -132,6 +134,7 @@ let abandonedCartTimerId = null;
 let draftHoldSent = false;
 let lastDraftHash = "";
 let activeHeroProductId = "";
+let activeHeroTransition = null;
 const heroCartSelections = {};
 const figurineCartSelections = {};
 
@@ -277,11 +280,12 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
     heroTriggers[i].addEventListener("click", function (event) {
       event.preventDefault();
       const card = this.closest(".latest-game-card");
+      const cardImage = card?.querySelector("img");
       const heroName = card?.querySelector("img")?.getAttribute("alt")?.trim() || "Hero";
       const image = card?.querySelector("img")?.getAttribute("src") || "";
       const product = findHeroProduct(heroName);
 
-      openHeroModal(product, heroName, image);
+      openHeroModal(product, heroName, image, cardImage);
     });
   }
 
@@ -1042,20 +1046,24 @@ function findFigurineProduct(figurineName) {
   });
 }
 
-function openHeroModal(product, title, image) {
+function openHeroModal(product, title, image, sourceImage) {
   if (!heroModal || !product) {
     return;
   }
+
+  cleanupHeroTransition();
 
   activeHeroProductId = product.id;
   heroModal.hidden = false;
   document.body.style.overflow = "hidden";
   heroModalTitle.textContent = title;
+  heroModal.classList.add("is-entering");
 
   if (heroModalViewer) {
     if (product.modelSrc) {
       heroModalViewer.src = product.modelSrc;
       heroModalViewer.poster = image || product.fallbackImage || "";
+      heroModalViewer.removeAttribute("camera-controls");
       heroModalViewer.hidden = false;
       heroFormatNote.hidden = true;
     } else {
@@ -1068,7 +1076,13 @@ function openHeroModal(product, title, image) {
   if (heroModalFallback) {
     heroModalFallback.src = product.fallbackImage || image || "";
     heroModalFallback.alt = title;
-    heroModalFallback.hidden = false;
+    heroModalFallback.hidden = Boolean(product.modelSrc);
+  }
+
+  if (sourceImage && heroModalMedia) {
+    animateHeroCardToModal(sourceImage);
+  } else {
+    revealHeroModalContent();
   }
 }
 
@@ -1077,9 +1091,89 @@ function closeHeroModal() {
     return;
   }
 
+  cleanupHeroTransition();
   heroModal.hidden = true;
+  heroModal.classList.remove("is-entering");
   document.body.style.overflow = "";
   activeHeroProductId = "";
+}
+
+function animateHeroCardToModal(sourceImage) {
+  if (!heroModalMedia || !heroModalDialog) {
+    revealHeroModalContent();
+    return;
+  }
+
+  const sourceRect = sourceImage.getBoundingClientRect();
+  const targetRect = heroModalMedia.getBoundingClientRect();
+
+  if (!sourceRect.width || !sourceRect.height || !targetRect.width || !targetRect.height) {
+    revealHeroModalContent();
+    return;
+  }
+
+  const floatingCard = document.createElement("div");
+  const floatingImage = document.createElement("img");
+  floatingCard.className = "hero-modal-floating-card";
+  floatingImage.src = sourceImage.currentSrc || sourceImage.src;
+  floatingImage.alt = sourceImage.alt || "Hero";
+  floatingCard.appendChild(floatingImage);
+  document.body.appendChild(floatingCard);
+
+  floatingCard.style.left = `${sourceRect.left}px`;
+  floatingCard.style.top = `${sourceRect.top}px`;
+  floatingCard.style.width = `${sourceRect.width}px`;
+  floatingCard.style.height = `${sourceRect.height}px`;
+
+  activeHeroTransition = floatingCard;
+
+  requestAnimationFrame(function () {
+    const scaleX = targetRect.width / sourceRect.width;
+    const scaleY = targetRect.height / sourceRect.height;
+    const translateX = targetRect.left - sourceRect.left;
+    const translateY = targetRect.top - sourceRect.top;
+
+    floatingCard.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
+  });
+
+  window.setTimeout(function () {
+    if (floatingCard !== activeHeroTransition) {
+      return;
+    }
+
+    floatingCard.style.opacity = "0";
+    revealHeroModalContent();
+
+    window.setTimeout(function () {
+      if (floatingCard.parentNode) {
+        floatingCard.parentNode.removeChild(floatingCard);
+      }
+
+      if (activeHeroTransition === floatingCard) {
+        activeHeroTransition = null;
+      }
+    }, 220);
+  }, 420);
+}
+
+function revealHeroModalContent() {
+  if (!heroModal) {
+    return;
+  }
+
+  heroModal.classList.remove("is-entering");
+}
+
+function cleanupHeroTransition() {
+  if (!activeHeroTransition) {
+    return;
+  }
+
+  if (activeHeroTransition.parentNode) {
+    activeHeroTransition.parentNode.removeChild(activeHeroTransition);
+  }
+
+  activeHeroTransition = null;
 }
 
 function openPaymentModal(title, message) {

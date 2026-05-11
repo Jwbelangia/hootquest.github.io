@@ -779,6 +779,7 @@ body {
   display: grid;
   place-items: center;
   padding: 20px;
+  isolation: isolate;
 }
 
 .hero-modal-media model-viewer,
@@ -791,11 +792,20 @@ body {
 .hero-modal-media model-viewer {
   height: min(42vh, 420px);
   min-height: 200px;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-modal-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   height: auto;
-  object-fit: contain;
+  object-fit: cover;
+  opacity: 0.16;
+  filter: grayscale(0.3) brightness(0.55);
+  z-index: 1;
 }
 
 .hero-modal-content {

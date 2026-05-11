@@ -135,6 +135,7 @@ let draftHoldSent = false;
 let lastDraftHash = "";
 let activeHeroProductId = "";
 let activeHeroTransition = null;
+let activeHeroRevealToken = 0;
 const heroCartSelections = {};
 const figurineCartSelections = {};
 
@@ -1052,37 +1053,56 @@ function openHeroModal(product, title, image, sourceImage) {
   }
 
   cleanupHeroTransition();
+  activeHeroRevealToken += 1;
+  const revealToken = activeHeroRevealToken;
 
   activeHeroProductId = product.id;
   heroModal.hidden = false;
-  document.body.style.overflow = "hidden";
+  lockBodyScroll();
   heroModalTitle.textContent = title;
   heroModal.classList.add("is-entering");
 
   if (heroModalViewer) {
     if (product.modelSrc) {
+      heroModalViewer.hidden = true;
+      heroModalViewer.removeAttribute("src");
       heroModalViewer.src = product.modelSrc;
       heroModalViewer.poster = image || product.fallbackImage || "";
       heroModalViewer.removeAttribute("camera-controls");
-      heroModalViewer.hidden = false;
       heroFormatNote.hidden = true;
+
+      const handleModelLoad = function () {
+        heroModalViewer.removeEventListener("load", handleModelLoad);
+
+        if (revealToken !== activeHeroRevealToken) {
+          return;
+        }
+
+        heroModalViewer.hidden = false;
+        markHeroModelReady(revealToken);
+      };
+
+      heroModalViewer.addEventListener("load", handleModelLoad, { once: true });
     } else {
       heroModalViewer.removeAttribute("src");
       heroModalViewer.hidden = true;
       heroFormatNote.hidden = false;
+      markHeroModelReady(revealToken);
     }
+  } else {
+    markHeroModelReady(revealToken);
   }
 
   if (heroModalFallback) {
     heroModalFallback.src = product.fallbackImage || image || "";
     heroModalFallback.alt = title;
-    heroModalFallback.hidden = Boolean(product.modelSrc);
+    heroModalFallback.hidden = false;
   }
 
   if (sourceImage && heroModalMedia) {
-    animateHeroCardToModal(sourceImage);
+    animateHeroCardToModal(sourceImage, revealToken);
   } else {
-    revealHeroModalContent();
+    waitForHeroModalReveal(revealToken);
   }
 }
 
@@ -1094,13 +1114,14 @@ function closeHeroModal() {
   cleanupHeroTransition();
   heroModal.hidden = true;
   heroModal.classList.remove("is-entering");
-  document.body.style.overflow = "";
+  unlockBodyScroll();
   activeHeroProductId = "";
+  activeHeroRevealToken += 1;
 }
 
-function animateHeroCardToModal(sourceImage) {
+function animateHeroCardToModal(sourceImage, revealToken) {
   if (!heroModalMedia || !heroModalDialog) {
-    revealHeroModalContent();
+    waitForHeroModalReveal(revealToken);
     return;
   }
 

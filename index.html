@@ -390,7 +390,7 @@
                             <img src="./assets/images/Play.png" width="600" height="400" loading="lazy"
                                  alt="Live Match Video" class="img-cover">
 
-                            <button class="play-btn" aria-label="play video">
+                            <button class="play-btn" aria-label="open campaign story" data-campaign-story-open>
                                 <ion-icon name="play"></ion-icon>
                             </button>
 
@@ -1074,6 +1074,116 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <div class="campaign-story-modal" data-campaign-story-modal hidden>
+        <div class="campaign-story-overlay" data-campaign-story-close></div>
+
+        <aside class="campaign-story-panel" role="dialog" aria-modal="true" aria-labelledby="campaign-story-title">
+            <button class="hero-modal-close" type="button" aria-label="Close campaign story" data-campaign-story-close>
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+
+            <div class="campaign-story-inner">
+                <div class="campaign-story-hero">
+                    <div>
+                        <p class="hero-modal-subtitle">Kickstarter Vision</p>
+                        <h3 class="h2" id="campaign-story-title">Hoot Quest — Story & Campaign</h3>
+                        <p class="hero-modal-text">A cinematic introduction to Owlcrest, the long road behind the project, and the future you are helping build.</p>
+                    </div>
+
+                    <div class="campaign-story-placeholder">Game Logo</div>
+                </div>
+
+                <section class="campaign-story-section-block">
+                    <div class="campaign-story-copy">
+                        <p class="hero-modal-subtitle">The Story Behind</p>
+                        <h4 class="h3">Hoot Quest</h4>
+                        <p class="hero-modal-text">More than 13 years ago, Hoot Quest began as a rough concept created by a college student with a passion for storytelling and game design.</p>
+                        <p class="hero-modal-text">What started as the idea for a video game slowly evolved into something far larger — a dark fantasy world filled with heroes, monsters, mysteries, and survival.</p>
+                        <p class="hero-modal-text">Now, after years of development, Hoot Quest is finally becoming reality.</p>
+                    </div>
+
+                    <div class="campaign-story-placeholder">Cinematic Story Image</div>
+                </section>
+
+                <section class="campaign-story-section-block timeline-block">
+                    <div class="campaign-story-heading">
+                        <p class="hero-modal-subtitle">From Concept to Tabletop</p>
+                        <h4 class="h3">The Journey</h4>
+                    </div>
+
+                    <div class="campaign-timeline-grid">
+                        <article class="campaign-timeline-card">
+                            <div class="campaign-story-placeholder small">Company Logo</div>
+                            <h5 class="h3">The Beginning</h5>
+                            <p class="campaign-story-meta">13+ years ago</p>
+                            <p class="hero-modal-text">The first version of Hoot Quest started as a personal passion project centered around storytelling and immersive worldbuilding.</p>
+                        </article>
+
+                        <article class="campaign-timeline-card">
+                            <div class="campaign-story-placeholder small">Hero Cards</div>
+                            <h5 class="h3">Development</h5>
+                            <p class="campaign-story-meta">August 2025</p>
+                            <p class="hero-modal-text">The tabletop adaptation entered development with redesigned mechanics, cooperative systems, miniatures, and encounter progression.</p>
+                        </article>
+
+                        <article class="campaign-timeline-card">
+                            <div class="campaign-story-placeholder small">Miniature Model</div>
+                            <h5 class="h3">Today</h5>
+                            <p class="campaign-story-meta">Launching Now</p>
+                            <p class="hero-modal-text">After testing and iteration, Hoot Quest is ready to grow into a full fantasy tabletop experience.</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="campaign-story-section-block support-block">
+                    <div class="campaign-story-heading">
+                        <p class="hero-modal-subtitle">Why We Need Your Support</p>
+                        <h4 class="h3">What Funding Helps Us Do</h4>
+                    </div>
+
+                    <div class="campaign-feature-grid">
+                        <div class="campaign-feature-card"><span>Expand production capacity</span></div>
+                        <div class="campaign-feature-card"><span>Reduce manufacturing time</span></div>
+                        <div class="campaign-feature-card"><span>Improve miniature quality</span></div>
+                        <div class="campaign-feature-card"><span>Upgrade packaging and components</span></div>
+                        <div class="campaign-feature-card"><span>Develop future expansions</span></div>
+                        <div class="campaign-feature-card"><span>Build larger campaigns and lore</span></div>
+                    </div>
+                </section>
+
+                <section class="campaign-story-section-block future-block">
+                    <div class="campaign-story-copy full">
+                        <p class="hero-modal-subtitle">Owlcrest Is Only the Beginning</p>
+                        <h4 class="h3">The Future of the World</h4>
+                        <p class="hero-modal-text">The first campaign introduces players to Owlcrest — a village surrounded by corruption, danger, and ancient mysteries. Future expansions will introduce new regions, additional heroes, larger enemy factions, deeper lore, and expanding storylines across the greater world.</p>
+                    </div>
+
+                    <div class="campaign-story-placeholder wide">World Map / Cinematic Expansion Art</div>
+                </section>
+
+                <section class="campaign-story-section-block thankyou-block">
+                    <div class="campaign-story-copy full">
+                        <p class="hero-modal-subtitle">Thank You For Believing In Hoot Quest</p>
+                        <h4 class="h3">Join the Journey</h4>
+                        <p class="hero-modal-text">Whether you support the campaign, share the game with friends, or simply follow our progress, your support means everything to us. We have spent years building this world, and we are excited to finally place it in your hands.</p>
+                    </div>
+
+                    <div class="campaign-story-actions">
+                        <a href="https://www.kickstarter.com/profile/playforge" class="btn skewBg">
+                            <span class="span">Support the Campaign</span>
+                            <ion-icon name="rocket-outline" aria-hidden="true"></ion-icon>
+                        </a>
+
+                        <button type="button" class="btn skewBg" data-campaign-story-close>
+                            <span class="span">Back to Site</span>
+                            <ion-icon name="arrow-forward-outline" aria-hidden="true"></ion-icon>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </aside>
     </div>
 
     <iframe name="newsletter-submit-frame" hidden title="Newsletter submission"></iframe>

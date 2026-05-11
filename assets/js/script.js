@@ -117,6 +117,9 @@ const heroAddToCartButton = document.querySelector("[data-hero-add-to-cart]");
 const heroModalCloseButtons = document.querySelectorAll("[data-hero-modal-close]");
 const heroModalDialog = heroModal?.querySelector(".hero-modal-dialog");
 const heroModalMedia = heroModal?.querySelector(".hero-modal-media");
+const campaignStoryModal = document.querySelector("[data-campaign-story-modal]");
+const campaignStoryOpenButtons = document.querySelectorAll("[data-campaign-story-open]");
+const campaignStoryCloseButtons = document.querySelectorAll("[data-campaign-story-close]");
 const paymentModal = document.querySelector("[data-payment-modal]");
 const paymentModalTitle = document.querySelector("[data-payment-modal-title]");
 const paymentModalText = document.querySelector("[data-payment-modal-text]");
@@ -312,6 +315,18 @@ if (paymentModal) {
   }
 }
 
+if (campaignStoryModal) {
+  for (let i = 0; i < campaignStoryOpenButtons.length; i++) {
+    campaignStoryOpenButtons[i].addEventListener("click", function () {
+      openCampaignStoryModal();
+    });
+  }
+
+  for (let i = 0; i < campaignStoryCloseButtons.length; i++) {
+    campaignStoryCloseButtons[i].addEventListener("click", closeCampaignStoryModal);
+  }
+}
+
 if (figurineModal) {
   for (let i = 0; i < figurineModalCloseButtons.length; i++) {
     figurineModalCloseButtons[i].addEventListener("click", closeFigurineModal);
@@ -347,6 +362,10 @@ document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     if (heroModal && !heroModal.hidden) {
       closeHeroModal();
+    }
+
+    if (campaignStoryModal && !campaignStoryModal.hidden) {
+      closeCampaignStoryModal();
     }
 
     if (paymentModal && !paymentModal.hidden) {
@@ -1119,6 +1138,34 @@ function closeHeroModal() {
   activeHeroRevealToken += 1;
 }
 
+function openCampaignStoryModal() {
+  if (!campaignStoryModal) {
+    return;
+  }
+
+  campaignStoryModal.hidden = false;
+  lockBodyScroll();
+
+  requestAnimationFrame(function () {
+    campaignStoryModal.classList.add("is-open");
+  });
+}
+
+function closeCampaignStoryModal() {
+  if (!campaignStoryModal) {
+    return;
+  }
+
+  campaignStoryModal.classList.remove("is-open");
+
+  window.setTimeout(function () {
+    if (!campaignStoryModal.classList.contains("is-open")) {
+      campaignStoryModal.hidden = true;
+      unlockBodyScroll();
+    }
+  }, 380);
+}
+
 function animateHeroCardToModal(sourceImage, revealToken) {
   if (!heroModalMedia || !heroModalDialog) {
     waitForHeroModalReveal(revealToken);
@@ -1162,10 +1209,16 @@ function animateHeroCardToModal(sourceImage, revealToken) {
       return;
     }
 
-    floatingCard.style.opacity = "0";
+    waitForHeroModalReveal(revealToken, function () {
+      if (floatingCard !== activeHeroTransition) {
+        return;
+      }
 
-    window.setTimeout(function () {
-      revealHeroModalContent();
+      floatingCard.style.opacity = "0";
+
+      window.setTimeout(function () {
+        revealHeroModalContent();
+      }, 220);
 
       window.setTimeout(function () {
         if (floatingCard.parentNode) {
@@ -1175,19 +1228,35 @@ function animateHeroCardToModal(sourceImage, revealToken) {
         if (activeHeroTransition === floatingCard) {
           activeHeroTransition = null;
         }
-      }, 120);
-    }, 280);
-
-    window.setTimeout(function () {
-      if (floatingCard.parentNode) {
-        floatingCard.parentNode.removeChild(floatingCard);
-      }
-
-      if (activeHeroTransition === floatingCard) {
-        activeHeroTransition = null;
-      }
-    }, 520);
+      }, 620);
+    });
   }, 420);
+}
+
+function waitForHeroModalReveal(revealToken, callback) {
+  if (revealToken !== activeHeroRevealToken) {
+    return;
+  }
+
+  if (heroModal?.dataset.modelReady === String(revealToken)) {
+    if (typeof callback === "function") {
+      callback();
+    }
+
+    return;
+  }
+
+  window.setTimeout(function () {
+    waitForHeroModalReveal(revealToken, callback);
+  }, 40);
+}
+
+function markHeroModelReady(revealToken) {
+  if (!heroModal || revealToken !== activeHeroRevealToken) {
+    return;
+  }
+
+  heroModal.dataset.modelReady = String(revealToken);
 }
 
 function revealHeroModalContent() {
@@ -1199,6 +1268,10 @@ function revealHeroModalContent() {
 }
 
 function cleanupHeroTransition() {
+  if (heroModal) {
+    delete heroModal.dataset.modelReady;
+  }
+
   if (!activeHeroTransition) {
     return;
   }
@@ -1208,6 +1281,17 @@ function cleanupHeroTransition() {
   }
 
   activeHeroTransition = null;
+}
+
+function lockBodyScroll() {
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  document.body.style.paddingRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : "";
+}
+
+function unlockBodyScroll() {
+  document.body.style.overflow = "";
+  document.body.style.paddingRight = "";
 }
 
 function openPaymentModal(title, message) {

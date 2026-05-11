@@ -127,6 +127,8 @@ const paymentModalCloseButtons = document.querySelectorAll("[data-payment-modal-
 const figurineModal = document.querySelector("[data-figurine-modal]");
 const figurineModalCloseButtons = document.querySelectorAll("[data-figurine-modal-close]");
 const figurineOptionInputs = document.querySelectorAll("[data-figurine-option]");
+const figurineAdjustButtons = document.querySelectorAll("[data-figurine-adjust]");
+const figurineQuantityDisplays = document.querySelectorAll("[data-figurine-quantity]");
 const figurineSubmitButton = document.querySelector("[data-figurine-submit]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
@@ -332,20 +334,29 @@ if (figurineModal) {
     figurineModalCloseButtons[i].addEventListener("click", closeFigurineModal);
   }
 
+  for (let i = 0; i < figurineAdjustButtons.length; i++) {
+    figurineAdjustButtons[i].addEventListener("click", function () {
+      const figurineName = this.dataset.figurineOption;
+      const delta = Number(this.dataset.figurineAdjust || 0);
+      updateFigurinePickerQuantity(figurineName, delta);
+    });
+  }
+
   figurineSubmitButton?.addEventListener("click", function () {
     let hasSelection = false;
 
     for (let i = 0; i < figurineOptionInputs.length; i++) {
-      const input = figurineOptionInputs[i];
-      const quantity = Number(input.value || 0);
-      const product = findFigurineProduct(input.dataset.figurineOption);
+      const option = figurineOptionInputs[i];
+      const figurineName = option.dataset.figurineOption;
+      const quantity = getFigurinePickerQuantity(figurineName);
+      const product = findFigurineProduct(figurineName);
 
       if (!product || quantity <= 0) {
         continue;
       }
 
       figurineCartSelections[product.id] = Number(figurineCartSelections[product.id] || 0) + quantity;
-      input.value = "0";
+      setFigurinePickerQuantity(figurineName, 0);
       hasSelection = true;
     }
 
@@ -417,6 +428,25 @@ if (orderHub && orderForm) {
   orderForm.addEventListener("change", function () {
     persistOrderDraft();
     refreshCartState();
+  });
+
+  heroCartList?.addEventListener("click", function (event) {
+    const removeButton = event.target.closest("[data-cart-remove]");
+
+    if (!removeButton) {
+      return;
+    }
+
+    const productId = removeButton.dataset.cartRemove;
+    const source = removeButton.dataset.cartSource;
+
+    if (source === "figurine") {
+      delete figurineCartSelections[productId];
+    } else if (source === "hero") {
+      delete heroCartSelections[productId];
+    }
+
+    orderForm.dispatchEvent(new Event("input", { bubbles: true }));
   });
 
   orderForm.addEventListener("submit", async function (event) {
@@ -513,7 +543,7 @@ if (orderHub && orderForm) {
       const lineTotal = product.price * quantity;
       pretaxTotal += lineTotal;
       itemCount += quantity;
-      selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
+      selectedItems.push(`${getCartProductName(product)} x${quantity} ($${lineTotal.toFixed(2)})`);
     }
 
     const figurineSelectionIds = Object.keys(figurineCartSelections);
@@ -532,9 +562,11 @@ if (orderHub && orderForm) {
       const lineTotal = product.price * quantity;
       pretaxTotal += lineTotal;
       itemCount += quantity;
-      selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
+      selectedItems.push(`${getCartProductName(product)} x${quantity} ($${lineTotal.toFixed(2)})`);
       heroItems.push({
-        name: product.name,
+        id: product.id,
+        source: "figurine",
+        name: getCartProductName(product),
         quantity: quantity,
         total: lineTotal
       });
@@ -556,9 +588,11 @@ if (orderHub && orderForm) {
       const lineTotal = product.price * quantity;
       pretaxTotal += lineTotal;
       itemCount += quantity;
-      selectedItems.push(`${product.name} x${quantity} ($${lineTotal.toFixed(2)})`);
+      selectedItems.push(`${getCartProductName(product)} x${quantity} ($${lineTotal.toFixed(2)})`);
       heroItems.push({
-        name: product.name,
+        id: product.id,
+        source: "hero",
+        name: getCartProductName(product),
         quantity: quantity,
         total: lineTotal
       });
@@ -572,7 +606,7 @@ if (orderHub && orderForm) {
     if (heroCartSummary && heroCartList) {
       if (heroItems.length) {
         heroCartList.innerHTML = heroItems.map(function (item) {
-          return `<li><span>${item.name} x${item.quantity}</span><span>$${item.total.toFixed(2)}</span></li>`;
+          return `<li><span>${item.name} x${item.quantity}</span><span>$${item.total.toFixed(2)}</span><button type="button" class="hero-cart-remove" data-cart-remove="${item.id}" data-cart-source="${item.source}" aria-label="Remove ${item.name} from cart">×</button></li>`;
         }).join("");
         heroCartSummary.hidden = false;
       } else {
@@ -846,6 +880,8 @@ if (orderHub && orderForm) {
     for (let i = 0; i < figurineSelectionIds.length; i++) {
       delete figurineCartSelections[figurineSelectionIds[i]];
     }
+
+    resetFigurinePickerQuantities();
   }
 }
 
@@ -915,6 +951,50 @@ if (orderHub && orderStatusForm) {
       }
     }
   });
+}
+
+function getCartProductName(product) {
+  if (!product) {
+    return "Figurine";
+  }
+
+  if (product.heroName) {
+    return `${product.heroName} Figurine`;
+  }
+
+  if (product.figurineName) {
+    return `${product.figurineName} Figurine`;
+  }
+
+  return product.name;
+}
+
+function getFigurinePickerDisplay(figurineName) {
+  return document.querySelector(`[data-figurine-quantity="${figurineName}"]`);
+}
+
+function getFigurinePickerQuantity(figurineName) {
+  const display = getFigurinePickerDisplay(figurineName);
+  return Number(display?.textContent || 0);
+}
+
+function setFigurinePickerQuantity(figurineName, quantity) {
+  const display = getFigurinePickerDisplay(figurineName);
+
+  if (display) {
+    display.textContent = String(Math.max(0, quantity));
+  }
+}
+
+function updateFigurinePickerQuantity(figurineName, delta) {
+  const nextQuantity = getFigurinePickerQuantity(figurineName) + Number(delta || 0);
+  setFigurinePickerQuantity(figurineName, nextQuantity);
+}
+
+function resetFigurinePickerQuantities() {
+  for (let i = 0; i < figurineQuantityDisplays.length; i++) {
+    figurineQuantityDisplays[i].textContent = "0";
+  }
 }
 
 async function submitOrderPayload(payload) {
@@ -1180,6 +1260,8 @@ function animateHeroCardToModal(sourceImage, revealToken) {
     return;
   }
 
+  const targetCardRect = getHeroTransitionTargetRect(sourceRect, targetRect);
+
   const floatingCard = document.createElement("div");
   const floatingImage = document.createElement("img");
   floatingCard.className = "hero-modal-floating-card";
@@ -1196,10 +1278,10 @@ function animateHeroCardToModal(sourceImage, revealToken) {
   activeHeroTransition = floatingCard;
 
   requestAnimationFrame(function () {
-    const scaleX = targetRect.width / sourceRect.width;
-    const scaleY = targetRect.height / sourceRect.height;
-    const translateX = targetRect.left - sourceRect.left;
-    const translateY = targetRect.top - sourceRect.top;
+    const scaleX = targetCardRect.width / sourceRect.width;
+    const scaleY = targetCardRect.height / sourceRect.height;
+    const translateX = targetCardRect.left - sourceRect.left;
+    const translateY = targetCardRect.top - sourceRect.top;
 
     floatingCard.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})`;
   });
@@ -1208,6 +1290,26 @@ function animateHeroCardToModal(sourceImage, revealToken) {
     if (floatingCard !== activeHeroTransition) {
       return;
     }
+
+function getHeroTransitionTargetRect(sourceRect, targetRect) {
+  const sourceAspectRatio = sourceRect.width / sourceRect.height;
+  const maxWidth = targetRect.width * 0.82;
+  const maxHeight = targetRect.height * 0.92;
+  let width = Math.min(maxWidth, maxHeight * sourceAspectRatio);
+  let height = width / sourceAspectRatio;
+
+  if (height > maxHeight) {
+    height = maxHeight;
+    width = height * sourceAspectRatio;
+  }
+
+  return {
+    left: targetRect.left + (targetRect.width - width) / 2,
+    top: targetRect.top + (targetRect.height - height) / 2,
+    width: width,
+    height: height
+  };
+}
 
     waitForHeroModalReveal(revealToken, function () {
       if (floatingCard !== activeHeroTransition) {

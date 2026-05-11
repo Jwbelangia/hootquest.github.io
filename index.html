@@ -2,43 +2,42 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Playforge Entertainment - HootQuest - Owlcrest needs heros</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playforge Entertainment - HootQuest - Owlcrest needs heros</title>
 
-  <!-- 
-    - favicon
-  -->
-  <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml">
+    <!--
+      - favicon
+    -->
+    <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml">
 
-  <!-- 
-    - custom css link
-  -->
-  <link rel="stylesheet" href="./assets/css/style.css">
+    <!--
+      - custom css link
+    -->
+    <link rel="stylesheet" href="./assets/css/style.css">
 
-  <!-- 
-    - google font link
-  -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"> 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Oxanium:wght@600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+    <!--
+      - google font link
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XKEK5JCZ6D"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XKEK5JCZ6D"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-XKEK5JCZ6D');
-  </script>
-
-  <!-- 
-    - preload images
-  -->
+        gtag('config', 'G-XKEK5JCZ6D');
+    </script>
+    <meta name="websitelaunches-verification" content="b83120e28083c4f4646a99b060d87821">
+    <!--
+      - preload images
+    -->
 </head>
 
 <body id="top">
@@ -169,7 +168,7 @@
                         </h1>
 
                         <p class="hero-text">
-                            “Save Owlcrest from the vermin horde — assemble your murder of heroic owls and master brutal pattern tactics.”
+                            “Save Owlcrest from the vermin horde — assemble your parliament of heroic owls and master brutal pattern tactics.”
                         </p>
 
                         <buttonref href="https://www.kickstarter.com/profile/playforge" class="btn skewBg">Support Owlcrest</buttonref>
@@ -914,12 +913,12 @@
 
                     <div class="social-wrapper">
 
-                        <p class="footer-list-title">Follow Us</p>
+                        <p class="footer-list-title">Message Us</p>
 
                         <ul class="social-list">
 
                             <li>
-                                <a href="http://m.me/PlayforgeEntertainment?text=Hello%20Playforge%20Entertainment..." class="social-link" style="background-color: #3b5998">
+                                <a href="https://www.facebook.com/PlayforgeEntertainment" class="social-link" style="background-color: #3b5998" target="_blank" rel="noopener noreferrer" aria-label="Follow Playforge Entertainment on Facebook">
                                     <ion-icon name="logo-facebook"></ion-icon>
                                 </a>
                             </li>
@@ -1039,26 +1038,46 @@
                 <p class="hero-modal-text">Select which made-to-order figurines you want to add, then submit them to the cart.</p>
 
                 <div class="figurine-picker-grid" data-figurine-picker-grid>
-                    <label class="figurine-picker-row">
+                    <div class="figurine-picker-row" data-figurine-option="Rogue">
                         <span class="figurine-picker-name">Rogue</span>
-                        <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Rogue">
-                    </label>
-                    <label class="figurine-picker-row">
+                        <div class="figurine-picker-controls">
+                            <button type="button" class="figurine-adjust-btn is-minus" data-figurine-adjust="-1" data-figurine-option="Rogue" aria-label="Decrease Rogue figurine quantity">-</button>
+                            <span class="figurine-picker-quantity" data-figurine-quantity="Rogue">0</span>
+                            <button type="button" class="figurine-adjust-btn is-plus" data-figurine-adjust="1" data-figurine-option="Rogue" aria-label="Increase Rogue figurine quantity">+</button>
+                        </div>
+                    </div>
+                    <div class="figurine-picker-row" data-figurine-option="Mage">
                         <span class="figurine-picker-name">Mage</span>
-                        <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Mage">
-                    </label>
-                    <label class="figurine-picker-row">
+                        <div class="figurine-picker-controls">
+                            <button type="button" class="figurine-adjust-btn is-minus" data-figurine-adjust="-1" data-figurine-option="Mage" aria-label="Decrease Mage figurine quantity">-</button>
+                            <span class="figurine-picker-quantity" data-figurine-quantity="Mage">0</span>
+                            <button type="button" class="figurine-adjust-btn is-plus" data-figurine-adjust="1" data-figurine-option="Mage" aria-label="Increase Mage figurine quantity">+</button>
+                        </div>
+                    </div>
+                    <div class="figurine-picker-row" data-figurine-option="Healer">
                         <span class="figurine-picker-name">Healer</span>
-                        <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Healer">
-                    </label>
-                    <label class="figurine-picker-row">
+                        <div class="figurine-picker-controls">
+                            <button type="button" class="figurine-adjust-btn is-minus" data-figurine-adjust="-1" data-figurine-option="Healer" aria-label="Decrease Healer figurine quantity">-</button>
+                            <span class="figurine-picker-quantity" data-figurine-quantity="Healer">0</span>
+                            <button type="button" class="figurine-adjust-btn is-plus" data-figurine-adjust="1" data-figurine-option="Healer" aria-label="Increase Healer figurine quantity">+</button>
+                        </div>
+                    </div>
+                    <div class="figurine-picker-row" data-figurine-option="Tank">
                         <span class="figurine-picker-name">Tank</span>
-                        <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Tank">
-                    </label>
-                    <label class="figurine-picker-row">
+                        <div class="figurine-picker-controls">
+                            <button type="button" class="figurine-adjust-btn is-minus" data-figurine-adjust="-1" data-figurine-option="Tank" aria-label="Decrease Tank figurine quantity">-</button>
+                            <span class="figurine-picker-quantity" data-figurine-quantity="Tank">0</span>
+                            <button type="button" class="figurine-adjust-btn is-plus" data-figurine-adjust="1" data-figurine-option="Tank" aria-label="Increase Tank figurine quantity">+</button>
+                        </div>
+                    </div>
+                    <div class="figurine-picker-row" data-figurine-option="Archer">
                         <span class="figurine-picker-name">Archer</span>
-                        <input type="number" min="0" value="0" class="figurine-picker-input" data-figurine-option="Archer">
-                    </label>
+                        <div class="figurine-picker-controls">
+                            <button type="button" class="figurine-adjust-btn is-minus" data-figurine-adjust="-1" data-figurine-option="Archer" aria-label="Decrease Archer figurine quantity">-</button>
+                            <span class="figurine-picker-quantity" data-figurine-quantity="Archer">0</span>
+                            <button type="button" class="figurine-adjust-btn is-plus" data-figurine-adjust="1" data-figurine-option="Archer" aria-label="Increase Archer figurine quantity">+</button>
+                        </div>
+                    </div>
                 </div>
 
                 <p class="hero-modal-note">A staff member will email you to confirm the made-to-order figurine request and details.</p>

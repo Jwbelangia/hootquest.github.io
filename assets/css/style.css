@@ -769,8 +769,8 @@ body {
 }
 
 .hero-modal-media {
-  min-height: min(300px, 38vh);
-  max-height: 46vh;
+  min-height: min(430px, 70vh);
+  max-height: 72vh;
   border-radius: 24px;
   background:
     radial-gradient(circle at top, hsla(42, 99%, 46%, 0.16), transparent 46%),
@@ -784,14 +784,14 @@ body {
 
 .hero-modal-media model-viewer,
 .hero-modal-fallback {
-  width: min(100%, 340px);
+  width: min(100%, 320px);
   max-width: 100%;
-  max-height: min(42vh, 420px);
+  max-height: min(64vh, 700px);
 }
 
 .hero-modal-media model-viewer {
-  height: min(42vh, 420px);
-  min-height: 200px;
+  height: min(64vh, 700px);
+  min-height: 420px;
   position: relative;
   z-index: 2;
 }
@@ -938,7 +938,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 52px;
+  min-height: 72px;
   padding: 12px 16px;
   border-radius: 16px;
   background-color: hsla(0, 0%, 100%, 0.08);
@@ -953,14 +953,69 @@ body {
   text-transform: uppercase;
 }
 
-.figurine-picker-input {
-  width: 88px;
-  min-height: 40px;
-  border-radius: 12px;
-  background-color: hsla(0, 0%, 100%, 0.12);
-  border: 1px solid hsla(42, 99%, 46%, 0.16);
+.figurine-picker-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.figurine-adjust-btn {
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  font-family: var(--ff-oxanium);
+  font-size: 2.2rem;
+  font-weight: var(--fw-800);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: var(--transition);
+}
+
+.figurine-adjust-btn.is-minus {
+  background-color: hsla(0, 75%, 52%, 0.18);
+  border: 1px solid hsla(0, 75%, 52%, 0.36);
+  color: hsl(0, 86%, 67%);
+}
+
+.figurine-adjust-btn.is-plus {
+  background-color: hsla(42, 99%, 46%, 0.18);
+  border: 1px solid hsla(42, 99%, 46%, 0.32);
+  color: var(--marigold);
+}
+
+.figurine-adjust-btn:is(:hover, :focus-visible) {
+  transform: translateY(-1px);
+}
+
+.figurine-picker-quantity {
+  min-width: 40px;
   color: var(--white);
+  font-family: var(--ff-oxanium);
+  font-size: var(--fs-7);
+  font-weight: var(--fw-800);
   text-align: center;
+}
+
+.hero-cart-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-cart-remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: hsl(0, 86%, 67%);
+  background-color: hsla(0, 75%, 52%, 0.12);
+  border: 1px solid hsla(0, 75%, 52%, 0.24);
+  font-size: 1.4rem;
+  font-weight: var(--fw-800);
 }
 
 .package-item-action {

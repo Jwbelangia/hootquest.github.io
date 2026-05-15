@@ -304,6 +304,40 @@ function syncCardShowcaseFan() {
   cardShowcase.classList.toggle("is-fanned", shouldFan);
 }
 
+function clearCardShowcaseHover() {
+  if (!cardShowcase) {
+    return;
+  }
+
+  delete cardShowcase.dataset.hoverDeck;
+  delete cardShowcase.dataset.hoverIndex;
+}
+
+function setCardShowcaseHover(card) {
+  if (!cardShowcase || !card) {
+    return;
+  }
+
+  const activeDeck = cardShowcase.dataset.activeDeck || "owls";
+  const deck = card.dataset.deck;
+
+  if (deck !== activeDeck) {
+    clearCardShowcaseHover();
+    return;
+  }
+
+  const activeDeckCards = Array.from(cardShowcase.querySelectorAll(`.showcase-card[data-deck="${activeDeck}"]`));
+  const hoverIndex = activeDeckCards.indexOf(card);
+
+  if (hoverIndex < 0) {
+    clearCardShowcaseHover();
+    return;
+  }
+
+  cardShowcase.dataset.hoverDeck = activeDeck;
+  cardShowcase.dataset.hoverIndex = String(hoverIndex);
+}
+
 if (contactScrollLink && contactEmailField) {
   contactScrollLink.addEventListener("click", function (event) {
     event.preventDefault();
@@ -375,6 +409,16 @@ if (deckTabs.length && cardShowcase) {
       this.dataset.capTarget = "center";
     }
   });
+
+  const showcaseCards = cardShowcase.querySelectorAll(".showcase-card");
+
+  for (let i = 0; i < showcaseCards.length; i++) {
+    showcaseCards[i].addEventListener("mouseenter", function () {
+      setCardShowcaseHover(this);
+    });
+
+    showcaseCards[i].addEventListener("mouseleave", clearCardShowcaseHover);
+  }
 
   syncCardShowcaseFan();
   window.addEventListener("scroll", syncCardShowcaseFan, { passive: true });

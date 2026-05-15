@@ -309,8 +309,11 @@ function clearCardShowcaseHover() {
     return;
   }
 
-  delete cardShowcase.dataset.hoverDeck;
-  delete cardShowcase.dataset.hoverIndex;
+  const hoveredCards = cardShowcase.querySelectorAll(".showcase-card.is-hovered");
+
+  for (let i = 0; i < hoveredCards.length; i++) {
+    hoveredCards[i].classList.remove("is-hovered");
+  }
 }
 
 function setCardShowcaseHover(card) {
@@ -326,16 +329,8 @@ function setCardShowcaseHover(card) {
     return;
   }
 
-  const activeDeckCards = Array.from(cardShowcase.querySelectorAll(`.showcase-card[data-deck="${activeDeck}"]`));
-  const hoverIndex = activeDeckCards.indexOf(card);
-
-  if (hoverIndex < 0) {
-    clearCardShowcaseHover();
-    return;
-  }
-
-  cardShowcase.dataset.hoverDeck = activeDeck;
-  cardShowcase.dataset.hoverIndex = String(hoverIndex);
+  clearCardShowcaseHover();
+  card.classList.add("is-hovered");
 }
 
 if (contactScrollLink && contactEmailField) {
@@ -418,6 +413,14 @@ if (deckTabs.length && cardShowcase) {
     });
 
     showcaseCards[i].addEventListener("mouseleave", clearCardShowcaseHover);
+    showcaseCards[i].addEventListener("focusin", function () {
+      setCardShowcaseHover(this);
+    });
+    showcaseCards[i].addEventListener("focusout", function () {
+      if (!this.contains(document.activeElement)) {
+        clearCardShowcaseHover();
+      }
+    });
   }
 
   syncCardShowcaseFan();

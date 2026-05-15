@@ -615,7 +615,7 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   width: min(100%, 760px);
-  margin: 0 auto 20px;
+  margin: 12px auto 20px;
   padding-block-end: 18px;
 }
 
@@ -639,7 +639,7 @@ body {
   height: 56px;
   transform: translateX(-50%);
   background:
-    linear-gradient(104deg, transparent 0 28%, hsl(42, 99%, 46%) 28% 38%, transparent 38% 46%, var(--white) 46% 56%, transparent 56% 64%, hsl(6, 90%, 50%) 64% 74%, transparent 74% 100%);
+    linear-gradient(104deg, transparent 0 28%, hsl(42, 99%, 46%) 28% 40%, transparent 40% 60%, hsl(6, 90%, 50%) 60% 72%, transparent 72% 100%);
   pointer-events: none;
   z-index: 2;
 }

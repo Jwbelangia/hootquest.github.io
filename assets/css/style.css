@@ -615,7 +615,7 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   width: min(100%, 760px);
-  margin: 12px auto 20px;
+  margin: 96px auto 20px;
   padding-block-end: 18px;
 }
 
@@ -633,15 +633,17 @@ body {
 .latest-game-controls::before {
   content: "";
   position: absolute;
+  top: -16px;
   left: 50%;
-  top: 0;
-  width: 74px;
-  height: 56px;
+  width: 82px;
+  height: 18px;
+  border-radius: 18px 18px 0 0;
   transform: translateX(-50%);
-  background:
-    linear-gradient(104deg, transparent 0 28%, hsl(42, 99%, 46%) 28% 40%, transparent 40% 60%, hsl(6, 90%, 50%) 60% 72%, transparent 72% 100%);
+  background: linear-gradient(180deg, hsla(0, 0%, 38%, 0.96) 0%, hsla(0, 0%, 24%, 0.98) 100%);
+  box-shadow: 0 8px 18px hsla(0, 0%, 0%, 0.22);
   pointer-events: none;
-  z-index: 2;
+  z-index: 3;
+  transition: left 280ms ease, transform 280ms ease, background 220ms ease, box-shadow 220ms ease;
 }
 
 .deck-tab {
@@ -659,38 +661,12 @@ body {
   transition: transform var(--transition), filter var(--transition), opacity var(--transition), box-shadow var(--transition);
 }
 
-.deck-tab::after {
-  content: "";
-  position: absolute;
-  top: 8px;
-  bottom: 8px;
-  width: 9px;
-  border-radius: 999px;
-  opacity: 0.88;
-  pointer-events: none;
-  transition: transform var(--transition), opacity var(--transition), background 240ms ease, box-shadow var(--transition);
-}
-
 .deck-tab[data-deck-tab="owls"] {
   clip-path: polygon(5% 0, 100% 0, 92% 100%, 0 100%);
 }
 
-.deck-tab[data-deck-tab="owls"]::after {
-  right: 28px;
-  transform: skewX(-16deg) translateX(0);
-  background: linear-gradient(180deg, hsla(42, 100%, 70%, 0.95) 0%, hsl(42, 99%, 46%) 100%);
-  box-shadow: 0 0 12px hsla(42, 99%, 46%, 0.22);
-}
-
 .deck-tab[data-deck-tab="rats"] {
   clip-path: polygon(8% 0, 100% 0, 95% 100%, 0 100%);
-}
-
-.deck-tab[data-deck-tab="rats"]::after {
-  left: 28px;
-  transform: skewX(-16deg) translateX(0);
-  background: linear-gradient(180deg, hsla(2, 100%, 70%, 0.95) 0%, hsl(2, 86%, 47%) 100%);
-  box-shadow: 0 0 12px hsla(2, 86%, 47%, 0.22);
 }
 
 .deck-tab[data-deck-tab="owls"].is-active {
@@ -716,16 +692,18 @@ body {
   transform: translateY(-2px);
 }
 
-.deck-tab[data-deck-tab="owls"]:is(:hover, :focus-visible)::after {
-  transform: skewX(-16deg) translateX(14px);
-  background: linear-gradient(180deg, hsla(42, 100%, 74%, 0.96) 0%, hsl(2, 96%, 53%) 100%);
-  box-shadow: 0 0 14px hsla(2, 86%, 47%, 0.3);
+.latest-game-controls[data-cap-target="owls"]::before {
+  left: 25%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, hsl(42, 100%, 54%) 0%, hsl(42, 99%, 42%) 100%);
+  box-shadow: 0 10px 22px hsla(42, 99%, 46%, 0.26);
 }
 
-.deck-tab[data-deck-tab="rats"]:is(:hover, :focus-visible)::after {
-  transform: skewX(-16deg) translateX(-14px);
-  background: linear-gradient(180deg, hsla(2, 100%, 76%, 0.96) 0%, hsl(42, 99%, 46%) 100%);
-  box-shadow: 0 0 14px hsla(42, 99%, 46%, 0.3);
+.latest-game-controls[data-cap-target="rats"]::before {
+  left: 75%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, hsl(2, 100%, 58%) 0%, hsl(2, 86%, 47%) 100%);
+  box-shadow: 0 10px 22px hsla(2, 86%, 30%, 0.26);
 }
 
 .card-showcase {
@@ -902,11 +880,13 @@ body {
     width: 100%;
     gap: 8px;
     padding-block-end: 14px;
+    margin-top: 72px;
   }
 
   .latest-game-controls::before {
-    width: 52px;
-    height: 48px;
+    top: -14px;
+    width: 58px;
+    height: 14px;
   }
 
   .deck-tab {

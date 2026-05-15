@@ -110,6 +110,7 @@ const contactEmailField = document.querySelector("[data-contact-email]");
 const heroTriggers = document.querySelectorAll("[data-hero-trigger]");
 const deckTabs = document.querySelectorAll("[data-deck-tab]");
 const cardShowcase = document.querySelector("[data-card-showcase]");
+const latestGameControls = document.querySelector(".latest-game-controls");
 const heroModal = document.querySelector("[data-hero-modal]");
 const heroModalTitle = document.querySelector("[data-hero-modal-title]");
 const heroModalViewer = document.querySelector("[data-hero-model-viewer]");
@@ -343,11 +344,37 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
 }
 
 if (deckTabs.length && cardShowcase) {
+  if (latestGameControls) {
+    latestGameControls.dataset.capTarget = "center";
+  }
+
   for (let i = 0; i < deckTabs.length; i++) {
     deckTabs[i].addEventListener("click", function () {
       setActiveDeck(this.dataset.deckTab || "owls");
     });
+
+    deckTabs[i].addEventListener("mouseenter", function () {
+      if (latestGameControls) {
+        latestGameControls.dataset.capTarget = this.dataset.deckTab || "center";
+      }
+    });
+
+    deckTabs[i].addEventListener("focus", function () {
+      if (latestGameControls) {
+        latestGameControls.dataset.capTarget = this.dataset.deckTab || "center";
+      }
+    });
   }
+
+  latestGameControls?.addEventListener("mouseleave", function () {
+    this.dataset.capTarget = "center";
+  });
+
+  latestGameControls?.addEventListener("focusout", function () {
+    if (!this.contains(document.activeElement)) {
+      this.dataset.capTarget = "center";
+    }
+  });
 
   syncCardShowcaseFan();
   window.addEventListener("scroll", syncCardShowcaseFan, { passive: true });

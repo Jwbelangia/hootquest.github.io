@@ -290,6 +290,19 @@ function setActiveDeck(deckName) {
   }
 }
 
+function syncCardShowcaseFan() {
+  if (!cardShowcase) {
+    return;
+  }
+
+  const showcaseRect = cardShowcase.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const fanThreshold = viewportHeight * 0.82;
+  const shouldFan = showcaseRect.top <= fanThreshold && showcaseRect.bottom >= viewportHeight * 0.12;
+
+  cardShowcase.classList.toggle("is-fanned", shouldFan);
+}
+
 if (contactScrollLink && contactEmailField) {
   contactScrollLink.addEventListener("click", function (event) {
     event.preventDefault();
@@ -335,6 +348,10 @@ if (deckTabs.length && cardShowcase) {
       setActiveDeck(this.dataset.deckTab || "owls");
     });
   }
+
+  syncCardShowcaseFan();
+  window.addEventListener("scroll", syncCardShowcaseFan, { passive: true });
+  window.addEventListener("resize", syncCardShowcaseFan);
 }
 
 if (paymentModal) {

@@ -610,53 +610,122 @@ body {
 .latest-game .section-title { margin-block-end: 34px; }
 
 .latest-game-controls {
-  display: inline-grid;
+  position: relative;
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  width: min(100%, 640px);
-  margin: 0 auto 34px;
+  gap: 0;
+  width: min(100%, 760px);
+  margin: 0 auto 44px;
+  padding-block-end: 18px;
+}
+
+.latest-game-controls::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(100%, 440px);
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, hsla(0, 0%, 100%, 0.6) 18%, hsla(0, 0%, 100%, 0.6) 82%, transparent 100%);
+  transform: translateX(-50%);
+}
+
+.latest-game-controls::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 74px;
+  height: 56px;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(104deg, transparent 0 28%, hsl(42, 99%, 46%) 28% 38%, transparent 38% 46%, var(--white) 46% 56%, transparent 56% 64%, hsl(6, 90%, 50%) 64% 74%, transparent 74% 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .deck-tab {
-  min-height: 54px;
-  border-radius: 22px 22px 10px 10px;
-  padding: 0 22px;
+  min-height: 56px;
+  padding: 0 34px;
   font-family: var(--ff-oxanium);
   font-size: var(--fs-8);
   font-weight: var(--fw-800);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--platinum);
-  background:
-    linear-gradient(180deg, hsla(0, 0%, 100%, 0.12) 0%, hsla(280, 10%, 18%, 0.88) 100%);
-  border: 1px solid hsla(0, 0%, 100%, 0.12);
-  box-shadow: inset 0 1px 0 hsla(0, 0%, 100%, 0.05);
-  transition: transform var(--transition), background-color var(--transition), color var(--transition), border-color var(--transition), filter var(--transition), box-shadow var(--transition);
+  border: none;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  transition: transform var(--transition), filter var(--transition), opacity var(--transition), box-shadow var(--transition);
+}
+
+.deck-tab::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  width: 9px;
+  border-radius: 999px;
+  opacity: 0.88;
+  pointer-events: none;
+  transition: transform var(--transition), opacity var(--transition), background 240ms ease, box-shadow var(--transition);
+}
+
+.deck-tab[data-deck-tab="owls"] {
+  clip-path: polygon(5% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+.deck-tab[data-deck-tab="owls"]::after {
+  right: 28px;
+  transform: skewX(-16deg) translateX(0);
+  background: linear-gradient(180deg, hsla(42, 100%, 70%, 0.95) 0%, hsl(42, 99%, 46%) 100%);
+  box-shadow: 0 0 12px hsla(42, 99%, 46%, 0.22);
+}
+
+.deck-tab[data-deck-tab="rats"] {
+  clip-path: polygon(8% 0, 100% 0, 95% 100%, 0 100%);
+}
+
+.deck-tab[data-deck-tab="rats"]::after {
+  left: 28px;
+  transform: skewX(-16deg) translateX(0);
+  background: linear-gradient(180deg, hsla(2, 100%, 70%, 0.95) 0%, hsl(2, 86%, 47%) 100%);
+  box-shadow: 0 0 12px hsla(2, 86%, 47%, 0.22);
 }
 
 .deck-tab[data-deck-tab="owls"].is-active {
   color: var(--xiketic);
-  background:
-    linear-gradient(180deg, hsl(42, 99%, 56%) 0%, hsl(42, 99%, 46%) 100%);
-  border-color: hsla(42, 99%, 46%, 0.42);
-  box-shadow: 0 14px 28px hsla(42, 99%, 46%, 0.2);
+  background: linear-gradient(180deg, hsl(42, 100%, 48%) 0%, hsl(42, 99%, 42%) 100%);
+  box-shadow: 0 12px 24px hsla(42, 99%, 46%, 0.24);
 }
 
 .deck-tab[data-deck-tab="rats"].is-active {
   color: var(--white);
-  background:
-    linear-gradient(180deg, hsl(6, 74%, 49%) 0%, hsl(2, 60%, 31%) 100%);
-  border-color: hsla(6, 74%, 49%, 0.38);
-  box-shadow: 0 14px 28px hsla(2, 60%, 18%, 0.25);
+  background: linear-gradient(180deg, hsl(2, 96%, 53%) 0%, hsl(2, 86%, 47%) 100%);
+  box-shadow: 0 12px 24px hsla(2, 86%, 30%, 0.24);
 }
 
 .deck-tab:not(.is-active) {
-  filter: grayscale(0.6);
-  opacity: 0.72;
+  color: hsla(0, 0%, 100%, 0.72);
+  background: linear-gradient(180deg, hsla(0, 0%, 24%, 0.95) 0%, hsla(0, 0%, 18%, 0.95) 100%);
+  filter: grayscale(0.55);
+  opacity: 0.78;
 }
 
 .deck-tab:is(:hover, :focus-visible) {
   transform: translateY(-2px);
+}
+
+.deck-tab[data-deck-tab="owls"]:is(:hover, :focus-visible)::after {
+  transform: skewX(-16deg) translateX(14px);
+  background: linear-gradient(180deg, hsla(42, 100%, 74%, 0.96) 0%, hsl(2, 96%, 53%) 100%);
+  box-shadow: 0 0 14px hsla(2, 86%, 47%, 0.3);
+}
+
+.deck-tab[data-deck-tab="rats"]:is(:hover, :focus-visible)::after {
+  transform: skewX(-16deg) translateX(-14px);
+  background: linear-gradient(180deg, hsla(2, 100%, 76%, 0.96) 0%, hsl(42, 99%, 46%) 100%);
+  box-shadow: 0 0 14px hsla(42, 99%, 46%, 0.3);
 }
 
 .card-showcase {
@@ -803,13 +872,21 @@ body {
 @media (max-width: 767px) {
   .latest-game-controls {
     width: 100%;
-    gap: 10px;
+    gap: 8px;
+    padding-block-end: 14px;
+  }
+
+  .latest-game-controls::before {
+    width: 52px;
+    height: 48px;
   }
 
   .deck-tab {
     min-height: 48px;
     padding-inline: 14px;
     font-size: 1.25rem;
+    clip-path: none;
+    border-radius: 14px;
   }
 
   .card-showcase-stage {

@@ -519,6 +519,10 @@ body {
   width: 100%;
 }
 
+.hero-content {
+  position: relative;
+}
+
 .hero-subtitle {
   color: var(--marigold);
   font-size: var(--fs-6);
@@ -537,6 +541,24 @@ body {
   background-color: hsla(0, 0%, 45%, 0.38);
   backdrop-filter: blur(3px);
   margin-block-end: 45px;
+}
+
+.hero-memo {
+  width: min(100%, 300px);
+  margin: -28px 0 28px auto;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background-color: hsla(280, 18%, 12%, 0.56);
+  border: 1px solid hsla(42, 99%, 46%, 0.18);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 24px hsla(0, 0%, 0%, 0.18);
+}
+
+.hero-memo-text {
+  color: hsla(0, 0%, 100%, 0.84);
+  font-size: 1.2rem;
+  line-height: 1.55;
+  text-align: left;
 }
 
 .hero-cta-group {
@@ -958,13 +980,23 @@ body {
   .card-showcase:not(.is-fanned)[data-active-deck="owls"] .showcase-card[data-deck="rats"],
   .card-showcase:not(.is-fanned)[data-active-deck="rats"] .showcase-card[data-deck="owls"] {
     transform: translate(-50%, -50%) translate3d(calc(var(--mobile-rest-x, var(--rest-x)) * 12% * var(--card-showcase-mobile-spread-scale)), calc(var(--mobile-rest-y, var(--rest-y)) * 11%), calc(var(--mobile-rest-z, var(--rest-z, 1)) * 1px)) rotateZ(calc(var(--mobile-rest-rotate, var(--rest-rotate)) * 0.55)) scale(calc(0.95 + ((var(--mobile-rest-scale, var(--rest-scale)) - 0.95) * 0.4)));
-    z-index: var(--mobile-rest-z, var(--rest-z));
+    z-index: calc(var(--mobile-rest-z, var(--rest-z)) - 10);
   }
 
   .card-showcase.is-fanned[data-active-deck="owls"] .showcase-card[data-deck="rats"],
   .card-showcase.is-fanned[data-active-deck="rats"] .showcase-card[data-deck="owls"] {
     transform: translate(-50%, -50%) translate3d(calc(var(--mobile-rest-x, var(--rest-x)) * 18% * var(--card-showcase-fan-spread)), calc(var(--mobile-rest-y, var(--rest-y)) * 13%), calc(var(--mobile-rest-z, var(--rest-z, 1)) * 1px)) rotateZ(var(--mobile-rest-rotate, var(--rest-rotate))) scale(var(--mobile-rest-scale, var(--rest-scale)));
-    z-index: var(--mobile-rest-z, var(--rest-z));
+    z-index: calc(var(--mobile-rest-z, var(--rest-z)) - 10);
+  }
+
+  .hero-memo {
+    width: min(100%, 250px);
+    margin: -24px 0 24px auto;
+    padding: 9px 11px;
+  }
+
+  .hero-memo-text {
+    font-size: 1.1rem;
   }
 }
 
@@ -2775,6 +2807,10 @@ body {
 
   .hero-cta-group {
     justify-items: start;
+  }
+
+  .hero-memo {
+    margin-right: 0;
   }
 
   .scrollbar-item { min-width: calc(33.33% - 20px); }

@@ -1,0 +1,394 @@
+HootQuest SEO Content Plan
+=========================
+
+Primary brand strategy
+----------------------
+Primary name: HootQuest
+Alternate name: Hoot Quest
+
+Rule:
+- Use HootQuest as the main brand name in titles, headings, URLs, and structured data.
+- Use Hoot Quest naturally in meta descriptions, FAQs, bios, alt text, and some social copy.
+- Do not alternate randomly. Keep HootQuest dominant.
+
+Core keyword themes
+-------------------
+Primary keywords:
+- HootQuest
+- Hoot Quest
+- HootQuest board game
+- Hoot Quest board game
+- HootQuest card game
+- cooperative fantasy board game
+
+Secondary keywords:
+- owl board game
+- tabletop fantasy game
+- adventure board game
+- card and dice game
+- miniatures board game
+- tactical fantasy board game
+- campaign board game
+- family strategy board game
+
+Mechanic keywords:
+- cooperative game
+- deck construction
+- dice rolling
+- grid movement
+- pattern movement
+- pattern building
+- modular board
+- movement points
+- line of sight
+- square grid
+- scenario mission campaign game
+- action queue
+
+World/lore keywords:
+- Owlcrest
+- Swarm of the Rat King
+- heroic owl characters
+- rat king boss battle
+- fantasy owl heroes
+
+Keyword usage rules
+-------------------
+- Put the main keyword near the start of the title tag.
+- Mention HootQuest in the H1.
+- Mention Hoot Quest once in visible body copy where natural.
+- Use one main keyword + two or three secondary keywords per page.
+- Avoid stuffing long keyword lists into paragraphs.
+- Write for users first, then search.
+
+Page-by-page plan
+-----------------
+
+1) Homepage
+Main goal:
+- Rank for HootQuest, Hoot Quest, and broad product-intent searches.
+
+Primary keyword:
+- HootQuest
+
+Secondary keywords:
+- Hoot Quest
+- cooperative fantasy board game
+- owl board game
+- deck construction
+- dice rolling
+
+Suggested title:
+- HootQuest (Hoot Quest) | Cooperative Fantasy Board Game
+
+Suggested meta description:
+- HootQuest, also written as Hoot Quest, is a cooperative fantasy board game set in Owlcrest with deck construction, dice rolling, grid movement, and campaign adventures.
+
+Suggested H1:
+- HootQuest
+
+Suggested support copy:
+- HootQuest, also known as Hoot Quest, is a cooperative fantasy board game where heroic owls defend Owlcrest from the Swarm of the Rat King.
+
+2) Story / Campaign page
+Main goal:
+- Rank for lore, world, campaign, and setting-related searches.
+
+Primary keyword:
+- HootQuest story
+
+Secondary keywords:
+- Owlcrest
+- Swarm of the Rat King
+- fantasy campaign board game
+- scenario mission game
+
+Suggested title:
+- HootQuest Story | Owlcrest, Heroes, and the Swarm of the Rat King
+
+Suggested meta description:
+- Explore the world of HootQuest through Owlcrest, its heroic owl defenders, and the rising threat of the Swarm of the Rat King in this cooperative fantasy campaign game.
+
+Suggested H1:
+- The Story of HootQuest
+
+Suggested intro copy:
+- Enter Owlcrest, the fantasy setting of HootQuest, where brave owl heroes face the Swarm of the Rat King across dangerous missions and branching campaign scenarios.
+
+Suggested subtopics:
+- What is Owlcrest?
+- Who are the owl heroes?
+- Who is the Rat King?
+- How campaign missions connect
+
+3) Heroes / Character page
+Main goal:
+- Rank for hero, character, class, and faction intent.
+
+Primary keyword:
+- HootQuest heroes
+
+Secondary keywords:
+- owl heroes
+- cooperative board game characters
+- fantasy hero cards
+- heroic owl classes
+
+Suggested title:
+- HootQuest Heroes | Meet the Owlcrest Defenders
+
+Suggested meta description:
+- Meet the owl heroes of HootQuest and discover their combat roles, tactical strengths, and how each character supports cooperative fantasy gameplay.
+
+Suggested H1:
+- Meet the Heroes of HootQuest
+
+Suggested intro copy:
+- Every HootQuest hero brings a distinct role to the fight, from frontline defense to ranged control, support, and precision attacks.
+
+Suggested per-character wording pattern:
+- [Character name] is a HootQuest hero focused on [role]. Best used for [tactical purpose], this owl defender helps players [benefit].
+
+4) Enemy / Rat King page
+Main goal:
+- Rank for enemy and boss-related searches.
+
+Primary keyword:
+- HootQuest Rat King
+
+Secondary keywords:
+- Swarm of the Rat King
+- fantasy board game boss
+- rat enemy faction
+- cooperative boss fight game
+
+Suggested title:
+- HootQuest Rat King | Enemies of Owlcrest
+
+Suggested meta description:
+- Face the Swarm of the Rat King in HootQuest and learn about the enemy faction, battlefield threats, and boss encounters shaping the campaign.
+
+Suggested H1:
+- The Swarm of the Rat King
+
+Suggested intro copy:
+- The enemies of HootQuest pressure players with numbers, corruption, and battlefield control, all under the command of the Rat King.
+
+5) Gameplay / How to Play page
+Main goal:
+- Rank for gameplay, mechanics, and rules-intent searches.
+
+Primary keyword:
+- how to play HootQuest
+
+Secondary keywords:
+- deck construction game
+- dice rolling board game
+- grid movement board game
+- cooperative fantasy strategy game
+
+Suggested title:
+- How to Play HootQuest | Deck Construction, Dice, and Tactical Movement
+
+Suggested meta description:
+- Learn how to play HootQuest with cooperative tactics, deck construction, dice rolling, grid movement, line of sight, and scenario-based missions.
+
+Suggested H1:
+- How to Play HootQuest
+
+Suggested intro copy:
+- HootQuest combines card-driven tactics, dice rolling, and positional play on a grid-based battlefield to create a cooperative fantasy board game experience.
+
+Suggested section keywords:
+- deck construction
+- action queue
+- movement points
+- line of sight
+- pattern movement
+- modular board
+- cooperative strategy
+
+6) Kickstarter / Prelaunch / Support page
+Main goal:
+- Rank for buying and launch-intent searches.
+
+Primary keyword:
+- HootQuest Kickstarter
+
+Secondary keywords:
+- fantasy board game Kickstarter
+- support HootQuest
+- upcoming board game campaign
+- Playforge Entertainment Kickstarter
+
+Suggested title:
+- HootQuest Kickstarter | Follow and Support the Campaign
+
+Suggested meta description:
+- Follow the HootQuest Kickstarter campaign for launch news, updates, rewards, and ways to support this cooperative fantasy board game by Playforge Entertainment.
+
+Suggested H1:
+- Support HootQuest on Kickstarter
+
+Suggested intro copy:
+- Join the HootQuest Kickstarter to follow campaign updates, support development, and help bring Owlcrest’s battle against the Rat King to the table.
+
+7) Shop / Merch / Figurines page
+Main goal:
+- Rank for product and figurine intent.
+
+Primary keyword:
+- HootQuest figurines
+
+Secondary keywords:
+- HootQuest merch
+- owl board game miniatures
+- fantasy game figurines
+- collectible owl characters
+
+Suggested title:
+- HootQuest Shop | Figurines, Merch, and Collector Items
+
+Suggested meta description:
+- Browse HootQuest figurines, merch, and collector items inspired by Owlcrest’s heroes and the Swarm of the Rat King.
+
+Suggested H1:
+- HootQuest Shop
+
+Suggested intro copy:
+- Explore HootQuest figurines and merch featuring the heroes, enemies, and world of Owlcrest.
+
+8) Contact / Newsletter page
+Main goal:
+- Rank for brand trust and engagement.
+
+Primary keyword:
+- contact HootQuest
+
+Secondary keywords:
+- HootQuest newsletter
+- Playforge Entertainment contact
+- Hoot Quest updates
+
+Suggested title:
+- Contact HootQuest | Newsletter, Updates, and Support
+
+Suggested meta description:
+- Contact HootQuest and subscribe for newsletter updates, product news, Kickstarter announcements, and support from Playforge Entertainment.
+
+Suggested H1:
+- Stay Connected with HootQuest
+
+Suggested intro copy:
+- Subscribe for HootQuest updates, campaign news, and future announcements from Playforge Entertainment.
+
+Bio and profile wording
+-----------------------
+
+Short brand bio:
+- HootQuest is a cooperative fantasy board game from Playforge Entertainment where heroic owls defend Owlcrest against the Swarm of the Rat King.
+
+Medium brand bio:
+- HootQuest, also written as Hoot Quest, is a cooperative fantasy board game by Playforge Entertainment. Built around deck construction, dice rolling, grid movement, and campaign missions, the game sends players into Owlcrest to battle the Swarm of the Rat King.
+
+Long brand bio:
+- HootQuest is a cooperative fantasy board game by Playforge Entertainment that combines tactical card play, dice rolling, grid movement, and scenario-based campaign design. Set in Owlcrest, the game follows heroic owl defenders as they push back the rising threat of the Swarm of the Rat King. HootQuest is designed for players who enjoy cooperative strategy, character roles, modular encounters, and story-driven tabletop adventures.
+
+Founder/company bio:
+- Playforge Entertainment creates fantasy tabletop experiences focused on memorable worlds, tactical gameplay, and collectible characters. HootQuest is the studio’s flagship cooperative board game set in the world of Owlcrest.
+
+Social bio options
+------------------
+Instagram/X short:
+- HootQuest is a cooperative fantasy board game where heroic owls defend Owlcrest from the Rat King.
+
+Kickstarter bio:
+- HootQuest is a cooperative fantasy board game by Playforge Entertainment featuring deck construction, dice rolling, tactical movement, and campaign adventures in Owlcrest.
+
+BoardGameGeek-style summary:
+- HootQuest is a cooperative fantasy board game in which players control owl heroes defending Owlcrest through tactical card play, dice rolling, grid movement, and mission-based scenarios against the Swarm of the Rat King.
+
+Marketplace/product wording
+---------------------------
+Product short description:
+- A cooperative fantasy board game of owl heroes, tactical cards, dice rolling, and campaign battles.
+
+Product medium description:
+- HootQuest is a cooperative fantasy board game that blends deck construction, dice rolling, and grid-based tactics as players defend Owlcrest from the Swarm of the Rat King.
+
+Image alt text patterns
+-----------------------
+Use descriptive alt text, not keyword stuffing.
+
+Examples:
+- HootQuest cooperative fantasy board game hero card
+- HootQuest owl hero figurine
+- HootQuest Rat King enemy card
+- Owlcrest artwork from HootQuest board game
+- Hoot Quest gameplay board with grid movement
+
+FAQ targets
+-----------
+Suggested FAQ questions:
+- Is HootQuest the same as Hoot Quest?
+- What type of game is HootQuest?
+- Is HootQuest a cooperative board game?
+- What mechanics are in HootQuest?
+- What is Owlcrest in HootQuest?
+- Who is the Rat King in HootQuest?
+
+Suggested answer for naming:
+- Yes. HootQuest and Hoot Quest refer to the same cooperative fantasy board game by Playforge Entertainment.
+
+Internal linking anchor text ideas
+----------------------------------
+Use natural variation:
+- HootQuest story
+- HootQuest heroes
+- how to play HootQuest
+- HootQuest Kickstarter
+- Hoot Quest updates
+- Owlcrest campaign lore
+- Rat King enemy faction
+
+Backlink and profile consistency
+--------------------------------
+Use these naming patterns externally:
+- 70 to 80 percent: HootQuest
+- 20 to 30 percent: Hoot Quest
+
+Examples:
+- HootQuest official site
+- HootQuest board game
+- Hoot Quest by Playforge Entertainment
+
+Content priorities
+------------------
+Highest priority:
+1. Homepage FAQ section with FAQ schema
+2. Story page copy
+3. Gameplay / How to Play page
+4. Kickstarter landing copy
+5. BoardGameGeek summary and profile text
+
+Next priority:
+6. Character pages
+7. Enemy / Rat King page
+8. Shop descriptions
+9. Newsletter / contact copy
+
+Writing style rules
+-------------------
+- Keep HootQuest as the primary spelling.
+- Use Hoot Quest once per page where natural.
+- Lead with plain-language descriptions before lore-heavy wording.
+- Mention mechanics clearly for search intent.
+- Keep paragraphs short and readable.
+- Avoid repeating the exact same keyword phrase too often.
+
+Success metrics to watch
+------------------------
+- Impressions for HootQuest and Hoot Quest in Google Search Console
+- Click-through rate on homepage and Kickstarter page
+- Queries containing board game, card game, cooperative game, Owlcrest, Rat King
+- Growth in branded search volume over time

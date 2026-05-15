@@ -513,6 +513,10 @@ body {
   align-items: center;
 }
 
+.hero .container {
+  width: 100%;
+}
+
 .hero-subtitle {
   color: var(--marigold);
   font-size: var(--fs-6);
@@ -2395,6 +2399,31 @@ body {
   .container { max-width: 960px; }
 
   :is(.header, .hero, .live-match) .container { max-width: unset; }
+
+  .hero {
+    align-items: start;
+  }
+
+  .hero .container {
+    display: flex;
+    justify-content: flex-start;
+    padding-inline-start: 15%;
+    padding-block-start: 24px;
+  }
+
+  .hero-content {
+    text-align: left;
+    max-width: 44rem;
+  }
+
+  .hero-text {
+    display: block;
+    margin-block-end: 28px;
+  }
+
+  .hero-cta-group {
+    justify-items: start;
+  }
 
   .scrollbar-item { min-width: calc(33.33% - 20px); }
 

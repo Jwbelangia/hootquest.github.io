@@ -123,6 +123,9 @@ const heroModalMedia = heroModal?.querySelector(".hero-modal-media");
 const campaignStoryModal = document.querySelector("[data-campaign-story-modal]");
 const campaignStoryOpenButtons = document.querySelectorAll("[data-campaign-story-open]");
 const campaignStoryCloseButtons = document.querySelectorAll("[data-campaign-story-close]");
+const supportModal = document.querySelector("[data-support-modal]");
+const supportModalOpenButtons = document.querySelectorAll("[data-support-modal-open]");
+const supportModalCloseButtons = document.querySelectorAll("[data-support-modal-close]");
 const paymentModal = document.querySelector("[data-payment-modal]");
 const paymentModalTitle = document.querySelector("[data-payment-modal-title]");
 const paymentModalText = document.querySelector("[data-payment-modal-text]");
@@ -428,6 +431,18 @@ if (deckTabs.length && cardShowcase) {
   window.addEventListener("resize", syncCardShowcaseFan);
 }
 
+if (supportModal) {
+  for (let i = 0; i < supportModalOpenButtons.length; i++) {
+    supportModalOpenButtons[i].addEventListener("click", function () {
+      openSupportModal();
+    });
+  }
+
+  for (let i = 0; i < supportModalCloseButtons.length; i++) {
+    supportModalCloseButtons[i].addEventListener("click", closeSupportModal);
+  }
+}
+
 if (paymentModal) {
   for (let i = 0; i < paymentModalCloseButtons.length; i++) {
     paymentModalCloseButtons[i].addEventListener("click", closePaymentModal);
@@ -494,6 +509,10 @@ document.addEventListener("keydown", function (event) {
 
     if (campaignStoryModal && !campaignStoryModal.hidden) {
       closeCampaignStoryModal();
+    }
+
+    if (supportModal && !supportModal.hidden) {
+      closeSupportModal();
     }
 
     if (paymentModal && !paymentModal.hidden) {
@@ -1361,6 +1380,24 @@ function closeCampaignStoryModal() {
       unlockBodyScroll();
     }
   }, 380);
+}
+
+function openSupportModal() {
+  if (!supportModal) {
+    return;
+  }
+
+  supportModal.hidden = false;
+  lockBodyScroll();
+}
+
+function closeSupportModal() {
+  if (!supportModal) {
+    return;
+  }
+
+  supportModal.hidden = true;
+  unlockBodyScroll();
 }
 
 function animateHeroCardToModal(sourceImage, revealToken) {

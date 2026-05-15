@@ -269,7 +269,7 @@
                         </aside>
 
                         <div class="hero-cta-group">
-                            <buttonref href="https://www.kickstarter.com/profile/playforge" class="btn skewBg">Support Owlcrest</buttonref>
+                            <button type="button" class="btn skewBg" data-support-modal-open>Support Owlcrest</button>
                             <button type="button" class="btn skewBg" data-campaign-story-open>Learn our story</button>
                         </div>
 
@@ -1279,6 +1279,36 @@
                     <button type="button" class="btn skewBg hero-modal-btn" data-figurine-modal-close>
                         <span class="span">Done</span>
                         <ion-icon name="checkmark" aria-hidden="true"></ion-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-modal payment-modal" data-support-modal hidden>
+        <div class="hero-modal-overlay" data-support-modal-close></div>
+
+        <div class="hero-modal-dialog payment-modal-dialog support-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="support-modal-title">
+            <button class="hero-modal-close" type="button" aria-label="Close support modal" data-support-modal-close>
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+
+            <div class="hero-modal-content payment-modal-content support-modal-content">
+                <p class="hero-modal-subtitle">Support HootQuest</p>
+                <h3 class="h3" id="support-modal-title">Back the Journey to Owlcrest</h3>
+                <p class="hero-modal-text">HootQuest, also known as Hoot Quest, is a cooperative fantasy board game built around tactical card play, dice rolling, and campaign missions.</p>
+                <p class="hero-modal-text">If the world of Owlcrest calls to you, we would love for you to visit our Kickstarter page, follow the campaign, and help us bring more heroes, enemies, miniatures, and stories to life.</p>
+                <p class="hero-modal-note">Every bit of support helps us keep building the project and move HootQuest closer to the table.</p>
+
+                <div class="figurine-modal-actions support-modal-actions">
+                    <a href="https://www.kickstarter.com/profile/playforge" class="btn skewBg hero-modal-btn" target="_blank" rel="noopener noreferrer">
+                        <span class="span">Visit Kickstarter</span>
+                        <ion-icon name="rocket-outline" aria-hidden="true"></ion-icon>
+                    </a>
+
+                    <button type="button" class="btn skewBg hero-modal-btn" data-support-modal-close>
+                        <span class="span">Back to Site</span>
+                        <ion-icon name="arrow-back" aria-hidden="true"></ion-icon>
                     </button>
                 </div>
             </div>

@@ -1335,6 +1335,18 @@ body {
   padding-block-start: 24px;
 }
 
+.support-modal-dialog {
+  max-width: 640px;
+}
+
+.support-modal-content {
+  gap: 14px;
+}
+
+.support-modal-actions {
+  margin-block-start: 8px;
+}
+
 .figurine-picker-grid {
   display: grid;
   grid-template-columns: 1fr;

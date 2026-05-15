@@ -256,14 +256,6 @@ const packageCatalog = [
     modelSrc: "./assets/models/Archer.glb",
     hiddenFromForm: true
   }
-
-if (deckTabs.length && cardShowcase) {
-  for (let i = 0; i < deckTabs.length; i++) {
-    deckTabs[i].addEventListener("click", function () {
-      setActiveDeck(this.dataset.deckTab || "owls");
-    });
-  }
-}
   // Example item format for future uploads:
   // {
   //   id: "item-slug",
@@ -335,6 +327,14 @@ if (heroTriggers.length && heroModal && heroAddToCartButton) {
     scrollToElement(document.querySelector("#order-request-center"));
     closeHeroModal();
   });
+}
+
+if (deckTabs.length && cardShowcase) {
+  for (let i = 0; i < deckTabs.length; i++) {
+    deckTabs[i].addEventListener("click", function () {
+      setActiveDeck(this.dataset.deckTab || "owls");
+    });
+  }
 }
 
 if (paymentModal) {

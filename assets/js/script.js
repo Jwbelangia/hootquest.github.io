@@ -108,6 +108,8 @@ const cartScrollButton = document.querySelector("[data-cart-scroll]");
 const contactScrollLink = document.querySelector("[data-contact-scroll]");
 const contactEmailField = document.querySelector("[data-contact-email]");
 const heroTriggers = document.querySelectorAll("[data-hero-trigger]");
+const deckTabs = document.querySelectorAll("[data-deck-tab]");
+const cardShowcase = document.querySelector("[data-card-showcase]");
 const heroModal = document.querySelector("[data-hero-modal]");
 const heroModalTitle = document.querySelector("[data-hero-modal-title]");
 const heroModalViewer = document.querySelector("[data-hero-model-viewer]");
@@ -254,6 +256,14 @@ const packageCatalog = [
     modelSrc: "./assets/models/Archer.glb",
     hiddenFromForm: true
   }
+
+if (deckTabs.length && cardShowcase) {
+  for (let i = 0; i < deckTabs.length; i++) {
+    deckTabs[i].addEventListener("click", function () {
+      setActiveDeck(this.dataset.deckTab || "owls");
+    });
+  }
+}
   // Example item format for future uploads:
   // {
   //   id: "item-slug",
@@ -270,6 +280,22 @@ if (cartScrollButton) {
   cartScrollButton.addEventListener("click", function () {
     scrollToElement(document.querySelector("#order-request-center"));
   });
+}
+
+function setActiveDeck(deckName) {
+  if (!cardShowcase) {
+    return;
+  }
+
+  const normalizedDeck = deckName === "rats" ? "rats" : "owls";
+  cardShowcase.dataset.activeDeck = normalizedDeck;
+
+  for (let i = 0; i < deckTabs.length; i++) {
+    const isActive = deckTabs[i].dataset.deckTab === normalizedDeck;
+    deckTabs[i].classList.toggle("is-active", isActive);
+    deckTabs[i].setAttribute("aria-selected", String(isActive));
+    deckTabs[i].setAttribute("tabindex", isActive ? "0" : "-1");
+  }
 }
 
 if (contactScrollLink && contactEmailField) {

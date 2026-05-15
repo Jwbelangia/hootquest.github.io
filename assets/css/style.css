@@ -74,6 +74,8 @@
    */
 
   --section-padding: 120px;
+  --card-showcase-fan-spread: 1;
+  --card-showcase-mobile-spread-scale: 0.72;
 
   /**
    * gradient
@@ -766,14 +768,14 @@ body {
 }
 
 .card-showcase:not(.is-fanned)[data-active-deck="owls"] .showcase-card[data-deck="owls"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 8%), calc(var(--front-y) * 6%), calc(var(--front-z, 1) * 1px)) rotateZ(calc(var(--front-rotate) * 0.55)) scale(calc(0.96 + ((var(--front-scale) - 0.96) * 0.45)));
+  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 8% * var(--card-showcase-mobile-spread-scale)), calc(var(--front-y) * 6%), calc(var(--front-z, 1) * 1px)) rotateZ(calc(var(--front-rotate) * 0.55)) scale(calc(0.96 + ((var(--front-scale) - 0.96) * 0.45)));
   z-index: var(--front-z);
   opacity: 1;
   filter: saturate(1) brightness(1);
 }
 
 .card-showcase.is-fanned[data-active-deck="owls"] .showcase-card[data-deck="owls"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 14%), calc(var(--front-y) * 10%), calc(var(--front-z, 1) * 1px)) rotateZ(var(--front-rotate)) scale(var(--front-scale));
+  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 14% * var(--card-showcase-fan-spread)), calc(var(--front-y) * 10%), calc(var(--front-z, 1) * 1px)) rotateZ(var(--front-rotate)) scale(var(--front-scale));
   z-index: var(--front-z);
   opacity: 1;
   filter: saturate(1) brightness(1);
@@ -784,14 +786,14 @@ body {
 }
 
 .card-showcase:not(.is-fanned)[data-active-deck="owls"] .showcase-card[data-deck="rats"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 6%), calc(var(--rest-y) * 5%), calc(var(--rest-z, 1) * 1px)) rotateZ(calc(var(--rest-rotate) * 0.5)) scale(calc(0.95 + ((var(--rest-scale) - 0.95) * 0.4)));
+  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 6% * var(--card-showcase-mobile-spread-scale)), calc(var(--rest-y) * 5%), calc(var(--rest-z, 1) * 1px)) rotateZ(calc(var(--rest-rotate) * 0.5)) scale(calc(0.95 + ((var(--rest-scale) - 0.95) * 0.4)));
   z-index: var(--rest-z);
   opacity: 0.94;
   filter: grayscale(0.85) saturate(0.55) brightness(0.75);
 }
 
 .card-showcase.is-fanned[data-active-deck="owls"] .showcase-card[data-deck="rats"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 14%), calc(var(--rest-y) * 10%), calc(var(--rest-z, 1) * 1px)) rotateZ(var(--rest-rotate)) scale(var(--rest-scale));
+  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 14% * var(--card-showcase-fan-spread)), calc(var(--rest-y) * 10%), calc(var(--rest-z, 1) * 1px)) rotateZ(var(--rest-rotate)) scale(var(--rest-scale));
   z-index: var(--rest-z);
   opacity: 0.94;
   filter: grayscale(0.85) saturate(0.55) brightness(0.75);
@@ -802,14 +804,14 @@ body {
 }
 
 .card-showcase:not(.is-fanned)[data-active-deck="rats"] .showcase-card[data-deck="rats"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 8%), calc(var(--front-y) * 6%), calc(var(--front-z, 1) * 1px)) rotateZ(calc(var(--front-rotate) * 0.55)) scale(calc(0.96 + ((var(--front-scale) - 0.96) * 0.45)));
+  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 8% * var(--card-showcase-mobile-spread-scale)), calc(var(--front-y) * 6%), calc(var(--front-z, 1) * 1px)) rotateZ(calc(var(--front-rotate) * 0.55)) scale(calc(0.96 + ((var(--front-scale) - 0.96) * 0.45)));
   z-index: var(--front-z);
   opacity: 1;
   filter: saturate(1) brightness(1);
 }
 
 .card-showcase.is-fanned[data-active-deck="rats"] .showcase-card[data-deck="rats"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 14%), calc(var(--front-y) * 10%), calc(var(--front-z, 1) * 1px)) rotateZ(var(--front-rotate)) scale(var(--front-scale));
+  transform: translate(-50%, -50%) translate3d(calc(var(--front-x) * 14% * var(--card-showcase-fan-spread)), calc(var(--front-y) * 10%), calc(var(--front-z, 1) * 1px)) rotateZ(var(--front-rotate)) scale(var(--front-scale));
   z-index: var(--front-z);
   opacity: 1;
   filter: saturate(1) brightness(1);
@@ -820,14 +822,14 @@ body {
 }
 
 .card-showcase:not(.is-fanned)[data-active-deck="rats"] .showcase-card[data-deck="owls"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 6%), calc(var(--rest-y) * 5%), calc(var(--rest-z, 1) * 1px)) rotateZ(calc(var(--rest-rotate) * 0.5)) scale(calc(0.95 + ((var(--rest-scale) - 0.95) * 0.4)));
+  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 6% * var(--card-showcase-mobile-spread-scale)), calc(var(--rest-y) * 5%), calc(var(--rest-z, 1) * 1px)) rotateZ(calc(var(--rest-rotate) * 0.5)) scale(calc(0.95 + ((var(--rest-scale) - 0.95) * 0.4)));
   z-index: var(--rest-z);
   opacity: 0.94;
   filter: grayscale(0.85) saturate(0.5) brightness(0.74);
 }
 
 .card-showcase.is-fanned[data-active-deck="rats"] .showcase-card[data-deck="owls"] {
-  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 14%), calc(var(--rest-y) * 10%), calc(var(--rest-z, 1) * 1px)) rotateZ(var(--rest-rotate)) scale(var(--rest-scale));
+  transform: translate(-50%, -50%) translate3d(calc(var(--rest-x) * 14% * var(--card-showcase-fan-spread)), calc(var(--rest-y) * 10%), calc(var(--rest-z, 1) * 1px)) rotateZ(var(--rest-rotate)) scale(var(--rest-scale));
   z-index: var(--rest-z);
   opacity: 0.94;
   filter: grayscale(0.85) saturate(0.5) brightness(0.74);
@@ -842,12 +844,27 @@ body {
 }
 
 .showcase-card .latest-game-card .card-content {
+  padding: clamp(34px, 7.2vw, 55px) clamp(12px, 2.4vw, 18px) clamp(12px, 2.4vw, 18px);
+}
+
+.showcase-card .latest-game-card .card-content {
   opacity: 1;
   transform: translateY(0);
 }
 
 .showcase-card .latest-game-card .card-badge {
+  min-height: clamp(22px, 4vw, 30px);
+  padding-inline: clamp(12px, 3vw, 20px);
+  font-size: clamp(0.9rem, 1.5vw, 1.2rem);
   pointer-events: auto;
+}
+
+.showcase-card .latest-game-card .card-title {
+  font-size: clamp(2rem, 4vw, var(--fs-6));
+}
+
+.showcase-card .latest-game-card .card-price {
+  font-size: clamp(1rem, 2vw, var(--fs-10));
 }
 
 .latest-game-card--enemy .card-banner {
@@ -1509,6 +1526,18 @@ body {
 
 .campaign-story-placeholder.wide {
   min-height: 180px;
+}
+
+.campaign-story-placeholder--image {
+  padding: 20px;
+  border-style: solid;
+}
+
+.campaign-story-logo-image {
+  width: min(100%, 320px);
+  max-height: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px hsla(0, 0%, 0%, 0.3));
 }
 
 .campaign-timeline-grid,

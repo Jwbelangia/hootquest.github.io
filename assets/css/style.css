@@ -731,6 +731,11 @@ body {
   transition: transform 860ms cubic-bezier(0.22, 1, 0.36, 1), filter 760ms ease, opacity 760ms ease;
 }
 
+.card-showcase[data-active-deck="owls"] .showcase-card[data-deck="owls"],
+.card-showcase[data-active-deck="rats"] .showcase-card[data-deck="rats"] {
+  pointer-events: auto;
+}
+
 .showcase-card-inner {
   position: relative;
   width: 100%;

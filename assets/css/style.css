@@ -543,24 +543,6 @@ body {
   margin-block-end: 45px;
 }
 
-.hero-memo {
-  width: min(100%, 300px);
-  margin: -28px 0 28px auto;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background-color: hsla(280, 18%, 12%, 0.56);
-  border: 1px solid hsla(42, 99%, 46%, 0.18);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 10px 24px hsla(0, 0%, 0%, 0.18);
-}
-
-.hero-memo-text {
-  color: hsla(0, 0%, 100%, 0.84);
-  font-size: 1.2rem;
-  line-height: 1.55;
-  text-align: left;
-}
-
 .hero-cta-group {
   display: inline-grid;
   gap: 9px;
@@ -989,15 +971,6 @@ body {
     z-index: calc(var(--mobile-rest-z, var(--rest-z)) - 10);
   }
 
-  .hero-memo {
-    width: min(100%, 250px);
-    margin: -24px 0 24px auto;
-    padding: 9px 11px;
-  }
-
-  .hero-memo-text {
-    font-size: 1.1rem;
-  }
 }
 
 .latest-game-card {
@@ -2819,10 +2792,6 @@ body {
 
   .hero-cta-group {
     justify-items: start;
-  }
-
-  .hero-memo {
-    margin-right: 0;
   }
 
   .scrollbar-item { min-width: calc(33.33% - 20px); }

@@ -52,9 +52,9 @@ button:disabled {
 .secondary { border-color: #b5915a; }
 
 .app {
-  width: 100%;
-  margin: 0;
-  padding: 24px 16px 36px;
+  width: min(1480px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0 36px;
 }
 
 .topbar, .scenario-strip, .setup, .top-actions {

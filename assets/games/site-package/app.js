@@ -123,11 +123,13 @@ let state = {
   animating: false,
   layoutMode: getCookie("hq_layout") || "desktop",
   tutorialDone: getCookie("hq_tutorial_done") === "1",
+  tutorialPhase: "setup",
+  releaseNoteShown: false,
   phase: "setup",
   pendingAction: null,
   selectedPatternId: null,
   legalCells: [],
-  turnActions: { actionsLeft: 2, rotated: false },
+  turnActions: { actionsLeft: 2, attackUsed: false },
   log: []
 };
 
@@ -167,7 +169,9 @@ const els = {
   endTitle: document.querySelector("#endTitle"),
   endMessage: document.querySelector("#endMessage"),
   endKicker: document.querySelector("#endKicker"),
-  restartFromEndButton: document.querySelector("#restartFromEndButton")
+  restartFromEndButton: document.querySelector("#restartFromEndButton"),
+  releaseNote: document.querySelector("#releaseNote"),
+  releaseNoteButton: document.querySelector("#releaseNoteButton")
 };
 
 function init() {
@@ -197,6 +201,10 @@ function wireEvents() {
     render();
   });
   els.restartFromEndButton.addEventListener("click", () => resetEncounter(true));
+  els.releaseNoteButton.addEventListener("click", () => {
+    state.releaseNoteShown = true;
+    render();
+  });
   els.tutorialDoneButton = document.querySelector("#tutorialDoneButton");
   els.tutorialDoneButton.addEventListener("click", () => {
     state.tutorialDone = true;
@@ -216,7 +224,8 @@ function renderRoster() {
   els.roster.innerHTML = "";
   heroes.forEach(hero => {
     const button = document.createElement("button");
-    button.className = `roster-card ${state.selectedIds.includes(hero.id) ? "selected" : ""}`;
+    const isSelected = state.selectedIds.includes(hero.id);
+    button.className = `roster-card ${isSelected ? "selected" : ""} ${tutorialTarget("roster", hero.id) ? "tutorial-target" : ""}`;
     button.style.backgroundImage = `url(${hero.image})`;
     button.innerHTML = `<span>${hero.name}</span>`;
     button.addEventListener("click", () => toggleHero(hero.id));
@@ -304,7 +313,8 @@ function resetEncounter(started) {
     ability: "Swarm: Health and aggro are shared between packs. Health = 11 x pack size."
   };
 
-  state.turnDeck = shuffle([...state.pieces.map(piece => piece.id), ...rats.map(rat => rat.id)]);
+  const encounterCards = [...state.pieces.map(piece => piece.id), ...rats.map(rat => rat.id)];
+  state.turnDeck = state.tutorialDone ? shuffle(encounterCards) : encounterCards;
   state.turnIndex = 0;
   if (started) {
     if (!state.pieces.every(hero => hero.minorPattern && hero.majorPattern && hero.movePattern)) assignStartingTiles();
@@ -360,9 +370,15 @@ function render() {
   if (els.statusPill) els.statusPill.textContent = state.finished ? state.finished : state.started ? `${displayActor()} card flipped` : "Setup";
   els.actionWheel.classList.toggle("open", state.wheelOpen);
   els.actionWheel.classList.toggle("waiting", state.started && !state.finished && !state.animating && Boolean(currentHero()) && !state.pendingAction);
+  els.wheelToggle.classList.toggle("tutorial-target", tutorialTarget("wheel"));
+  els.moveButton.classList.toggle("tutorial-target", tutorialTarget("move"));
+  els.minorAttackButton.classList.toggle("tutorial-target", tutorialTarget("minor"));
+  els.endTurnButton.classList.toggle("tutorial-target", tutorialTarget("end"));
+  els.startButton.classList.toggle("tutorial-target", tutorialTarget("start"));
   els.wheelToggle.textContent = state.wheelOpen ? "Hide" : "Actions";
   renderTutorial();
   renderEndOverlay();
+  renderReleaseNote();
   renderBoard();
   renderTurnDeck();
   renderCards();
@@ -391,7 +407,7 @@ function renderSetupFlow() {
   const choices = state.draftStep === "attack" ? hero.attackDraft : hero.moveDraft;
   els.draftChoices.innerHTML = `
     <div class="draft-choice-grid">
-      ${choices.map(pattern => `<button class="draft-choice ${isDraftSelected(pattern) ? "selected" : ""}" data-pattern="${pattern.id}">${tilePreview("", pattern)}</button>`).join("")}
+      ${choices.map(pattern => `<button class="draft-choice ${isDraftSelected(pattern) ? "selected" : ""} ${isDraftFading(pattern) ? "fading" : ""} ${tutorialTarget("draft", pattern.id) ? "tutorial-target" : ""}" data-pattern="${pattern.id}">${tilePreview("", pattern)}</button>`).join("")}
     </div>`;
   els.draftChoices.querySelectorAll(".draft-choice").forEach(button => {
     button.addEventListener("click", () => chooseDraftTile(button.dataset.pattern));
@@ -402,6 +418,10 @@ function isDraftSelected(pattern) {
   return state.draftStep === "attack"
     ? state.draftAttackPicks.includes(pattern.id)
     : state.draftMovePick === pattern.id;
+}
+
+function isDraftFading(pattern) {
+  return state.draftStep === "attack" && state.draftAttackPicks.length === 2 && !state.draftAttackPicks.includes(pattern.id);
 }
 
 function chooseDraftTile(patternId) {
@@ -417,7 +437,7 @@ function chooseDraftTile(patternId) {
       const picked = state.draftAttackPicks.map(id => hero.attackDraft.find(pattern => pattern.id === id));
       hero.minorPattern = picked[0];
       hero.majorPattern = picked[1];
-      setTimeout(() => {
+    setTimeout(() => {
         state.draftStep = "move";
         render();
       }, 350);
@@ -426,6 +446,7 @@ function chooseDraftTile(patternId) {
     state.draftMovePick = patternId;
     hero.movePattern = hero.moveDraft.find(pattern => pattern.id === patternId);
     setTimeout(() => {
+      if (!state.tutorialDone && state.draftHeroIndex === 0) state.tutorialPhase = "first-owl-done";
       state.draftHeroIndex += 1;
       prepareDraftForHero();
       render();
@@ -853,6 +874,7 @@ async function endTurn() {
     state.turnIndex += 1;
   }
   resetTurnActions();
+  const completedRatOne = state.playedTurns.includes("rat_a");
   const hero = currentHero();
   if (hero && !hero.sprintReady) {
     hero.sprintReady = true;
@@ -861,6 +883,10 @@ async function endTurn() {
   const rat = currentRat();
   if (rat) await runEnemyTurn(rat);
   checkOutcome();
+  if (completedRatOne && !state.tutorialDone) {
+    state.tutorialDone = true;
+    setCookie("hq_tutorial_done", "1", 365);
+  }
   render();
 }
 
@@ -954,32 +980,133 @@ function renderEndOverlay() {
   }
 }
 
+function renderReleaseNote() {
+  if (!els.releaseNote) return;
+  const shouldShow = state.tutorialDone && !state.releaseNoteShown && state.started && currentRat()?.label === "1" && state.playedTurns.includes("rat_a");
+  els.releaseNote.classList.toggle("show", Boolean(shouldShow));
+}
+
 function renderTutorial() {
   const bubble = document.querySelector("#tutorialBubble");
   const title = document.querySelector("#tutorialTitle");
   const text = document.querySelector("#tutorialText");
   const button = document.querySelector("#tutorialDoneButton");
-  if (!bubble || state.tutorialDone || !state.started || state.finished) {
+  const step = tutorialState();
+  if (!bubble || state.tutorialDone || state.finished || !step) {
     if (bubble) bubble.classList.remove("show");
     return;
   }
   bubble.classList.add("show");
+  title.textContent = step.title;
+  text.textContent = step.text;
+  if (button) button.textContent = step.done ? "Got it" : "Skip tutorial";
+}
+
+function tutorialState() {
+  if (!state.started && !state.drafting) {
+    return {
+      key: "start",
+      title: "Step 1: Choose Your Murder",
+      text: "For this guided first game, keep Tank, Rogue, Mage, and Healer selected. Click Choose Tiles to equip Tank first.",
+      done: false
+    };
+  }
+
+  if (state.drafting) {
+    const hero = state.pieces[state.draftHeroIndex];
+    if (!hero) return null;
+    if (state.draftHeroIndex > 0 || state.tutorialPhase === "first-owl-done") {
+      return {
+        key: "setup-rest",
+        title: "Finish Setup",
+        text: "Continue choosing tiles for the remaining owls the same way. The guided prompts return on Tank's first card.",
+        done: false
+      };
+    }
+    if (state.draftStep === "attack") {
+      const pickNumber = state.draftAttackPicks.length + 1;
+      return {
+        key: pickNumber === 1 ? "minor-draft" : "major-draft",
+        title: `Step ${state.draftHeroIndex + 2}: ${hero.name} ${pickNumber === 1 ? "Minor" : "Major"} Attack`,
+        text: pickNumber === 1
+          ? `Pick ${hero.name}'s first attack tile. This becomes their Minor attack.`
+          : `Pick ${hero.name}'s second attack tile. This becomes their Major attack; the unchosen tile fades away.`,
+        done: false
+      };
+    }
+    return {
+      key: "move-draft",
+      title: `Step ${state.draftHeroIndex + 2}: ${hero.name} Sprint`,
+      text: `Pick one Sprint tile for ${hero.name}. That completes the guided tile example; the rest of setup works the same way.`,
+      done: false
+    };
+  }
+
   const hero = currentHero();
   const rat = currentRat();
-  if (state.tutorialStep === 0) {
-    title.textContent = "Turn Card";
-    text.textContent = "Follow the highlighted turn card. This order repeats for the whole encounter without reshuffling.";
-  } else if (state.tutorialStep === 1) {
-    title.textContent = "Hero Actions";
-    text.textContent = hero ? `${hero.name} may rotate freely, then take two actions. Only one attack can be used per turn, and Sprint ends the action sequence.` : "When a hero card appears, rotate freely, then take two actions.";
-  } else if (rat) {
-    title.textContent = "Rat Turns";
-    text.textContent = `Rat ${rat.label} acts from its own card. Let it resolve, then press End to continue.`;
-  } else {
-    title.textContent = "Rat Turns";
-    text.textContent = "Each rat has its own card. End the rat turn after its action resolves.";
+  if (hero) {
+    if (hero.id !== "tank") return null;
+    if (!state.wheelOpen && state.turnActions.actionsLeft === 2) {
+      return {
+        key: "wheel",
+        title: `Step: ${hero.name}'s First Turn`,
+        text: `The highlighted card is ${hero.name}. Click Actions to open the wheel. Since the owls start clustered, move first to create a clean attack lane.`,
+        done: false
+      };
+    }
+    if (state.wheelOpen && state.turnActions.actionsLeft === 2) {
+      return {
+        key: "move",
+        title: "Step: Move First",
+        text: "Click Move, then choose a highlighted square. Moving before attacking helps avoid catching allies in your pattern.",
+        done: false
+      };
+    }
+    if (state.wheelOpen && state.turnActions.actionsLeft === 1 && !state.turnActions.attackUsed) {
+      return {
+        key: "minor",
+        title: "Step: Then Attack",
+        text: "Click Minor to project Tank's attack tile. Every occupied square in the pattern is affected, so facing and spacing matter.",
+        done: false
+      };
+    }
+    if (state.turnActions.actionsLeft < 2) {
+      return {
+        key: "end",
+        title: "Step: Finish the Card",
+        text: "After taking actions, click End to move to the next revealed card. The order will loop without reshuffling.",
+        done: true
+      };
+    }
   }
-  if (button) button.textContent = state.tutorialStep >= 2 ? "Got it" : "Next";
+  if (rat) {
+    if (rat.label !== "1") return null;
+    return {
+      key: "end",
+      title: `Step: Rat ${rat.label}'s Card`,
+      text: "This is the first rat card. Let the rat resolve, then click End. After this, you have completed the guided basics.",
+      done: true
+    };
+  }
+  return null;
+}
+
+function tutorialTarget(kind, id = null) {
+  if (state.tutorialDone) return false;
+  const step = tutorialState();
+  if (!step) return false;
+  if (kind === "roster") return step.key === "start" && ["tank", "rogue", "mage", "healer"].includes(id);
+  if (kind === "start") return step.key === "start";
+  if (kind === "draft") {
+    const hero = state.pieces[state.draftHeroIndex];
+    if (!hero) return false;
+    if (step.key === "setup-rest") return false;
+    if (step.key === "minor-draft" || step.key === "major-draft") {
+      return hero.attackDraft.some(pattern => pattern.id === id);
+    }
+    if (step.key === "move-draft") return hero.moveDraft.some(pattern => pattern.id === id);
+  }
+  return step.key === kind;
 }
 
 function applyLayoutMode() {
@@ -996,7 +1123,13 @@ function toggleLayoutMode() {
 function restartTutorial() {
   state.tutorialDone = false;
   state.tutorialStep = 0;
+  state.tutorialPhase = "setup";
+  state.selectedIds = ["tank", "rogue", "mage", "healer"];
+  state.started = false;
+  state.drafting = false;
+  state.pieces = [];
   setCookie("hq_tutorial_done", "0", -1);
+  renderRoster();
   render();
 }
 

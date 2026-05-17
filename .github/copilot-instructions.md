@@ -6,4 +6,5 @@
 - For the Owl/Rat deck switch, place the controls lower below the art, with a single center slider cap that moves to the hovered tab, changes to that tab's color, and visually completes the top of the button.
 
 ### Embedded Game
-- Do not modify embedded game files for modal sizing; adjust only how the site presents the game (e.g., container sizing, CSS wrappers, or modal presentation).
+- Prefer adjusting how the site presents the game (e.g., container sizing, CSS wrappers, or modal presentation) rather than modifying embedded game files for modal sizing.
+- If modification of embedded game files is necessary, make minimal, targeted changes and avoid broad or extensive rewrites.

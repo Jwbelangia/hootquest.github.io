@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hoot Quest Strict Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="setup" id="setupPanel">
+      </section>
+
+      <section class="table">
+        <aside class="side-panel">
+          <h2>Turn Deck</h2>
+          <div id="turnDeck" class="turn-deck"></div>
+          <div id="setupSlot" class="setup-slot">
+            <h2>Choose 4 Owls</h2>
+            <p>Five classes are available. Four enter the burrow.</p>
+            <div class="roster" id="roster"></div>
+            <button id="startButton" class="primary">Start Pack Rat Encounter</button>
+          </div>
+          <div id="heroCards" class="active-card-slot"></div>
+        </aside>
+
+        <section class="board-wrap">
+          <div class="scenario-strip">
+            <div>
+              <p class="eyebrow">Playforge Entertainment Demo</p>
+              <h2>The Burrow Warrens: Pack Rat Test</h2>
+            </div>
+            <div class="top-actions">
+              <button id="fullscreenButton">Full Screen</button>
+              <button id="newGameButton" class="primary">New Encounter</button>
+            </div>
+          </div>
+          <div id="board" class="board" aria-label="6 by 6 Hoot Quest board"></div>
+          <div id="actionWheel" class="action-wheel">
+            <button id="wheelToggle" class="wheel-center" aria-label="Open actions">Actions</button>
+            <button id="rotateLeftButton" class="wheel-action a1">Left</button>
+            <button id="rotateRightButton" class="wheel-action a2">Right</button>
+            <button id="moveButton" class="wheel-action a3">Move</button>
+            <button id="sprintButton" class="wheel-action a4">Sprint</button>
+            <button id="minorAttackButton" class="wheel-action a5">Minor</button>
+            <button id="majorAttackButton" class="wheel-action a6">Major</button>
+            <button id="endTurnButton" class="wheel-action a7">End</button>
+          </div>
+        </section>
+
+        <aside class="side-panel cards-panel">
+          <h2>Enemy Card</h2>
+          <div id="enemyCard"></div>
+          <h2>Friction Log</h2>
+          <ol id="log" class="log"></ol>
+        </aside>
+      </section>
+
+      <section id="endOverlay" class="end-overlay" aria-live="polite">
+        <div class="end-card">
+          <p id="endKicker" class="eyebrow">Campaign Result</p>
+          <h2 id="endTitle"></h2>
+          <p id="endMessage"></p>
+          <div class="end-logo">Hoot Quest</div>
+          <button id="restartFromEndButton" class="primary">Return to the Fight</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

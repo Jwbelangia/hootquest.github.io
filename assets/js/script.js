@@ -126,6 +126,10 @@ const campaignStoryCloseButtons = document.querySelectorAll("[data-campaign-stor
 const supportModal = document.querySelector("[data-support-modal]");
 const supportModalOpenButtons = document.querySelectorAll("[data-support-modal-open]");
 const supportModalCloseButtons = document.querySelectorAll("[data-support-modal-close]");
+const gameModal = document.querySelector("[data-game-modal]");
+const gameModalFrame = document.querySelector("[data-game-modal-frame]");
+const gameModalOpenButtons = document.querySelectorAll("[data-game-modal-open]");
+const gameModalCloseButtons = document.querySelectorAll("[data-game-modal-close]");
 const paymentModal = document.querySelector("[data-payment-modal]");
 const paymentModalTitle = document.querySelector("[data-payment-modal-title]");
 const paymentModalText = document.querySelector("[data-payment-modal-text]");
@@ -443,6 +447,18 @@ if (supportModal) {
   }
 }
 
+if (gameModal) {
+  for (let i = 0; i < gameModalOpenButtons.length; i++) {
+    gameModalOpenButtons[i].addEventListener("click", function () {
+      openGameModal();
+    });
+  }
+
+  for (let i = 0; i < gameModalCloseButtons.length; i++) {
+    gameModalCloseButtons[i].addEventListener("click", closeGameModal);
+  }
+}
+
 if (paymentModal) {
   for (let i = 0; i < paymentModalCloseButtons.length; i++) {
     paymentModalCloseButtons[i].addEventListener("click", closePaymentModal);
@@ -513,6 +529,10 @@ document.addEventListener("keydown", function (event) {
 
     if (supportModal && !supportModal.hidden) {
       closeSupportModal();
+    }
+
+    if (gameModal && !gameModal.hidden) {
+      closeGameModal();
     }
 
     if (paymentModal && !paymentModal.hidden) {
@@ -1397,6 +1417,28 @@ function closeSupportModal() {
   }
 
   supportModal.hidden = true;
+  unlockBodyScroll();
+}
+
+function openGameModal() {
+  if (!gameModal) {
+    return;
+  }
+
+  if (gameModalFrame && !gameModalFrame.getAttribute("src")) {
+    gameModalFrame.src = "./assets/games/site-package/index.html";
+  }
+
+  gameModal.hidden = false;
+  lockBodyScroll();
+}
+
+function closeGameModal() {
+  if (!gameModal) {
+    return;
+  }
+
+  gameModal.hidden = true;
   unlockBodyScroll();
 }
 

@@ -1320,6 +1320,57 @@ body {
   margin-block-start: 8px;
 }
 
+.game-modal {
+  z-index: 10;
+}
+
+.game-modal-dialog {
+  width: min(1400px, calc(100vw - 32px));
+  max-width: 1400px;
+  height: min(92vh, 980px);
+  max-height: 92vh;
+  padding: 20px;
+  display: grid;
+}
+
+.game-modal-content {
+  display: grid;
+  gap: 16px;
+  min-height: 0;
+  padding-block-start: 18px;
+}
+
+.game-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.game-modal-header .hero-modal-note {
+  margin: 0;
+  max-width: 34ch;
+}
+
+.game-modal-frame-wrap {
+  min-height: 0;
+  flex: 1;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid hsla(42, 99%, 46%, 0.18);
+  background: linear-gradient(180deg, hsl(277, 25%, 18%) 0%, hsl(280, 11%, 11%) 100%);
+  box-shadow: inset 0 0 0 1px hsla(0, 0%, 100%, 0.04);
+}
+
+.game-modal-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 66vh;
+  border: 0;
+  display: block;
+  background-color: hsl(280, 11%, 11%);
+}
+
 .figurine-picker-grid {
   display: grid;
   grid-template-columns: 1fr;

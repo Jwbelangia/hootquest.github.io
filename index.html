@@ -567,7 +567,7 @@
                             <img src="./assets/images/Play.png" width="600" height="400" loading="lazy"
                                  alt="Live Match Video" class="img-cover">
 
-                            <button class="play-btn" aria-label="play featured video">
+                            <button class="play-btn" type="button" aria-label="Play HootQuest demo" data-game-modal-open>
                                 <ion-icon name="play"></ion-icon>
                             </button>
 
@@ -1304,6 +1304,31 @@
                         <span class="span">Back to Site</span>
                         <ion-icon name="arrow-back" aria-hidden="true"></ion-icon>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-modal game-modal" data-game-modal hidden>
+        <div class="hero-modal-overlay" data-game-modal-close></div>
+
+        <div class="hero-modal-dialog game-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="game-modal-title">
+            <button class="hero-modal-close" type="button" aria-label="Close game modal" data-game-modal-close>
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+
+            <div class="hero-modal-content game-modal-content">
+                <div class="game-modal-header">
+                    <div>
+                        <p class="hero-modal-subtitle">Playable Demo</p>
+                        <h3 class="h3" id="game-modal-title">HootQuest Demo Encounter</h3>
+                    </div>
+
+                    <p class="hero-modal-note">Launch the encounter here or use the game's fullscreen control for the full experience.</p>
+                </div>
+
+                <div class="game-modal-frame-wrap">
+                    <iframe src="./assets/games/site-package/index.html" title="HootQuest playable game demo" class="game-modal-frame" data-game-modal-frame loading="lazy" allow="fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 </div>
             </div>
         </div>

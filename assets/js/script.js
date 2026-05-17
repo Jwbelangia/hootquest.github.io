@@ -141,6 +141,7 @@ const figurineAdjustButtons = document.querySelectorAll("[data-figurine-adjust]"
 const figurineQuantityDisplays = document.querySelectorAll("[data-figurine-quantity]");
 const figurineSubmitButton = document.querySelector("[data-figurine-submit]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
+let gameModalResizeTimerId = null;
 const orderDraftKey = "hootquest-order-draft";
 const orderDraftIdKey = "hootquest-order-draft-id";
 const orderInvoiceCookieKey = "hootquest-last-invoice";
@@ -1425,17 +1426,49 @@ function openGameModal() {
     return;
   }
 
-  if (gameModalFrame && !gameModalFrame.getAttribute("src")) {
-    gameModalFrame.src = "./assets/games/site-package/index.html";
-  }
-
   gameModal.hidden = false;
   lockBodyScroll();
+
+  if (!gameModalFrame) {
+    return;
+  }
+
+  const gameSrc = gameModalFrame.dataset.gameSrc || "./assets/games/site-package/index.html";
+
+  window.setTimeout(function () {
+    if (gameModal.hidden || !gameModalFrame) {
+      return;
+    }
+
+    gameModalFrame.src = `${gameSrc}?view=${Date.now()}`;
+  }, 40);
+
+  if (gameModalResizeTimerId) {
+    window.clearTimeout(gameModalResizeTimerId);
+  }
+
+  gameModalResizeTimerId = window.setTimeout(function () {
+    if (gameModal.hidden || !gameModalFrame) {
+      return;
+    }
+
+    gameModalFrame.src = `${gameSrc}?view=${Date.now()}`;
+    gameModalResizeTimerId = null;
+  }, 220);
 }
 
 function closeGameModal() {
   if (!gameModal) {
     return;
+  }
+
+  if (gameModalResizeTimerId) {
+    window.clearTimeout(gameModalResizeTimerId);
+    gameModalResizeTimerId = null;
+  }
+
+  if (gameModalFrame) {
+    gameModalFrame.src = "about:blank";
   }
 
   gameModal.hidden = true;

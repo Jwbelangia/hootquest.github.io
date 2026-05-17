@@ -158,12 +158,6 @@ const packageCatalog = [
     description: "Base HootQuest box with core encounter content. Includes Swarm of the Rat King expansion."
   },
   {
-    id: "rat-king-expansion",
-    name: "Swarm of the Rat King Expansion",
-    price: 39.99,
-    description: "Expansion content pack with Rat figurings, Campaign booklet, Campaign Pattern."
-  },
-  {
     id: "owlcrest-collectible",
     name: "Owlcrest Medium Figurine",
     price: 14.99,

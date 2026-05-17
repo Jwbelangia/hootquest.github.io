@@ -108,6 +108,11 @@ function toPattern(id, [name, grid], bag, type) {
 let state = {
   selectedIds: ["tank", "rogue", "mage", "healer"],
   started: false,
+  drafting: false,
+  draftHeroIndex: 0,
+  draftStep: "attack",
+  draftAttackPicks: [],
+  draftMovePick: null,
   pieces: [],
   enemy: null,
   turnDeck: [],
@@ -116,6 +121,8 @@ let state = {
   wheelOpen: false,
   finished: null,
   animating: false,
+  layoutMode: getCookie("hq_layout") || "desktop",
+  tutorialDone: getCookie("hq_tutorial_done") === "1",
   phase: "setup",
   pendingAction: null,
   selectedPatternId: null,
@@ -127,6 +134,10 @@ let state = {
 const els = {
   setupPanel: document.querySelector("#setupPanel"),
   setupSlot: document.querySelector("#setupSlot"),
+  teamSetup: document.querySelector("#teamSetup"),
+  draftSetup: document.querySelector("#draftSetup"),
+  draftCard: document.querySelector("#draftCard"),
+  draftChoices: document.querySelector("#draftChoices"),
   roster: document.querySelector("#roster"),
   startButton: document.querySelector("#startButton"),
   newGameButton: document.querySelector("#newGameButton"),
@@ -148,6 +159,8 @@ const els = {
   majorAttackButton: document.querySelector("#majorAttackButton"),
   endTurnButton: document.querySelector("#endTurnButton"),
   fullscreenButton: document.querySelector("#fullscreenButton"),
+  layoutButton: document.querySelector("#layoutButton"),
+  tutorialButton: document.querySelector("#tutorialButton"),
   wheelToggle: document.querySelector("#wheelToggle"),
   actionWheel: document.querySelector("#actionWheel"),
   endOverlay: document.querySelector("#endOverlay"),
@@ -158,6 +171,8 @@ const els = {
 };
 
 function init() {
+  if (!getCookie("hq_layout")) setCookie("hq_layout", state.layoutMode, 365);
+  applyLayoutMode();
   renderRoster();
   wireEvents();
   resetEncounter(false);
@@ -165,7 +180,7 @@ function init() {
 }
 
 function wireEvents() {
-  els.startButton.addEventListener("click", () => resetEncounter(true));
+  els.startButton.addEventListener("click", beginDraft);
   els.newGameButton.addEventListener("click", () => resetEncounter(false));
   els.rotateLeftButton.addEventListener("click", () => rotateActor(-1));
   els.rotateRightButton.addEventListener("click", () => rotateActor(1));
@@ -175,11 +190,19 @@ function wireEvents() {
   els.majorAttackButton.addEventListener("click", () => beginPattern("major"));
   els.endTurnButton.addEventListener("click", () => endTurn());
   els.fullscreenButton.addEventListener("click", toggleFullscreen);
+  els.layoutButton.addEventListener("click", toggleLayoutMode);
+  els.tutorialButton.addEventListener("click", restartTutorial);
   els.wheelToggle.addEventListener("click", () => {
     state.wheelOpen = !state.wheelOpen;
     render();
   });
   els.restartFromEndButton.addEventListener("click", () => resetEncounter(true));
+  els.tutorialDoneButton = document.querySelector("#tutorialDoneButton");
+  els.tutorialDoneButton.addEventListener("click", () => {
+    state.tutorialDone = true;
+    setCookie("hq_tutorial_done", "1", 365);
+    render();
+  });
   if (els.patternSelect) {
     els.patternSelect.addEventListener("change", () => {
       state.selectedPatternId = els.patternSelect.value;
@@ -201,6 +224,41 @@ function renderRoster() {
   });
 }
 
+function beginDraft() {
+  state.pieces = createSelectedPieces();
+  state.drafting = true;
+  state.draftHeroIndex = 0;
+  prepareDraftForHero();
+  render();
+}
+
+function createSelectedPieces() {
+  const starts = [{ x: 0, y: 5 }, { x: 1, y: 5 }, { x: 0, y: 4 }, { x: 1, y: 4 }];
+  const selected = state.selectedIds.slice(0, 4).map(id => heroes.find(hero => hero.id === id));
+  return selected.map((hero, index) => ({
+    ...hero,
+    kind: "hero",
+    x: starts[index].x,
+    y: starts[index].y,
+    facing: "N",
+    hp: hero.health,
+    gold: 0,
+    majorReady: false,
+    sprintReady: true,
+    knockedOut: false
+  }));
+}
+
+function prepareDraftForHero() {
+  const hero = state.pieces[state.draftHeroIndex];
+  if (!hero) return startEncounterFromDraft();
+  hero.attackDraft = shuffle(patterns[hero.bag]).slice(0, 3);
+  hero.moveDraft = shuffle(patterns.move).slice(0, 2);
+  state.draftStep = "attack";
+  state.draftAttackPicks = [];
+  state.draftMovePick = null;
+}
+
 function toggleHero(id) {
   if (state.started) return;
   if (state.selectedIds.includes(id)) {
@@ -214,6 +272,7 @@ function toggleHero(id) {
 
 function resetEncounter(started) {
   state.started = started;
+  state.drafting = false;
   state.phase = started ? "hero" : "setup";
   state.pendingAction = null;
   state.legalCells = [];
@@ -223,20 +282,7 @@ function resetEncounter(started) {
   state.wheelOpen = false;
   resetTurnActions();
 
-  const starts = [{ x: 0, y: 5 }, { x: 1, y: 5 }, { x: 0, y: 4 }, { x: 1, y: 4 }];
-  const selected = state.selectedIds.slice(0, 4).map(id => heroes.find(hero => hero.id === id));
-  state.pieces = selected.map((hero, index) => ({
-    ...hero,
-    kind: "hero",
-    x: starts[index].x,
-    y: starts[index].y,
-    facing: "N",
-    hp: hero.health,
-    gold: 0,
-    majorReady: false,
-    sprintReady: true,
-    knockedOut: false
-  }));
+  if (!state.pieces.length || !started) state.pieces = createSelectedPieces();
 
   const rats = [
     { id: "rat_a", label: "1", x: 4, y: 0, facing: "S", hp: 11 },
@@ -261,11 +307,15 @@ function resetEncounter(started) {
   state.turnDeck = shuffle([...state.pieces.map(piece => piece.id), ...rats.map(rat => rat.id)]);
   state.turnIndex = 0;
   if (started) {
-    assignStartingTiles();
+    if (!state.pieces.every(hero => hero.minorPattern && hero.majorPattern && hero.movePattern)) assignStartingTiles();
     addLog("Encounter started. Initiative cards are shuffled once and flipped one at a time.");
   }
   renderRoster();
   render();
+}
+
+function startEncounterFromDraft() {
+  resetEncounter(true);
 }
 
 function assignStartingTiles() {
@@ -296,7 +346,7 @@ function currentRat() {
 }
 
 function resetTurnActions() {
-  state.turnActions = { actionsLeft: 2, rotated: false };
+  state.turnActions = { actionsLeft: 2, attackUsed: false };
 }
 
 function isHeroTurn() {
@@ -306,9 +356,12 @@ function isHeroTurn() {
 function render() {
   els.setupPanel.style.display = state.started ? "none" : "flex";
   els.setupSlot.style.display = state.started ? "none" : "grid";
+  renderSetupFlow();
   if (els.statusPill) els.statusPill.textContent = state.finished ? state.finished : state.started ? `${displayActor()} card flipped` : "Setup";
   els.actionWheel.classList.toggle("open", state.wheelOpen);
+  els.actionWheel.classList.toggle("waiting", state.started && !state.finished && !state.animating && Boolean(currentHero()) && !state.pendingAction);
   els.wheelToggle.textContent = state.wheelOpen ? "Hide" : "Actions";
+  renderTutorial();
   renderEndOverlay();
   renderBoard();
   renderTurnDeck();
@@ -317,6 +370,68 @@ function render() {
   renderLog();
   if (els.patternSelect) renderPatternSelect();
   syncButtons();
+}
+
+function renderSetupFlow() {
+  if (!els.teamSetup || !els.draftSetup) return;
+  els.teamSetup.style.display = state.drafting ? "none" : "grid";
+  els.draftSetup.classList.toggle("active", state.drafting);
+  if (!state.drafting) return;
+  const hero = state.pieces[state.draftHeroIndex];
+  if (!hero) return;
+  els.draftCard.innerHTML = `
+    <article class="hero-card">
+      <div class="card-art" style="background-image:url(${hero.image})">
+        <div class="card-title"><span>${hero.name}</span><span>${state.draftStep === "attack" ? "Attack" : "Move"}</span></div>
+      </div>
+      <div class="card-body">
+        <div class="ability">${state.draftStep === "attack" ? "Pick two attack patterns." : "Pick one sprint pattern."}</div>
+      </div>
+    </article>`;
+  const choices = state.draftStep === "attack" ? hero.attackDraft : hero.moveDraft;
+  els.draftChoices.innerHTML = `
+    <div class="draft-choice-grid">
+      ${choices.map(pattern => `<button class="draft-choice ${isDraftSelected(pattern) ? "selected" : ""}" data-pattern="${pattern.id}">${tilePreview("", pattern)}</button>`).join("")}
+    </div>`;
+  els.draftChoices.querySelectorAll(".draft-choice").forEach(button => {
+    button.addEventListener("click", () => chooseDraftTile(button.dataset.pattern));
+  });
+}
+
+function isDraftSelected(pattern) {
+  return state.draftStep === "attack"
+    ? state.draftAttackPicks.includes(pattern.id)
+    : state.draftMovePick === pattern.id;
+}
+
+function chooseDraftTile(patternId) {
+  const hero = state.pieces[state.draftHeroIndex];
+  if (!hero) return;
+  if (state.draftStep === "attack") {
+    if (state.draftAttackPicks.includes(patternId)) {
+      state.draftAttackPicks = state.draftAttackPicks.filter(id => id !== patternId);
+    } else if (state.draftAttackPicks.length < 2) {
+      state.draftAttackPicks.push(patternId);
+    }
+    if (state.draftAttackPicks.length === 2) {
+      const picked = state.draftAttackPicks.map(id => hero.attackDraft.find(pattern => pattern.id === id));
+      hero.minorPattern = picked[0];
+      hero.majorPattern = picked[1];
+      setTimeout(() => {
+        state.draftStep = "move";
+        render();
+      }, 350);
+    }
+  } else {
+    state.draftMovePick = patternId;
+    hero.movePattern = hero.moveDraft.find(pattern => pattern.id === patternId);
+    setTimeout(() => {
+      state.draftHeroIndex += 1;
+      prepareDraftForHero();
+      render();
+    }, 350);
+  }
+  render();
 }
 
 function renderBoard() {
@@ -333,9 +448,10 @@ function renderBoard() {
       const piece = pieceAt(x, y);
       if (piece) {
         const token = document.createElement("div");
-        token.className = `piece ${piece.kind} ${piece.ringClass || ""} ${piece.id === currentActorId() ? "current-piece" : ""}`;
+        token.className = `piece ${piece.kind} ${piece.ringClass || ""} ${piece.id === currentActorId() ? "current-piece" : ""} ${piece.kind === "hero" && piece.hp < 5 && piece.id !== currentActorId() ? "low-health" : ""}`;
         token.style.backgroundImage = `url(${piece.image || "assets/ratpack.png"})`;
-        token.style.transform = `rotate(${facingDegrees(piece.facing)}deg)`;
+        const degrees = facingDegrees(piece.facing);
+        token.style.transform = `rotate(${degrees}deg)`;
         token.title = piece.name || "Rat";
         token.dataset.info = pieceInfo(piece);
         cell.appendChild(token);
@@ -350,7 +466,7 @@ function pieceAt(x, y) {
   if (hero) return { ...hero, kind: "hero" };
   const ratIndex = state.enemy?.pieces.findIndex(piece => piece.x === x && piece.y === y && piece.hp > 0) ?? -1;
   const rat = ratIndex >= 0 ? state.enemy.pieces[ratIndex] : null;
-  if (rat) return { ...rat, kind: "rat", name: `Rat ${rat.label}`, image: "assets/ratpack.png", ringClass: `rat-ring-${rat.label}` };
+  if (rat && state.enemy.hp > 0) return { ...rat, kind: "rat", name: `Rat ${rat.label}`, image: "assets/ratpack.png", ringClass: `rat-ring-${rat.label}` };
   return null;
 }
 
@@ -358,7 +474,7 @@ function pieceInfo(piece) {
   if (piece.kind === "hero") {
     return `${piece.name}\nHealth ${piece.hp}/${piece.health}\nSprint ${piece.sprintReady ? "◆" : "◇"}\nMajor ${piece.majorReady ? "◆" : "◇"}`;
   }
-  return `${piece.name}\nHealth ${piece.hp}/11\nPack HP ${Math.max(0, state.enemy.hp)}/${state.enemy.health}`;
+  return `${piece.name}\nShared Health ${Math.max(0, state.enemy.hp)}/${state.enemy.health}`;
 }
 
 function renderTurnDeck() {
@@ -396,7 +512,7 @@ function renderCards() {
         ${slider("Speed", state.enemy.speed, 10)}
         ${slider("Strength", state.enemy.strength, 10)}
         ${slider("Weight", state.enemy.weight, 10)}
-        <div class="ability">Aggro: ${state.enemy.aggroHeroId ? nameForId(state.enemy.aggroHeroId) : "none"} | This rat: ${rat.hp}/11</div>
+        <div class="ability">Aggro: ${state.enemy.aggroHeroId ? nameForId(state.enemy.aggroHeroId) : "none"} | Shared pack health</div>
       </div>`;
     els.heroCards.appendChild(card);
     return;
@@ -414,7 +530,7 @@ function renderCards() {
         ${slider("Strength", hero.strength, 10)}
         ${slider("Weight", hero.weight, 10)}
         ${slider("Crit", hero.crit, 20)}
-        <div class="ability">Gold: ${hero.gold} | Actions left: ${state.turnActions.actionsLeft} | Rotate: ${state.turnActions.rotated ? "used" : "ready"}</div>
+        <div class="ability">Gold: ${hero.gold} | Actions left: ${state.turnActions.actionsLeft} | Attack: ${state.turnActions.attackUsed ? "used" : "ready"}</div>
         <div class="ability">Major: ${hero.majorReady ? "ready" : "locked/cooling"} | Sprint: ${hero.sprintReady ? "ready" : "cooling"}</div>
         <div class="equipped-tiles">
           ${tilePreview("Minor", hero.minorPattern)}
@@ -429,7 +545,7 @@ function tilePreview(label, pattern) {
   if (!pattern) return "";
   return `
     <div class="tile-preview">
-      <span>${label}</span>
+      ${label ? `<span>${label}</span>` : ""}
       <div class="tile-grid">
         ${pattern.grid.flatMap(row => row.map(cell => `<i class="${cell === "P" ? "origin" : cell === "#" ? "mark" : ""}">${cell === "P" ? "▲" : ""}</i>`)).join("")}
       </div>
@@ -449,7 +565,7 @@ function renderEnemy() {
         ${slider("Strength", state.enemy.strength, 10)}
         ${slider("Weight", state.enemy.weight, 10)}
         <div class="ability"><strong>${state.enemy.ability}</strong></div>
-        <div class="ability">Aggro: ${state.enemy.aggroHeroId ? nameForId(state.enemy.aggroHeroId) : "none"} | Pieces: ${state.enemy.pieces.filter(rat => rat.hp > 0).length} | ${defeated ? "Defeated" : "Active"}</div>
+        <div class="ability">Aggro: ${state.enemy.aggroHeroId ? nameForId(state.enemy.aggroHeroId) : "none"} | Pieces: ${state.enemy.pieces.length} | ${defeated ? "Defeated" : "Active"}</div>
       </div>
     </article>`;
 }
@@ -494,12 +610,12 @@ function syncButtons() {
   const hero = currentHero();
   const active = state.started && !state.finished && !state.animating && Boolean(hero);
   const hasAction = active && state.turnActions.actionsLeft > 0 && !hero.knockedOut;
-  els.rotateLeftButton.disabled = !active || state.turnActions.rotated;
-  els.rotateRightButton.disabled = !active || state.turnActions.rotated;
+  els.rotateLeftButton.disabled = !active || Boolean(state.pendingAction);
+  els.rotateRightButton.disabled = !active || Boolean(state.pendingAction);
   els.moveButton.disabled = !hasAction;
   els.sprintButton.disabled = !hasAction || !hero.sprintReady;
-  els.minorAttackButton.disabled = !hasAction;
-  els.majorAttackButton.disabled = !hasAction || !hero.majorReady;
+  els.minorAttackButton.disabled = !hasAction || state.turnActions.attackUsed;
+  els.majorAttackButton.disabled = !hasAction || state.turnActions.attackUsed || !hero.majorReady;
   els.endTurnButton.disabled = !state.started || Boolean(state.finished);
   if (els.patternSelect) els.patternSelect.disabled = !active || !state.pendingAction;
 }
@@ -518,10 +634,9 @@ async function handleCellClick(x, y) {
 
 function rotateActor(step) {
   const hero = currentHero();
-  if (!hero || state.turnActions.rotated) return;
+  if (!hero || state.pendingAction) return;
   const next = (dirs.indexOf(hero.facing) + step + dirs.length) % dirs.length;
   hero.facing = dirs[next];
-  state.turnActions.rotated = true;
   addLog(`${hero.name} faces ${hero.facing}.`);
   refreshLegalCells();
   render();
@@ -546,10 +661,10 @@ async function sprintTo(x, y) {
   }
   await movePieceAlongPath(hero, buildPath(hero, { x, y }));
   hero.sprintReady = false;
-  spendAction();
+  state.turnActions.actionsLeft = 0;
   state.pendingAction = null;
   state.legalCells = [];
-  addLog(`${hero.name} sprints to ${coord(x, y)}. Sprint enters cooldown.`);
+  addLog(`${hero.name} sprints to ${coord(x, y)}. Sprint enters cooldown and ends their actions.`);
   render();
 }
 
@@ -632,7 +747,7 @@ function equippedOptions(hero, action) {
 
 function attackCell(x, y, action, batch = false) {
   const hero = currentHero();
-  const rat = state.enemy.pieces.find(piece => piece.x === x && piece.y === y && piece.hp > 0);
+  const rat = state.enemy.pieces.find(piece => piece.x === x && piece.y === y && state.enemy.hp > 0);
   const ally = state.pieces.find(piece => piece.x === x && piece.y === y && piece.id !== hero.id && piece.hp > 0);
   if (!rat && !ally) {
     addLog("Attack resolved against empty space. No damage rolled.");
@@ -667,12 +782,10 @@ function attackCell(x, y, action, batch = false) {
     if (hero.id === "healer") {
       const previous = state.enemy.hp;
       state.enemy.hp = Math.min(state.enemy.health, state.enemy.hp + damage);
-      rat.hp = Math.min(11, rat.hp + damage);
       hero.gold = Math.max(0, hero.gold - damage);
       addLog(`${hero.name}'s attack heals the Pack Rat at ${coord(x, y)} for ${state.enemy.hp - previous}. Gold penalty applied.`);
     } else {
       state.enemy.hp -= damage;
-      rat.hp = Math.max(0, rat.hp - damage);
       state.enemy.aggroHeroId = hero.id;
       hero.gold += action === "major" ? damage : 1;
       addLog(`${hero.name} hits Pack Rat at ${coord(x, y)} for ${damage}. Shared HP now ${Math.max(0, state.enemy.hp)}.`);
@@ -692,6 +805,7 @@ function attackCell(x, y, action, batch = false) {
     }
   }
   if (!batch) {
+    state.turnActions.attackUsed = true;
     spendAction();
     state.pendingAction = null;
     state.legalCells = [];
@@ -704,12 +818,13 @@ async function resolvePatternAttack(action) {
   const hero = currentHero();
   if (!hero || !state.legalCells.length) return;
   const targets = state.legalCells
-    .map(pos => ({ ...pos, rat: state.enemy.pieces.find(piece => piece.x === pos.x && piece.y === pos.y && piece.hp > 0), ally: state.pieces.find(piece => piece.x === pos.x && piece.y === pos.y && piece.id !== hero.id && piece.hp > 0) }))
+    .map(pos => ({ ...pos, rat: state.enemy.pieces.find(piece => piece.x === pos.x && piece.y === pos.y && state.enemy.hp > 0), ally: state.pieces.find(piece => piece.x === pos.x && piece.y === pos.y && piece.id !== hero.id && piece.hp > 0) }))
     .filter(pos => pos.rat || pos.ally);
 
   if (!targets.length) {
     await animatePattern(hero.bag, state.legalCells);
     addLog(`${hero.name}'s pattern resolves with no occupied targets.`);
+    state.turnActions.attackUsed = true;
     spendAction();
     state.pendingAction = null;
     state.legalCells = [];
@@ -718,6 +833,7 @@ async function resolvePatternAttack(action) {
 
   await animatePattern(hero.id === "healer" ? "heal" : hero.bag, state.legalCells);
   targets.forEach(target => attackCell(target.x, target.y, action, true));
+  state.turnActions.attackUsed = true;
   spendAction();
   state.pendingAction = null;
   state.legalCells = [];
@@ -749,7 +865,7 @@ async function endTurn() {
 }
 
 async function runEnemyTurn(activeRat) {
-  if (state.enemy.hp <= 0 || !activeRat || activeRat.hp <= 0) return;
+  if (state.enemy.hp <= 0 || !activeRat) return;
   addLog(`Rat ${activeRat.label} turn begins.`);
   const target = chooseRatTarget();
   state.enemy.aggroHeroId = target.id;
@@ -836,6 +952,64 @@ function renderEndOverlay() {
     els.endTitle.textContent = "OwlCrest Distress Grows";
     els.endMessage.textContent = "OwlCrest distress grows. Brave adventurer, return to the fight.";
   }
+}
+
+function renderTutorial() {
+  const bubble = document.querySelector("#tutorialBubble");
+  const title = document.querySelector("#tutorialTitle");
+  const text = document.querySelector("#tutorialText");
+  const button = document.querySelector("#tutorialDoneButton");
+  if (!bubble || state.tutorialDone || !state.started || state.finished) {
+    if (bubble) bubble.classList.remove("show");
+    return;
+  }
+  bubble.classList.add("show");
+  const hero = currentHero();
+  const rat = currentRat();
+  if (state.tutorialStep === 0) {
+    title.textContent = "Turn Card";
+    text.textContent = "Follow the highlighted turn card. This order repeats for the whole encounter without reshuffling.";
+  } else if (state.tutorialStep === 1) {
+    title.textContent = "Hero Actions";
+    text.textContent = hero ? `${hero.name} may rotate freely, then take two actions. Only one attack can be used per turn, and Sprint ends the action sequence.` : "When a hero card appears, rotate freely, then take two actions.";
+  } else if (rat) {
+    title.textContent = "Rat Turns";
+    text.textContent = `Rat ${rat.label} acts from its own card. Let it resolve, then press End to continue.`;
+  } else {
+    title.textContent = "Rat Turns";
+    text.textContent = "Each rat has its own card. End the rat turn after its action resolves.";
+  }
+  if (button) button.textContent = state.tutorialStep >= 2 ? "Got it" : "Next";
+}
+
+function applyLayoutMode() {
+  document.body.classList.toggle("layout-desktop", state.layoutMode === "desktop");
+  if (els.layoutButton) els.layoutButton.textContent = state.layoutMode === "desktop" ? "Desktop" : "Auto";
+}
+
+function toggleLayoutMode() {
+  state.layoutMode = state.layoutMode === "desktop" ? "auto" : "desktop";
+  setCookie("hq_layout", state.layoutMode, 365);
+  applyLayoutMode();
+}
+
+function restartTutorial() {
+  state.tutorialDone = false;
+  state.tutorialStep = 0;
+  setCookie("hq_tutorial_done", "0", -1);
+  render();
+}
+
+function setCookie(name, value, days) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function getCookie(name) {
+  return document.cookie
+    .split("; ")
+    .find(row => row.startsWith(`${name}=`))
+    ?.split("=")[1];
 }
 
 async function animatePattern(kind, cells) {
@@ -956,7 +1130,7 @@ function stepToward(piece, target) {
 }
 
 function nearestRatDistance(hero) {
-  return Math.min(...state.enemy.pieces.filter(rat => rat.hp > 0).map(rat => manhattan(hero, rat)));
+  return Math.min(...state.enemy.pieces.map(rat => manhattan(hero, rat)));
 }
 
 function manhattan(a, b) {

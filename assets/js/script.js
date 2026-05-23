@@ -106,7 +106,6 @@ const orderStatusForm = document.querySelector("[data-order-status-form]");
 const cartBadge = document.querySelector("[data-cart-badge]");
 const cartScrollButton = document.querySelector("[data-cart-scroll]");
 const contactScrollLinks = document.querySelectorAll("[data-contact-scroll]");
-const contactEmailField = document.querySelector('.newsletter #kickstarter-tune-in .email-field, #kickstarter-tune-in .email-field');
 const contactSignupSection = document.querySelector("#kickstarter-tune-in");
 const heroTriggers = document.querySelectorAll("[data-hero-trigger]");
 const deckTabs = document.querySelectorAll("[data-deck-tab]");
@@ -331,20 +330,11 @@ function setCardShowcaseHover(card) {
   card.classList.add("is-hovered");
 }
 
-if (contactScrollLinks.length && contactSignupSection && contactEmailField) {
+if (contactScrollLinks.length && contactSignupSection) {
   for (let i = 0; i < contactScrollLinks.length; i++) {
     contactScrollLinks[i].addEventListener("click", function (event) {
       event.preventDefault();
-      contactSignupSection.classList.remove("is-highlighted");
-      void contactSignupSection.offsetWidth;
-      contactSignupSection.classList.add("is-highlighted");
-      scrollToElement(contactSignupSection, function () {
-        contactEmailField.focus();
-      });
-
-      if (campaignStoryModal && !campaignStoryModal.hidden) {
-        closeCampaignStoryModal();
-      }
+      scrollToTuneInSignup();
     });
   }
 }
@@ -1248,6 +1238,49 @@ function scrollToElement(element, callback) {
   if (typeof callback === "function") {
     window.setTimeout(callback, 500);
   }
+}
+
+function closeOpenModalForSignup() {
+  let closeDelayMs = 0;
+
+  if (campaignStoryModal && !campaignStoryModal.hidden) {
+    closeCampaignStoryModal();
+    closeDelayMs = 400;
+  } else if (supportModal && !supportModal.hidden) {
+    closeSupportModal();
+  } else if (heroModal && !heroModal.hidden) {
+    closeHeroModal();
+  } else if (paymentModal && !paymentModal.hidden) {
+    closePaymentModal();
+  } else if (figurineModal && !figurineModal.hidden) {
+    closeFigurineModal();
+  }
+
+  return closeDelayMs;
+}
+
+function scrollToTuneInSignup() {
+  if (!contactSignupSection) {
+    return;
+  }
+
+  const closeDelayMs = closeOpenModalForSignup();
+
+  window.setTimeout(function () {
+    const headerOffset = 110;
+    const targetTop = window.scrollY + contactSignupSection.getBoundingClientRect().top - headerOffset;
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth"
+    });
+
+    window.setTimeout(function () {
+      contactSignupSection.classList.remove("is-highlighted");
+      void contactSignupSection.offsetWidth;
+      contactSignupSection.classList.add("is-highlighted");
+    }, 460);
+  }, closeDelayMs);
 }
 
 function setCookie(name, value, days) {

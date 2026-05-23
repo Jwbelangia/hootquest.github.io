@@ -2011,6 +2011,10 @@ body {
 
 .newsletter { margin-block-end: 80px; }
 
+#kickstarter-tune-in {
+  scroll-margin-top: 110px;
+}
+
 .newsletter-card {
   background-color: var(--raisin-black-3);
   padding: 40px 15px;

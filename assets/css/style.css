@@ -1565,6 +1565,17 @@ body {
   max-width: 64ch;
 }
 
+.campaign-story-note {
+  margin-block-start: 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background-color: hsla(42, 99%, 46%, 0.08);
+  border: 1px solid hsla(42, 99%, 46%, 0.16);
+  color: var(--platinum);
+  font-size: var(--fs-9);
+  line-height: 1.7;
+}
+
 .campaign-story-placeholder {
   min-height: 220px;
   display: grid;
@@ -2448,6 +2459,25 @@ body {
 
 .footer-newsletter { position: relative; }
 
+#contact-signup {
+  border-radius: 18px;
+  padding: 14px;
+  background: linear-gradient(180deg, hsla(42, 99%, 46%, 0.08) 0%, hsla(42, 99%, 46%, 0.02) 100%);
+  border: 1px solid hsla(42, 99%, 46%, 0.12);
+  box-shadow: 0 0 0 0 hsla(42, 99%, 46%, 0);
+}
+
+#contact-signup.is-highlighted {
+  animation: signupPulse 1.6s ease 2;
+}
+
+.footer-signup-note {
+  color: var(--platinum);
+  font-size: var(--fs-10);
+  line-height: 1.7;
+  margin-block: -18px 14px;
+}
+
 .footer-newsletter .email-field {
   background-color: var(--raisin-black-4);
   padding: 12px 20px;
@@ -2471,6 +2501,24 @@ body {
 .footer-newsletter-status {
   text-align: left;
   margin-block-start: 10px;
+}
+
+@keyframes signupPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsla(42, 99%, 46%, 0);
+    border-color: hsla(42, 99%, 46%, 0.12);
+  }
+
+  35% {
+    box-shadow: 0 0 0 8px hsla(42, 99%, 46%, 0.12);
+    border-color: hsla(42, 99%, 46%, 0.34);
+  }
+
+  65% {
+    box-shadow: 0 0 0 16px hsla(42, 99%, 46%, 0);
+    border-color: hsla(42, 99%, 46%, 0.22);
+  }
 }
 
 .footer-bottom-img { display: none; }

@@ -2,7 +2,7 @@
 
 ## Project Guidelines
 - Top hero-section buttons should be only slightly taller than their text; only the live-section Learn our story button should be larger.
-- For homepage SEO copy, keep the main hero text short; move alternate-name explanatory copy into a small, discreet memo-style note at the bottom-right instead of the main bubble.
+- For homepage SEO copy, keep the main hero text short; move alternate-name explanatory copy into a small, discreet memo-style note at the bottom-right instead of the main bubble. Avoid mentioning weekdays or event-specific wording (e.g., "Monday"); signal the site is still being built using neutral, non-event phrasing.
 - For the Owl/Rat deck switch, place the controls lower below the art, with a single center slider cap that moves to the hovered tab, changes to that tab's color, and visually completes the top of the button.
 
 ### Embedded Game

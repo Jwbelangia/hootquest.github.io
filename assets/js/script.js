@@ -105,8 +105,9 @@ const orderForm = document.querySelector("[data-order-form]");
 const orderStatusForm = document.querySelector("[data-order-status-form]");
 const cartBadge = document.querySelector("[data-cart-badge]");
 const cartScrollButton = document.querySelector("[data-cart-scroll]");
-const contactScrollLink = document.querySelector("[data-contact-scroll]");
+const contactScrollLinks = document.querySelectorAll("[data-contact-scroll]");
 const contactEmailField = document.querySelector("[data-contact-email]");
+const contactSignupSection = document.querySelector("#contact-signup");
 const heroTriggers = document.querySelectorAll("[data-hero-trigger]");
 const deckTabs = document.querySelectorAll("[data-deck-tab]");
 const cardShowcase = document.querySelector("[data-card-showcase]");
@@ -330,13 +331,18 @@ function setCardShowcaseHover(card) {
   card.classList.add("is-hovered");
 }
 
-if (contactScrollLink && contactEmailField) {
-  contactScrollLink.addEventListener("click", function (event) {
-    event.preventDefault();
-    scrollToElement(document.querySelector("#contact-signup"), function () {
-      contactEmailField.focus();
+if (contactScrollLinks.length && contactSignupSection && contactEmailField) {
+  for (let i = 0; i < contactScrollLinks.length; i++) {
+    contactScrollLinks[i].addEventListener("click", function (event) {
+      event.preventDefault();
+      contactSignupSection.classList.remove("is-highlighted");
+      void contactSignupSection.offsetWidth;
+      contactSignupSection.classList.add("is-highlighted");
+      scrollToElement(contactSignupSection, function () {
+        contactEmailField.focus();
+      });
     });
-  });
+  }
 }
 
 if (heroTriggers.length && heroModal && heroAddToCartButton) {

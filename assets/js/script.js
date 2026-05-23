@@ -106,8 +106,8 @@ const orderStatusForm = document.querySelector("[data-order-status-form]");
 const cartBadge = document.querySelector("[data-cart-badge]");
 const cartScrollButton = document.querySelector("[data-cart-scroll]");
 const contactScrollLinks = document.querySelectorAll("[data-contact-scroll]");
-const contactEmailField = document.querySelector("[data-contact-email]");
-const contactSignupSection = document.querySelector("#contact-signup");
+const contactEmailField = document.querySelector('.newsletter #kickstarter-tune-in .email-field, #kickstarter-tune-in .email-field');
+const contactSignupSection = document.querySelector("#kickstarter-tune-in");
 const heroTriggers = document.querySelectorAll("[data-hero-trigger]");
 const deckTabs = document.querySelectorAll("[data-deck-tab]");
 const cardShowcase = document.querySelector("[data-card-showcase]");
@@ -341,6 +341,10 @@ if (contactScrollLinks.length && contactSignupSection && contactEmailField) {
       scrollToElement(contactSignupSection, function () {
         contactEmailField.focus();
       });
+
+      if (campaignStoryModal && !campaignStoryModal.hidden) {
+        closeCampaignStoryModal();
+      }
     });
   }
 }

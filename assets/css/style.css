@@ -2459,7 +2459,7 @@ body {
 
 .footer-newsletter { position: relative; }
 
-#contact-signup {
+#kickstarter-tune-in {
   border-radius: 18px;
   padding: 14px;
   background: linear-gradient(180deg, hsla(42, 99%, 46%, 0.08) 0%, hsla(42, 99%, 46%, 0.02) 100%);
@@ -2467,15 +2467,8 @@ body {
   box-shadow: 0 0 0 0 hsla(42, 99%, 46%, 0);
 }
 
-#contact-signup.is-highlighted {
+#kickstarter-tune-in.is-highlighted {
   animation: signupPulse 1.6s ease 2;
-}
-
-.footer-signup-note {
-  color: var(--platinum);
-  font-size: var(--fs-10);
-  line-height: 1.7;
-  margin-block: -18px 14px;
 }
 
 .footer-newsletter .email-field {

@@ -25,6 +25,9 @@
     body {
       margin: 0;
       min-width: 320px;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
       background: var(--bg);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -33,7 +36,12 @@
     .mini-roadmap {
       position: relative;
       overflow: hidden;
-      min-height: 360px;
+      display: grid;
+      grid-template-rows: auto auto;
+      align-content: center;
+      width: 100vw;
+      height: 100vh;
+      min-height: 0;
       padding: 18px;
       background:
         radial-gradient(circle at 18% 30%, rgba(156, 255, 88, 0.13), transparent 18rem),
@@ -103,6 +111,12 @@
       border: 1px solid rgba(120, 236, 255, 0.16);
       background: rgba(0, 0, 0, 0.1);
       box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .mini-shell {
+      width: 1120px;
+      transform-origin: center center;
+      margin: 0 auto;
     }
 
     .track {
@@ -244,31 +258,30 @@
         padding: 14px;
       }
 
+      .brand-stage,
       .viewport {
-        height: 240px;
-      }
-
-      .track {
-        height: 240px;
+        width: 1120px;
       }
     }
   </style>
 </head>
 <body>
   <section class="mini-roadmap" aria-label="HootQuest miniature animated roadmap">
-    <div class="brand-stage">
-      <span class="brand-mark" id="brandMark">PE</span>
-      <span class="brand-text" id="brandText">Playforge Entertainment</span>
-    </div>
+    <div class="mini-shell" id="miniShell">
+      <div class="brand-stage">
+        <span class="brand-mark" id="brandMark">PE</span>
+        <span class="brand-text" id="brandText">Playforge Entertainment</span>
+      </div>
 
-    <div class="viewport" id="viewport">
-      <div class="track" id="track">
-        <div class="seed-flash" aria-hidden="true"></div>
-        <svg viewBox="0 0 2680 260" preserveAspectRatio="none" aria-hidden="true">
-          <path class="spine" d="M 46 130 H 2580" />
-          <g id="wires"></g>
-        </svg>
-        <div id="nodes"></div>
+      <div class="viewport" id="viewport">
+        <div class="track" id="track">
+          <div class="seed-flash" aria-hidden="true"></div>
+          <svg viewBox="0 0 2680 260" preserveAspectRatio="none" aria-hidden="true">
+            <path class="spine" d="M 46 130 H 2580" />
+            <g id="wires"></g>
+          </svg>
+          <div id="nodes"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -292,12 +305,14 @@
     const rewindTime = 180;
     const track = document.getElementById("track");
     const viewport = document.getElementById("viewport");
+    const miniShell = document.getElementById("miniShell");
     const nodesRoot = document.getElementById("nodes");
     const wiresRoot = document.getElementById("wires");
     const brandText = document.getElementById("brandText");
     const brandMark = document.getElementById("brandMark");
     let index = -1;
     let direction = 1;
+    let shellScale = 1;
 
     function render() {
       nodesRoot.innerHTML = nodes.map((node) => `
@@ -334,6 +349,16 @@
       const target = active ? active.x - viewport.clientWidth * 0.42 : 0;
       const max = track.offsetWidth - viewport.clientWidth;
       track.style.transform = `translateX(${-Math.max(0, Math.min(max, target))}px)`;
+    }
+
+    function fitToFrame() {
+      const availableWidth = window.innerWidth - 28;
+      const availableHeight = window.innerHeight - 24;
+      const naturalWidth = 1120;
+      const naturalHeight = 310;
+      shellScale = Math.min(1, availableWidth / naturalWidth, availableHeight / naturalHeight);
+      miniShell.style.transform = `scale(${shellScale})`;
+      miniShell.style.height = `${naturalHeight}px`;
     }
 
     function typeConcept() {
@@ -388,9 +413,17 @@
       window.setTimeout(tick, direction < 0 ? rewindTime : focusTime);
     }
 
-    render();
-    setFocus(-1);
-    tick();
+    window.addEventListener("resize", () => {
+      fitToFrame();
+      setFocus(index);
+    });
+
+    window.addEventListener("load", () => {
+      fitToFrame();
+      render();
+      setFocus(-1);
+      tick();
+    });
   </script>
 </body>
 </html>

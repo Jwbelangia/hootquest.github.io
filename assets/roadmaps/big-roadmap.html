@@ -33,6 +33,12 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+    body:not(.editing) {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
     .roadmap-section {
       position: relative;
       overflow: hidden;
@@ -45,6 +51,8 @@
     }
 
     body:not(.editing) .roadmap-section {
+      display: grid;
+      align-items: center;
       min-height: 100vh;
       padding: 0;
     }
@@ -166,6 +174,8 @@
       width: 100%;
       height: min(720px, 100vh);
       border: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
     }
 
     .canvas-wrap::after {
@@ -1280,7 +1290,12 @@
       const maxY = Math.max(...activeGraph().nodes.map((node) => (Number(node.y) || 0) + (Number(node.height) || 110)));
       canvas.style.width = `${Math.max(1260, maxX + 280)}px`;
       canvas.style.height = `${Math.max(470, maxY + 150)}px`;
-      canvas.parentElement.style.height = `${Math.min(Math.max(470, maxY + 150), 720)}px`;
+      if (EDIT_MODE) {
+        canvas.parentElement.style.height = `${Math.min(Math.max(470, maxY + 150), 720)}px`;
+      } else {
+        canvas.parentElement.style.height = `${window.innerHeight}px`;
+        fitPublicFrame();
+      }
       applyZoom();
     }
 
@@ -1503,6 +1518,20 @@
       const baseHeight = Number.parseFloat(canvas.style.height) || canvas.offsetHeight;
       canvas.parentElement.style.setProperty("--scaled-width", `${baseWidth * zoom}px`);
       canvas.parentElement.style.setProperty("--scaled-height", `${baseHeight * zoom}px`);
+      if (!EDIT_MODE) {
+        const wrapHeight = canvas.parentElement.clientHeight || window.innerHeight;
+        const scaledHeight = baseHeight * zoom;
+        canvas.style.marginTop = `${Math.max(0, (wrapHeight - scaledHeight) / 2)}px`;
+      } else {
+        canvas.style.marginTop = "0";
+      }
+    }
+
+    function fitPublicFrame() {
+      if (EDIT_MODE) return;
+      const baseHeight = Number.parseFloat(canvas.style.height) || canvas.offsetHeight || 520;
+      const availableHeight = Math.max(240, window.innerHeight - 12);
+      zoom = Math.min(1, availableHeight / baseHeight);
     }
 
     function zoomAt(event) {
@@ -1733,6 +1762,13 @@
 
     document.getElementById("backLevel").addEventListener("click", backLevel);
     graphBackLevel.addEventListener("click", backLevel);
+
+    window.addEventListener("resize", () => {
+      if (!EDIT_MODE) {
+        sizeCanvasToData();
+        drawWires();
+      }
+    });
 
     document.getElementById("applyJson").addEventListener("click", () => {
       try {

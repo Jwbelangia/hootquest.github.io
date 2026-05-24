@@ -562,16 +562,16 @@
                             Kickstarter &<span class="span">Merch</span>
                         </h2>
 
-                        <figure class="live-match-banner img-holder" style="--width: 600; --height: 400;">
+                        <div class="live-roadmap" data-roadmap-reveal>
+                            <figure class="live-match-banner img-holder" style="--width: 600; --height: 400;">
+                                <img src="./assets/images/Play.png" width="600" height="400" loading="lazy"
+                                     alt="HootQuest roadmap teaser" class="img-cover live-roadmap-image">
+                            </figure>
 
-                            <img src="./assets/images/Play.png" width="600" height="400" loading="lazy"
-                                 alt="Live Match Video" class="img-cover">
-
-                            <a href="./assets/games/site-package/index.html" class="play-btn" aria-label="Play HootQuest demo" target="_blank" rel="noopener noreferrer">
-                                <ion-icon name="play"></ion-icon>
-                            </a>
-
-                        </figure>
+                            <div class="live-roadmap-reveal" aria-hidden="true">
+                                <iframe src="./assets/roadmaps/big-roadmap.html" title="HootQuest roadmap" class="live-roadmap-frame" loading="lazy"></iframe>
+                            </div>
+                        </div>
 
                         <div class="live-match-actions">
                             <button type="button" class="btn skewBg live-story-btn" data-campaign-story-open>Learn our story</button>
@@ -1396,7 +1396,18 @@
                         <p class="hero-modal-text">The first campaign introduces players to Owlcrest — a village surrounded by corruption, danger, and ancient mysteries. Future expansions will introduce new regions, additional heroes, larger enemy factions, deeper lore, and expanding storylines across the greater world.</p>
                     </div>
 
-                    <div class="campaign-story-placeholder wide">World Map / Cinematic Expansion Art</div>
+                    <div class="campaign-story-placeholder campaign-story-placeholder--embed wide">
+                        <iframe src="./assets/roadmaps/mini-roadmap.html" title="HootQuest mini roadmap" class="campaign-roadmap-frame" loading="lazy"></iframe>
+                    </div>
+                </section>
+
+                <section class="campaign-story-section-block roadmap-block">
+                    <div class="campaign-story-copy full">
+                        <p class="hero-modal-subtitle">Roadmap Momentum</p>
+                        <h4 class="h3">Building the Path Ahead</h4>
+                        <p class="hero-modal-text">The roadmap highlights the next stages of Hoot Quest with the same ambition driving Owlcrest forward — more heroes, richer encounters, broader regions, and deeper campaign systems already taking shape.</p>
+                        <p class="hero-modal-text">We are actively expanding the plan, refining each milestone, and turning long-term ideas into a growing path players can follow with excitement as the project develops.</p>
+                    </div>
                 </section>
 
                 <section class="campaign-story-section-block thankyou-block">

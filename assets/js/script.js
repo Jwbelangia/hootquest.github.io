@@ -56,6 +56,7 @@ window.addEventListener("scroll", function () {
 
 const newsletterForms = document.querySelectorAll("[data-newsletter-form]");
 const newsletterFrame = document.querySelector('iframe[name="newsletter-submit-frame"]');
+const liveRoadmap = document.querySelector("[data-roadmap-reveal]");
 let activeNewsletterForm = null;
 
 for (let i = 0; i < newsletterForms.length; i++) {
@@ -73,6 +74,21 @@ for (let i = 0; i < newsletterForms.length; i++) {
       button.disabled = true;
     }
   });
+}
+
+if (liveRoadmap) {
+  const liveRoadmapObserver = new IntersectionObserver(function (entries) {
+    for (let i = 0; i < entries.length; i++) {
+      if (entries[i].isIntersecting) {
+        liveRoadmap.classList.add("is-revealed");
+      }
+    }
+  }, {
+    threshold: 0.45,
+    rootMargin: "0px 0px -8% 0px"
+  });
+
+  liveRoadmapObserver.observe(liveRoadmap);
 }
 
 if (newsletterFrame) {

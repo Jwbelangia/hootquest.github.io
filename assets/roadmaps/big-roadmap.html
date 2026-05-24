@@ -1,0 +1,1908 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HootQuest Roadmap</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111820;
+      --bg-deep: #080d13;
+      --grid: rgba(156, 176, 184, 0.1);
+      --grid-major: rgba(156, 176, 184, 0.18);
+      --cyan: #78ecff;
+      --mint: #9cff58;
+      --white-wire: #f2f7f5;
+      --red: #d4232f;
+      --ink: #f2fbff;
+      --muted: #a8bac0;
+      --panel: rgba(18, 21, 21, 0.92);
+      --panel-top: rgba(255, 255, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--bg-deep);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .roadmap-section {
+      position: relative;
+      overflow: hidden;
+      min-height: 640px;
+      padding: clamp(18px, 4vw, 42px);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(120, 236, 255, 0.1), transparent 25rem),
+        linear-gradient(180deg, #151f28, #080d13);
+      isolation: isolate;
+    }
+
+    body:not(.editing) .roadmap-section {
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    body.depth-1 .roadmap-section {
+      background:
+        radial-gradient(circle at 22% 28%, rgba(156, 255, 88, 0.12), transparent 20rem),
+        radial-gradient(circle at 78% 42%, rgba(120, 236, 255, 0.12), transparent 24rem),
+        linear-gradient(180deg, #101c1b, #061012);
+    }
+
+    body.depth-2 .roadmap-section,
+    body.depth-3 .roadmap-section {
+      background:
+        radial-gradient(circle at 18% 34%, rgba(120, 236, 255, 0.16), transparent 17rem),
+        radial-gradient(circle at 70% 55%, rgba(156, 255, 88, 0.1), transparent 18rem),
+        linear-gradient(180deg, #09151c, #03080d);
+    }
+
+    .roadmap-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        linear-gradient(var(--grid-major) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-major) 1px, transparent 1px);
+      background-size: 24px 24px, 24px 24px, 96px 96px, 96px 96px;
+      background-position: center;
+      animation: gridParallax 34s linear infinite;
+    }
+
+    body.depth-1 .roadmap-section::before {
+      background-size: 18px 18px, 18px 18px, 72px 72px, 72px 72px;
+      opacity: 0.95;
+    }
+
+    body.depth-2 .roadmap-section::before,
+    body.depth-3 .roadmap-section::before {
+      background-size: 12px 12px, 12px 12px, 48px 48px, 48px 48px;
+      opacity: 1;
+    }
+
+    .roadmap-header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      width: min(1280px, 100%);
+      margin: 0 auto 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--mint);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4.8vw, 4.3rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+      text-shadow: 0 0 26px rgba(120, 236, 255, 0.26);
+    }
+
+    .toolbar {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .editing .toolbar {
+      display: flex;
+    }
+
+    body:not(.editing) .roadmap-header,
+    body:not(.editing) .json-panel {
+      display: none;
+    }
+
+    button {
+      border: 1px solid rgba(120, 236, 255, 0.42);
+      color: var(--ink);
+      background: rgba(16, 28, 34, 0.84);
+      min-height: 34px;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.82rem;
+      cursor: pointer;
+      box-shadow: inset 0 1px rgba(255, 255, 255, 0.12), 0 0 14px rgba(120, 236, 255, 0.1);
+    }
+
+    button:hover {
+      border-color: var(--mint);
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: min(1280px, 100%);
+      height: 520px;
+      margin: 0 auto;
+      border: 1px solid rgba(120, 236, 255, 0.16);
+      background: rgba(0, 0, 0, 0.12);
+      box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.25), 0 0 36px rgba(120, 236, 255, 0.06);
+      overflow: auto;
+    }
+
+    body:not(.editing) .canvas-wrap {
+      width: 100%;
+      height: min(720px, 100vh);
+      border: 0;
+    }
+
+    .canvas-wrap::after {
+      content: "";
+      display: block;
+      width: var(--scaled-width, 1260px);
+      height: var(--scaled-height, 520px);
+      pointer-events: none;
+    }
+
+    .canvas {
+      position: relative;
+      width: 1260px;
+      height: 520px;
+      transform-origin: 0 0;
+    }
+
+    .wires {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .editing .wires {
+      pointer-events: auto;
+    }
+
+    .spine-label {
+      position: absolute;
+      z-index: 2;
+      top: 248px;
+      color: rgba(242, 251, 255, 0.82);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .spine-label.start {
+      left: 24px;
+    }
+
+    .spine-label.finish {
+      right: 24px;
+    }
+
+    .wire {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 3.5;
+      filter: drop-shadow(0 0 5px currentColor);
+    }
+
+    .link-wire,
+    .branch-wire {
+      pointer-events: stroke;
+      cursor: pointer;
+    }
+
+    .wire.ghost {
+      stroke: rgba(255, 255, 255, 0.15);
+      stroke-width: 8;
+      filter: none;
+    }
+
+    .wire.flow {
+      stroke-dasharray: 1 13;
+      animation: flow 2.8s linear infinite;
+    }
+
+    .wire.dots {
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 1 15;
+      animation: flow 2.8s linear infinite;
+    }
+
+    .wire.laser {
+      stroke-width: 3;
+      stroke-dasharray: 22 9 2 9;
+      animation: laserFlow 0.55s linear infinite;
+    }
+
+    .wire.dash {
+      stroke-width: 4;
+      stroke-dasharray: 18 12;
+      animation: flow 3.4s linear infinite;
+    }
+
+    .wire.solid {
+      stroke-width: 4;
+      stroke-dasharray: none;
+      animation: none;
+    }
+
+    .wire.spark {
+      stroke-width: 5;
+      stroke-dasharray: 1 8 12 18;
+      animation: laserFlow 1s linear infinite;
+    }
+
+    .wire.dim {
+      opacity: 0.34;
+    }
+
+    .wire.spine {
+      stroke-width: 4;
+      stroke: rgba(242, 247, 245, 0.82);
+      stroke-dasharray: none;
+      filter: drop-shadow(0 0 6px rgba(242, 247, 245, 0.52));
+    }
+
+    .branch-handle {
+      position: absolute;
+      z-index: 5;
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(242, 247, 245, 0.92);
+      border-radius: 50%;
+      background: #111820;
+      box-shadow: 0 0 14px rgba(242, 247, 245, 0.55);
+      transform: translate(-50%, -50%);
+      cursor: ew-resize;
+    }
+
+    .editing .branch-handle {
+      display: block;
+    }
+
+    .node {
+      position: absolute;
+      z-index: 2;
+      width: 210px;
+      min-height: 84px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, var(--panel-top), transparent 34px),
+        linear-gradient(180deg, rgba(35, 37, 38, 0.96), var(--panel));
+      box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.24),
+        inset 0 -18px 28px rgba(0, 0, 0, 0.22),
+        0 10px 22px rgba(0, 0, 0, 0.34),
+        0 0 18px rgba(120, 236, 255, 0.08);
+      user-select: none;
+    }
+
+    .editing .node {
+      cursor: grab;
+    }
+
+    .editing .node:active {
+      cursor: grabbing;
+    }
+
+    .node.current {
+      border-color: rgba(156, 255, 88, 0.66);
+      box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.25),
+        inset 0 -18px 28px rgba(0, 0, 0, 0.22),
+        0 0 24px rgba(156, 255, 88, 0.22),
+        0 10px 22px rgba(0, 0, 0, 0.34);
+    }
+
+    .node.progress {
+      border-color: rgba(255, 220, 92, 0.86);
+      background:
+        linear-gradient(180deg, rgba(255, 220, 92, 0.2), transparent 36px),
+        linear-gradient(180deg, rgba(38, 34, 22, 0.96), rgba(18, 18, 17, 0.94));
+      box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.25),
+        inset 0 -18px 28px rgba(0, 0, 0, 0.22),
+        0 0 30px rgba(255, 220, 92, 0.26),
+        0 10px 22px rgba(0, 0, 0, 0.34);
+    }
+
+    .node.progress .node-title {
+      background: linear-gradient(90deg, rgba(255, 220, 92, 0.32), rgba(156, 255, 88, 0.08));
+    }
+
+    .node-progress {
+      margin-top: 10px;
+      border: 1px solid rgba(255, 220, 92, 0.32);
+      height: 8px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .node-progress span {
+      display: block;
+      width: var(--progress, 45%);
+      height: 100%;
+      background: linear-gradient(90deg, var(--mint), #ffdc5c);
+      box-shadow: 0 0 12px rgba(255, 220, 92, 0.62);
+    }
+
+    .node.complete {
+      border-color: rgba(120, 236, 255, 0.46);
+    }
+
+    .node.complete .node-title {
+      background: linear-gradient(90deg, rgba(120, 236, 255, 0.22), rgba(120, 236, 255, 0.04));
+    }
+
+    .node.locked {
+      opacity: 0.52;
+      border-style: dashed;
+      filter: saturate(0.72);
+    }
+
+    .node.removed {
+      opacity: 0.44;
+      border-color: rgba(212, 35, 47, 0.72);
+      border-style: dashed;
+      background:
+        linear-gradient(180deg, rgba(212, 35, 47, 0.16), transparent 36px),
+        linear-gradient(180deg, rgba(31, 15, 17, 0.9), rgba(12, 10, 11, 0.9));
+      filter: saturate(0.72);
+    }
+
+    .node.removed .node-title {
+      background: linear-gradient(90deg, rgba(212, 35, 47, 0.28), rgba(212, 35, 47, 0.04));
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: rgba(255, 125, 134, 0.7);
+    }
+
+    .node.milestone {
+      border-color: rgba(255, 220, 92, 0.72);
+      box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.25),
+        inset 0 -18px 28px rgba(0, 0, 0, 0.22),
+        0 0 28px rgba(255, 220, 92, 0.2),
+        0 10px 22px rgba(0, 0, 0, 0.34);
+    }
+
+    .dive-button {
+      position: absolute;
+      left: 50%;
+      bottom: -16px;
+      z-index: 4;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      width: auto;
+      height: 30px;
+      min-height: 0;
+      padding: 0 9px 0 11px;
+      border: 2px solid var(--mint);
+      border-radius: 999px;
+      color: #071018;
+      background: var(--mint);
+      font-size: 0.72rem;
+      font-weight: 900;
+      line-height: 1;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      box-shadow: 0 0 18px rgba(156, 255, 88, 0.8), 0 0 34px rgba(156, 255, 88, 0.28);
+    }
+
+    .dive-button::after {
+      content: "›";
+      display: grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      color: var(--mint);
+      background: #071018;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .node.has-child .dive-button {
+      animation: divePulse 1.25s ease-in-out infinite;
+    }
+
+    .node.has-child {
+      cursor: pointer;
+    }
+
+    .node.has-child:hover {
+      border-color: rgba(156, 255, 88, 0.86);
+      box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.25),
+        inset 0 -18px 28px rgba(0, 0, 0, 0.22),
+        0 0 30px rgba(156, 255, 88, 0.22),
+        0 10px 22px rgba(0, 0, 0, 0.34);
+    }
+
+    .node-title {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 5px 38px;
+      border-radius: 8px 8px 0 0;
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      text-align: center;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04));
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
+    }
+
+    .node.current .node-title {
+      background: linear-gradient(90deg, rgba(156, 255, 88, 0.28), rgba(156, 255, 88, 0.06));
+    }
+
+    .node-body {
+      padding: 12px 14px 14px;
+    }
+
+    .node-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .node-gallery {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    }
+
+    .node-gallery-track {
+      display: flex;
+      gap: 8px;
+      min-width: max-content;
+      animation: galleryScroll 12s linear infinite;
+    }
+
+    .node-gallery img {
+      width: 54px;
+      height: 42px;
+      object-fit: cover;
+      border: 1px solid rgba(120, 236, 255, 0.28);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 10px rgba(120, 236, 255, 0.1);
+    }
+
+    .port {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #eaf7f4;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .port-dot {
+      display: block;
+      flex: 0 0 auto;
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      background: var(--bg);
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .port-label {
+      pointer-events: none;
+    }
+
+    .port.in {
+      left: -8px;
+      top: 50%;
+      transform: translate(-100%, -50%);
+      flex-direction: row-reverse;
+    }
+
+    .port.out {
+      right: -8px;
+      top: 50%;
+      transform: translate(100%, -50%);
+    }
+
+    .port.flow-port {
+      color: var(--white-wire);
+    }
+
+    .port.mint-port {
+      color: var(--mint);
+    }
+
+    .port.cyan-port {
+      color: var(--cyan);
+    }
+
+    .port.red-port {
+      color: var(--red);
+    }
+
+    .json-panel {
+      display: none;
+      width: min(1280px, 100%);
+      margin: 12px auto 0;
+    }
+
+    .editing .json-panel {
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      border: 1px solid rgba(120, 236, 255, 0.3);
+      color: #d8fbff;
+      background: rgba(3, 8, 12, 0.88);
+      padding: 12px;
+      font: 0.78rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+      outline: none;
+    }
+
+    .edit-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .editor-message {
+      min-height: 20px;
+      margin: 8px 0 0;
+      color: var(--mint);
+      font-size: 0.82rem;
+    }
+
+    .editor-message.error {
+      color: #ff7d86;
+    }
+
+    .context-menu,
+    .color-popover,
+    .gizmo {
+      position: absolute;
+      z-index: 10;
+      border: 1px solid rgba(120, 236, 255, 0.34);
+      border-radius: 8px;
+      background: rgba(9, 13, 18, 0.96);
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.45), 0 0 22px rgba(120, 236, 255, 0.12);
+    }
+
+    .context-menu,
+    .color-popover {
+      display: none;
+      min-width: 190px;
+      padding: 7px;
+    }
+
+    .context-menu.open,
+    .color-popover.open,
+    .gizmo.open {
+      display: block;
+    }
+
+    .context-menu button {
+      display: block;
+      width: 100%;
+      border: 0;
+      min-height: 32px;
+      padding: 0 9px;
+      text-align: left;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .context-menu button:hover {
+      background: rgba(120, 236, 255, 0.12);
+    }
+
+    .color-popover label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .color-popover input {
+      width: 100%;
+      height: 34px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    .gizmo {
+      display: none;
+      width: 178px;
+      padding: 8px;
+    }
+
+    .gizmo-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+
+    .gizmo button {
+      min-height: 29px;
+      padding: 0 7px;
+      font-size: 0.72rem;
+    }
+
+    .resize-handle {
+      width: 100%;
+      min-height: 30px;
+      border-color: rgba(156, 255, 88, 0.52);
+    }
+
+    .branch-cursor {
+      position: absolute;
+      z-index: 9;
+      display: none;
+      width: 28px;
+      height: 28px;
+      border: 2px solid var(--mint);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 18px rgba(156, 255, 88, 0.72);
+    }
+
+    .editing.ctrl-down .branch-cursor {
+      display: block;
+    }
+
+    .level-back {
+      position: sticky;
+      left: 16px;
+      top: 16px;
+      z-index: 11;
+      display: none;
+      width: max-content;
+      border-color: rgba(156, 255, 88, 0.52);
+      background: rgba(7, 18, 24, 0.94);
+    }
+
+    body:not(.editing) .level-back.visible {
+      display: block;
+    }
+
+    @keyframes flow {
+      to {
+        stroke-dashoffset: -56;
+      }
+    }
+
+    @keyframes laserFlow {
+      to {
+        stroke-dashoffset: -96;
+      }
+    }
+
+    @keyframes galleryScroll {
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    @keyframes gridParallax {
+      to {
+        background-position:
+          48px 24px,
+          48px 24px,
+          96px 48px,
+          96px 48px;
+      }
+    }
+
+    @keyframes divePulse {
+      0%, 100% {
+        opacity: 0.55;
+        transform: translateX(-50%) scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.06);
+      }
+    }
+
+    .zooming-in .canvas,
+    .zooming-out .canvas {
+      transition: transform 320ms ease, opacity 240ms ease;
+    }
+
+    .zooming-in .canvas {
+      opacity: 0.2;
+      transform: scale(1.18);
+    }
+
+    .zooming-out .canvas {
+      opacity: 0.2;
+      transform: scale(0.82);
+    }
+
+    @media (max-width: 760px) {
+      .roadmap-section {
+        padding: 22px 12px;
+      }
+
+      .roadmap-header {
+        display: block;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+        margin-top: 14px;
+      }
+
+      .canvas-wrap {
+        height: 500px;
+      }
+
+      .canvas {
+        width: 1120px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="roadmap-section" aria-labelledby="roadmap-title">
+    <header class="roadmap-header">
+      <div>
+        <p class="eyebrow">Blueprint route planner</p>
+        <h1 id="roadmap-title">HootQuest Roadmap</h1>
+      </div>
+      <div class="toolbar" aria-label="Roadmap editor controls">
+        <button type="button" id="backLevel">Back Level</button>
+        <button type="button" id="exportJson">Export JSON</button>
+        <button type="button" id="applyJson">Apply JSON</button>
+      </div>
+    </header>
+
+    <div class="canvas-wrap">
+      <button type="button" class="level-back" id="graphBackLevel">Back Up</button>
+      <div class="canvas" id="canvas">
+        <svg class="wires" id="wires" aria-hidden="true"></svg>
+        <span class="spine-label start">Start</span>
+        <span class="spine-label finish">Finish</span>
+        <div id="nodes"></div>
+        <div id="branchHandles"></div>
+        <div class="branch-cursor" id="branchCursor"></div>
+        <div class="gizmo" id="gizmo">
+          <div class="gizmo-row">
+            <button type="button" data-status="complete">Check</button>
+            <button type="button" data-status="milestone">Milestone</button>
+            <button type="button" data-status="current">Current</button>
+            <button type="button" data-status="locked">Locked</button>
+            <button type="button" data-status="removed">Removed</button>
+          </div>
+          <button type="button" class="resize-handle" id="resizeHandle">Resize</button>
+        </div>
+        <div class="color-popover" id="colorPopover">
+          <label id="colorLabel" for="colorInput">Color</label>
+          <input id="colorInput" type="color" value="#78ecff">
+        </div>
+        <div class="context-menu" id="contextMenu">
+          <button type="button" data-action="add">Add Node Here</button>
+          <button type="button" data-action="edit">Edit Selected Node</button>
+          <button type="button" data-action="linked">Add Linked Branch</button>
+          <button type="button" data-action="split">Split Nearest Wire</button>
+          <button type="button" data-action="wirecolor">Wire Dot Color</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="json-panel">
+      <textarea id="jsonOutput" spellcheck="false" aria-label="Roadmap JSON"></textarea>
+      <p class="editor-message" id="editorMessage" role="status"></p>
+      <p class="edit-note">Edit mode is controlled by <code>EDIT_MODE</code> in the script. Drag cards, export JSON, then paste the exported data into <code>roadmapData</code> for the final locked version.</p>
+    </div>
+  </section>
+
+  <script>
+    const EDIT_MODE = false;
+
+    const sampleImages = {
+      minis: [
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23121b22'/%3E%3Ccircle cx='39' cy='38' r='18' fill='%239cff58'/%3E%3Ccircle cx='76' cy='38' r='18' fill='%2378ecff'/%3E%3Cpath d='M24 60h70' stroke='%23fff' stroke-width='5'/%3E%3C/svg%3E", alt: "Miniature samples" },
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%230b1118'/%3E%3Cpath d='M20 58h80M32 20v38M60 12v46M88 28v30' stroke='%2378ecff' stroke-width='7'/%3E%3C/svg%3E", alt: "Print test silhouettes" }
+      ],
+      plate: [
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23090f16'/%3E%3Cg fill='none' stroke='%239cff58' stroke-width='3'%3E%3Crect x='14' y='12' width='92' height='56'/%3E%3Ccircle cx='35' cy='32' r='10'/%3E%3Ccircle cx='61' cy='32' r='10'/%3E%3Ccircle cx='87' cy='32' r='10'/%3E%3Ccircle cx='48' cy='53' r='10'/%3E%3Ccircle cx='74' cy='53' r='10'/%3E%3C/g%3E%3C/svg%3E", alt: "Plate alignment grid" },
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23111920'/%3E%3Cpath d='M17 18h86v44H17z' fill='none' stroke='%2378ecff' stroke-width='3'/%3E%3Cpath d='M24 25h72M24 38h72M24 51h72' stroke='%23ffffff' stroke-opacity='.7'/%3E%3C/svg%3E", alt: "Bed spacing rows" }
+      ],
+      cards: [
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%230b1018'/%3E%3Crect x='20' y='12' width='32' height='52' rx='4' fill='%2378ecff'/%3E%3Crect x='44' y='16' width='32' height='52' rx='4' fill='%239cff58'/%3E%3Crect x='68' y='12' width='32' height='52' rx='4' fill='%23f2f7f5'/%3E%3C/svg%3E", alt: "Action card mockups" },
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%2310171f'/%3E%3Cpath d='M24 20h72M24 36h72M24 52h48' stroke='%239cff58' stroke-width='6'/%3E%3C/svg%3E", alt: "Rule reference cards" }
+      ],
+      art: [
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%23131a23'/%3E%3Ccircle cx='61' cy='36' r='20' fill='%2378ecff'/%3E%3Cpath d='M20 66c20-25 57-25 80 0' fill='none' stroke='%239cff58' stroke-width='6'/%3E%3C/svg%3E", alt: "Box art color pass" },
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Crect width='120' height='80' fill='%230d121a'/%3E%3Cpath d='M22 58 52 20l20 24 14-16 18 30z' fill='%239cff58'/%3E%3C/svg%3E", alt: "Woodland art block" }
+      ]
+    };
+
+    let currentLevel = "main";
+    const levelStack = [];
+
+    let roadmapData = {
+      spineY: 300,
+      nodes: [
+        { id: "concept", x: 151.16284397833974, y: 95.609029342653, title: "HootQuest Concept", body: "Original cooperative woodland heroes, dice combat, and tactical tile movement.", status: "complete", inPort: { label: "Dream", color: "flow" }, outPort: { label: "Prototype", color: "flow" }, spineOffset: -84 },
+        { id: "paper", x: 526.380837154194, y: 378.89725665282543, title: "Paper Prototype", body: "Rough dungeon layouts, placeholder owls, first turn rhythm, and combat assumptions.", status: "complete", inPort: { label: "Test", color: "flow" }, outPort: { label: "Refine", color: "mint" }, spineOffset: 117 },
+        { id: "tiles", x: 912.4909026762235, y: 115.51872920467962, title: "Tile System Rework", body: "Movement balancing, combat patterns, enemy spacing, and cleaner tactical readability.", status: "complete", inPort: { label: "Layout", color: "mint" }, outPort: { label: "Board", color: "mint" }, spineOffset: 87 },
+        { id: "manufacturing", x: 1280.9168932551258, y: 386.43611737061207, title: "Miniature Production", body: "PLA tests, resin hybrid planning, plate alignment, and print-bed efficiency.", status: "current", childLevel: "manufacturing", inPort: { label: "Print", color: "mint" }, outPort: { label: "Premium", color: "cyan" }, images: sampleImages.minis, spineOffset: -105 },
+        { id: "books", x: 1686.390469035097, y: 68.27093540579389, title: "Rulebook & Campaigns", body: "V2 rulebook, visual combat examples, Swarm of the Rat King, and campaign progression.", status: "current", childLevel: "books", inPort: { label: "Teach", color: "cyan" }, outPort: { label: "Story", color: "cyan" }, images: sampleImages.cards, spineOffset: 120 },
+        { id: "cardsloot", x: 2180.981674333544, y: 31.06300798649319, title: "Action Deck & Artifacts", body: "The 45-card Action Deck, status effects, persistent loot, and build-defining rewards.", status: "complete", childLevel: "cards", inPort: { label: "Cards", color: "mint" }, outPort: { label: "Strategy", color: "mint" }, images: sampleImages.cards, spineOffset: 109 },
+        { id: "wearehere", x: 2981.8232779294567, y: 351.62391327680587, title: "We Are Here", body: "Current work board: website finish, Kickstarter launch prep, print setup, shop connections, and gameplay tuning.", status: "progress", progress: 62, childLevel: "currentWork", inPort: { label: "Now", color: "#ffdc5c" }, outPort: { label: "Next", color: "mint" }, images: sampleImages.cards, spineOffset: -198 },
+        { id: "identity", x: 2366.4608974606226, y: 369.6286637078056, title: "Box Art & Website", body: "Unified visual identity, website presence, campaign previews, and launch-facing branding.", status: "milestone", childLevel: "identity", inPort: { label: "Visual", color: "flow" }, outPort: { label: "Audience", color: "mint" }, images: sampleImages.art, spineOffset: 126 },
+        { id: "community", x: 3413.406859657162, y: 91.08797530906828, title: "Community & Demo Events", body: "Public demos, convention showcases, feedback cycles, and early community building.", status: "current", inPort: { label: "Players", color: "mint" }, outPort: { label: "Launch", color: "cyan" }, spineOffset: 157 },
+        { id: "expansions", x: 4028.5712716238845, y: 391.80958339146207, title: "Expansion Roadmap", body: "Rat King, Skywatch Peaks, Wildwood Awakening, and Nightfall Hollow planning.", status: "locked", childLevel: "expansions", inPort: { label: "Future", color: "cyan" }, outPort: { label: "Next", color: "flow" }, spineOffset: 156 }
+      ],
+      links: [
+        { from: "concept", to: "paper", color: "flow" },
+        { from: "paper", to: "tiles", color: "mint" },
+        { from: "tiles", to: "manufacturing", color: "mint" },
+        { from: "manufacturing", to: "books", color: "cyan" },
+        { from: "books", to: "cardsloot", color: "mint" },
+        { from: "cardsloot", to: "wearehere", color: "#ffdc5c" },
+        { from: "wearehere", to: "community", color: "mint" },
+        { from: "identity", to: "community", color: "mint" },
+        { from: "community", to: "expansions", color: "cyan" },
+        { from: "books", to: "identity", color: "flow", dim: true }
+      ],
+      levels: {
+        manufacturing: {
+          title: "Miniature Production Blueprint",
+          spineY: 300,
+          nodes: [
+            { id: "pla-tests", x: 25.33331298828125, y: 105.33334350585938, title: "PLA Testing", body: "Nozzle size, layer height, owl silhouette readability, and durability checks.", status: "complete", inPort: { label: "Model", color: "mint" }, outPort: { label: "Batch", color: "mint" }, images: sampleImages.minis, spineOffset: -56 },
+            { id: "plate-align", x: 351.3333740234375, y: 52, title: "Plate Alignment", body: "Figurine orientation, support access, overhang reduction, and consistent bases.", status: "current", childLevel: "plateAlignment", inPort: { label: "Angles", color: "mint" }, outPort: { label: "Clean", color: "cyan" }, images: sampleImages.plate, spineOffset: -88 },
+            { id: "bed-max", x: 339.33331298828125, y: 386, title: "Maximize Print Beds", body: "Batch grouping, footprint spacing, failure isolation, and production-time estimates.", status: "current", childLevel: "bedMax", inPort: { label: "Nest", color: "cyan" }, outPort: { label: "Yield", color: "cyan" }, images: sampleImages.plate, spineOffset: 72 },
+            { id: "resin-hybrid", x: 768.666748046875, y: 113.33334350585938, title: "Resin / PLA Hybrid", body: "Premium detail experiments paired with durable PLA parts and presentation standards.", status: "milestone", inPort: { label: "Detail", color: "cyan" }, outPort: { label: "Premium", color: "flow" }, images: sampleImages.minis },
+            { id: "production-notes", x: 1252, y: 352, title: "Production Notes", body: "Document settings, pass/fail rules, packaging constraints, and repeatable print recipes.", status: "locked", inPort: { label: "Record", color: "flow" }, outPort: { label: "Ready", color: "flow" }, spineOffset: 123 }
+          ],
+          links: [
+            { from: "pla-tests", to: "plate-align", color: "mint" },
+            { from: "pla-tests", to: "bed-max", color: "cyan" },
+            { from: "plate-align", to: "resin-hybrid", color: "cyan" },
+            { from: "bed-max", to: "resin-hybrid", color: "cyan" },
+            { from: "resin-hybrid", to: "production-notes", color: "flow" }
+          ]
+        },
+        plateAlignment: {
+          title: "Plate Alignment Detail",
+          spineY: 260,
+          nodes: [
+            { id: "silhouette", x: 60, y: 200, title: "Read Silhouette", body: "Check if each owl reads clearly from table height after support cleanup.", status: "complete", inPort: { label: "Look", color: "mint" }, outPort: { label: "Angle", color: "mint" }, images: sampleImages.minis },
+            { id: "orientation", x: 390, y: 84, title: "Orientation Pass", body: "Rotate minis to reduce face supports, preserve wing detail, and protect bases.", status: "current", inPort: { label: "Rotate", color: "mint" }, outPort: { label: "Support", color: "cyan" }, images: sampleImages.plate },
+            { id: "support-map", x: 390, y: 330, title: "Support Map", body: "Mark support contact zones and cleanup risk before approving a batch.", status: "current", inPort: { label: "Touch", color: "cyan" }, outPort: { label: "Clean", color: "cyan" } },
+            { id: "approval", x: 730, y: 200, title: "Plate Approval", body: "Save screenshot, settings, expected yield, and notes for future repeat runs.", status: "milestone", inPort: { label: "Pass", color: "flow" }, outPort: { label: "Run", color: "flow" } }
+          ],
+          links: [
+            { from: "silhouette", to: "orientation", color: "mint" },
+            { from: "orientation", to: "support-map", color: "cyan" },
+            { from: "support-map", to: "approval", color: "cyan" }
+          ]
+        },
+        bedMax: {
+          title: "Print Bed Efficiency Detail",
+          spineY: 260,
+          nodes: [
+            { id: "batch-groups", x: 60, y: 200, title: "Batch Groups", body: "Group minis by height, support style, and likely failure risk.", status: "complete", inPort: { label: "Sort", color: "mint" }, outPort: { label: "Pack", color: "mint" }, images: sampleImages.plate },
+            { id: "spacing", x: 390, y: 200, title: "Spacing Rules", body: "Leave cleanup lanes, reduce chain failures, and keep bases easy to remove.", status: "current", inPort: { label: "Gap", color: "cyan" }, outPort: { label: "Yield", color: "cyan" } },
+            { id: "time-cost", x: 720, y: 200, title: "Time / Cost Notes", body: "Estimate batch time, material use, retry buffer, and best repeat settings.", status: "milestone", inPort: { label: "Calc", color: "flow" }, outPort: { label: "Recipe", color: "flow" } }
+          ],
+          links: [
+            { from: "batch-groups", to: "spacing", color: "mint" },
+            { from: "spacing", to: "time-cost", color: "cyan" }
+          ]
+        },
+        books: {
+          title: "Books & Campaign Blueprint",
+          spineY: 280,
+          nodes: [
+            { id: "rulebook", x: 84.6666259765625, y: 329.3333435058594, title: "Rulebook Formation", body: "V2 rules, visual examples, streamlined systems, and lore integration.", status: "complete", inPort: { label: "Rules", color: "cyan" }, outPort: { label: "Teach", color: "cyan" }, images: sampleImages.cards, spineOffset: 36 },
+            { id: "examples", x: 399.3333740234375, y: 117.3333740234375, title: "Combat Examples", body: "Diagram turns, targeting, tile movement, and edge cases for teaching clarity.", status: "current", inPort: { label: "Show", color: "mint" }, outPort: { label: "Learn", color: "cyan" }, spineOffset: 61 },
+            { id: "campaign", x: 615.3333740234375, y: 356, title: "Campaign Booklets", body: "Narrative adventures including Swarm of the Rat King and multi-level progression.", status: "current", inPort: { label: "Story", color: "cyan" }, outPort: { label: "World", color: "flow" }, spineOffset: -53 },
+            { id: "layout-pass", x: 972.66650390625, y: 129.3333282470703, title: "Layout Pass", body: "Page hierarchy, icon consistency, callouts, and table-readability polish.", status: "locked", inPort: { label: "Pages", color: "flow" }, outPort: { label: "Print", color: "flow" }, spineOffset: 150 }
+          ],
+          links: [
+            { from: "rulebook", to: "examples", color: "cyan" },
+            { from: "rulebook", to: "campaign", color: "cyan" },
+            { from: "examples", to: "layout-pass", color: "flow" },
+            { from: "campaign", to: "layout-pass", color: "flow" }
+          ]
+        },
+        cards: {
+          title: "Action Deck & Loot Blueprint",
+          spineY: 270,
+          nodes: [
+            { id: "actiondeck", x: 102.66668701171875, y: 65.99998474121094, title: "Action Deck Evolution", body: "45-card deck with abilities, tactical tempo, and status effects.", status: "complete", inPort: { label: "Cards", color: "mint" }, outPort: { label: "Strategy", color: "mint" }, images: sampleImages.cards },
+            { id: "status", x: 491.3333740234375, y: 100, title: "Status Effects", body: "Clean language for buffs, conditions, timing, and reminders.", status: "current", inPort: { label: "Effect", color: "cyan" }, outPort: { label: "Balance", color: "cyan" } },
+            { id: "artifacts", x: 491.3333740234375, y: 346.66668701171875, title: "Artifact & Loot Design", body: "Feather Foot, Thornmail, Iron Claw, Athena's Blessing, and build identity.", status: "current", inPort: { label: "Items", color: "mint" }, outPort: { label: "Builds", color: "cyan" }, images: sampleImages.cards },
+            { id: "decktest", x: 948.6666259765625, y: 300.66668701171875, title: "Playtest Pass", body: "Frequency checks, combo risk, reminder burden, and reward excitement.", status: "milestone", inPort: { label: "Test", color: "flow" }, outPort: { label: "Tune", color: "flow" }, spineOffset: 148 }
+          ],
+          links: [
+            { from: "actiondeck", to: "status", color: "cyan" },
+            { from: "actiondeck", to: "artifacts", color: "mint" },
+            { from: "status", to: "decktest", color: "flow" },
+            { from: "artifacts", to: "decktest", color: "flow" }
+          ]
+        },
+        currentWork: {
+          title: "We Are Here: Current Work Board",
+          spineY: 330,
+          nodes: [
+            { id: "website-final", x: 62.66668701171875, y: 18, title: "Website Final Look", body: "Post-ready final site look, launch messaging, visuals, and the embedded roadmap presentation.", status: "progress", progress: 72, childLevel: "identity", inPort: { label: "Site", color: "#ffdc5c" }, outPort: { label: "Publish", color: "mint" }, images: sampleImages.art, spineOffset: -71 },
+            { id: "ks-pricing", x: 60, y: 390, title: "Kickstarter End Goals", body: "Pricing out launch targets, production costs, stretch goals, reward tiers, and post-launch expectations.", status: "progress", progress: 46, inPort: { label: "Costs", color: "#ffdc5c" }, outPort: { label: "Goals", color: "mint" }, spineOffset: 37 },
+            { id: "card-shops", x: 446, y: 114, title: "Card Shop Connections", body: "Building relationships with local card shops for print paths, sales channels, demos, and support.", status: "progress", progress: 38, inPort: { label: "Retail", color: "mint" }, outPort: { label: "Partners", color: "cyan" } },
+            { id: "rulebook-visuals", x: 467.33331298828125, y: 382, title: "Rulebook Visuals", body: "Finalizing visual examples, layout clarity, icon treatment, and teachable combat diagrams.", status: "progress", progress: 67, childLevel: "books", inPort: { label: "Rules", color: "cyan" }, outPort: { label: "Teach", color: "mint" }, images: sampleImages.cards, spineOffset: -20 },
+            { id: "resin-times", x: 832, y: 19.33331298828125, title: "Resin Print Setup", body: "Polishing resin print times, setup notes, repeatable settings, and production-ready approval steps.", status: "progress", progress: 54, childLevel: "manufacturing", inPort: { label: "Print", color: "cyan" }, outPort: { label: "Ready", color: "#ffdc5c" }, images: sampleImages.minis, spineOffset: 72 },
+            { id: "gameplay-tuning", x: 809.3333740234375, y: 385.99993896484375, title: "Gameplay Tuning", body: "Small and large balance changes, combat flow adjustments, and late 45-card deck integration.", status: "progress", progress: 52, childLevel: "cards", inPort: { label: "Play", color: "mint" }, outPort: { label: "Tune", color: "#ffdc5c" }, images: sampleImages.cards, spineOffset: -64 },
+            { id: "giveaways", x: 1306, y: 57.999969482421875, title: "Giveaways & Prizes", body: "Planning launch giveaways, prize structure, visuals, and how rewards support the campaign story.", status: "milestone", progress: 30, inPort: { label: "Prizes", color: "#ffdc5c" }, outPort: { label: "Buzz", color: "mint" }, images: sampleImages.art, spineOffset: 176 },
+            { id: "box-visuals", x: 1382, y: 380.66668701171875, title: "Final Box Visuals", body: "Planning the final box presentation, front-facing art, product clarity, and campaign-ready imagery.", status: "progress", progress: 41, childLevel: "identity", inPort: { label: "Box", color: "flow" }, outPort: { label: "Reveal", color: "mint" }, images: sampleImages.art, spineOffset: -88 },
+            { id: "production-shift", x: 1789.3333740234375, y: 396.0000305175781, title: "Production Alteration", body: "The 45-card deck created a late production path change away from the earlier local print assumptions.", status: "progress", progress: 35, childLevel: "cards", inPort: { label: "Change", color: "#ffdc5c" }, outPort: { label: "Resolve", color: "cyan" }, spineOffset: 159 }
+          ],
+          links: [
+            { from: "website-final", to: "card-shops", color: "mint" },
+            { from: "ks-pricing", to: "rulebook-visuals", color: "#ffdc5c" },
+            { from: "card-shops", to: "resin-times", color: "cyan" },
+            { from: "rulebook-visuals", to: "gameplay-tuning", color: "mint" },
+            { from: "resin-times", to: "giveaways", color: "#ffdc5c" },
+            { from: "gameplay-tuning", to: "box-visuals", color: "mint" },
+            { from: "giveaways", to: "production-shift", color: "cyan" },
+            { from: "box-visuals", to: "production-shift", color: "cyan" }
+          ]
+        },
+        identity: {
+          title: "Brand & Website Blueprint",
+          spineY: 260,
+          nodes: [
+            { id: "boxart", x: 128.00006103515625, y: 66.66664123535156, title: "First Box Art", body: "Unified identity featuring woodland defenders and the enemy threat.", status: "milestone", inPort: { label: "Visual", color: "flow" }, outPort: { label: "Brand", color: "mint" }, images: sampleImages.art, spineOffset: -83 },
+            { id: "website", x: 547.3333129882812, y: 290.6666564941406, title: "Website & Branding", body: "Campaign previews, online presence, product framing, and launch messaging.", status: "complete", inPort: { label: "Online", color: "mint" }, outPort: { label: "Audience", color: "mint" }, images: sampleImages.art, spineOffset: -48 },
+            { id: "demo-kit", x: 1018.6666259765625, y: 89.33334350585938, title: "Demo Kit Look", body: "Table signage, quick explanation panels, and convention-ready visuals.", status: "locked", inPort: { label: "Show", color: "cyan" }, outPort: { label: "Ready", color: "flow" }, spineOffset: 157 }
+          ],
+          links: [
+            { from: "boxart", to: "website", color: "mint" },
+            { from: "website", to: "demo-kit", color: "cyan" }
+          ]
+        },
+        expansions: {
+          title: "Expansion Roadmap Blueprint",
+          spineY: 300,
+          nodes: [
+            { id: "ratking", x: 60, y: 60, title: "Expansion I", body: "Swarm of the Rat King: enemy waves, corruption mechanics, and campaign escalation.", status: "locked", inPort: { label: "Expansion", color: "cyan" }, outPort: { label: "Future", color: "flow" } },
+            { id: "skywatch", x: 390, y: 180, title: "Expansion II", body: "Skywatch Peaks: vertical maps, weather systems, flying enemies, and cliffside encounters.", status: "locked", inPort: { label: "Adventure", color: "cyan" }, outPort: { label: "Future", color: "flow" } },
+            { id: "wildwood", x: 720, y: 300, title: "Expansion III", body: "Wildwood Awakening: ancient forest spirits, druidic allies, and living terrain systems.", status: "locked", inPort: { label: "Nature", color: "cyan" }, outPort: { label: "Future", color: "flow" } },
+            { id: "nightfall", x: 1164.6666259765625, y: 436, title: "Expansion IV", body: "Nightfall Hollow: corrupted owls, shadow bosses, lantern mechanics, and survival scenarios.", status: "locked", inPort: { label: "Darkness", color: "cyan" }, outPort: { label: "Endgame", color: "flow" } }
+          ],
+          links: [
+            { from: "ratking", to: "skywatch", color: "cyan" },
+            { from: "skywatch", to: "wildwood", color: "cyan" },
+            { from: "wildwood", to: "nightfall", color: "cyan", dim: true }
+          ]
+        }
+      }
+    };
+
+    const colorMap = {
+      flow: "var(--white-wire)",
+      mint: "var(--mint)",
+      cyan: "var(--cyan)",
+      red: "var(--red)"
+    };
+
+    const canvas = document.getElementById("canvas");
+    const nodesRoot = document.getElementById("nodes");
+    const branchHandlesRoot = document.getElementById("branchHandles");
+    const wiresRoot = document.getElementById("wires");
+    const jsonOutput = document.getElementById("jsonOutput");
+    const editorMessage = document.getElementById("editorMessage");
+    const contextMenu = document.getElementById("contextMenu");
+    const colorPopover = document.getElementById("colorPopover");
+    const colorInput = document.getElementById("colorInput");
+    const colorLabel = document.getElementById("colorLabel");
+    const gizmo = document.getElementById("gizmo");
+    const resizeHandle = document.getElementById("resizeHandle");
+    const branchCursor = document.getElementById("branchCursor");
+    const graphBackLevel = document.getElementById("graphBackLevel");
+    let selectedNodeId = null;
+    let hoveredNodeId = null;
+    let hoveredPort = null;
+    let colorTarget = null;
+    let lastCanvasPoint = { x: 120, y: 252 };
+    let wireCounter = 0;
+    let zoom = 1;
+    const lineStyles = ["dots", "laser", "dash", "solid", "spark"];
+
+    document.body.classList.toggle("editing", EDIT_MODE);
+
+    function activeGraph() {
+      if (currentLevel === "main") return roadmapData;
+      return roadmapData.levels?.[currentLevel] || roadmapData;
+    }
+
+    function render() {
+      sizeCanvasToData();
+      graphBackLevel.classList.toggle("visible", levelStack.length > 0);
+      updateDepthClass();
+      nodesRoot.innerHTML = "";
+      branchHandlesRoot.innerHTML = "";
+      activeGraph().nodes.forEach((node) => {
+        const card = document.createElement("article");
+        card.className = [
+          "node",
+          node.status === "current" ? "current" : "",
+          node.status === "complete" ? "complete" : "",
+          node.status === "milestone" ? "milestone" : "",
+          node.status === "progress" ? "progress" : "",
+          node.status === "locked" ? "locked" : "",
+          node.status === "removed" ? "removed" : "",
+          node.childLevel ? "has-child" : ""
+        ].filter(Boolean).join(" ");
+        card.dataset.id = node.id;
+        card.style.left = `${node.x}px`;
+        card.style.top = `${node.y}px`;
+        card.style.width = `${node.width || 210}px`;
+        if (node.height) card.style.minHeight = `${node.height}px`;
+        if (node.color) card.style.borderColor = node.color;
+        card.innerHTML = `
+          <div class="node-title">${escapeHtml(node.title)}</div>
+          <div class="node-body">
+            <p class="node-copy">${escapeHtml(node.body)}</p>
+            ${renderProgress(node)}
+            ${renderGallery(node.images)}
+          </div>
+          ${node.childLevel ? `<button type="button" class="dive-button" aria-label="Open ${escapeAttr(node.title)} details">Open Details</button>` : ""}
+          <span class="port in ${portClass(node.inPort.color)}" data-port="in">
+            <span class="port-label">${escapeHtml(node.inPort.label)}</span>
+            <span class="port-dot"></span>
+          </span>
+          <span class="port out ${portClass(node.outPort.color)}" data-port="out">
+            <span class="port-dot"></span>
+            <span class="port-label">${escapeHtml(node.outPort.label)}</span>
+          </span>
+        `;
+        applyPortColor(card.querySelector('[data-port="in"]'), node.inPort.color);
+        applyPortColor(card.querySelector('[data-port="out"]'), node.outPort.color);
+        nodesRoot.appendChild(card);
+        renderBranchHandle(node);
+      });
+      bindDrag();
+      bindBranchHandles();
+      drawWires();
+      updateJson();
+    }
+
+    function drawWires() {
+      const nodeById = Object.fromEntries(activeGraph().nodes.map((node) => [node.id, node]));
+      wiresRoot.innerHTML = "";
+      wireCounter = 0;
+      drawSpine();
+      drawSpineBranches();
+      activeGraph().links.forEach((link) => {
+        const from = nodeById[link.from];
+        const to = nodeById[link.to];
+        if (!from || !to) return;
+
+        const start = getPortPoint(link.from, "out");
+        const end = getPortPoint(link.to, "in");
+        if (!start || !end) return;
+        const distance = Math.min(180, Math.max(28, Math.abs(end.x - start.x) * 0.42));
+        const d = `M ${start.x} ${start.y} C ${start.x + distance} ${start.y}, ${end.x - distance} ${end.y}, ${end.x} ${end.y}`;
+        addPath(d, link, true);
+        addPath(d, link, false, roadmapData === activeGraph() ? roadmapData.links.indexOf(link) : activeGraph().links.indexOf(link));
+      });
+    }
+
+    function drawSpine() {
+      const maxX = Math.max(...activeGraph().nodes.map((node) => Number(node.x) || 0));
+      const y = Number(activeGraph().spineY) || 252;
+      const d = `M 28 ${y} H ${Math.max(1180, maxX + 260)}`;
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      path.setAttribute("class", "wire spine");
+      wiresRoot.appendChild(path);
+    }
+
+    function drawSpineBranches() {
+      const y = Number(activeGraph().spineY) || 252;
+      activeGraph().nodes.forEach((node) => {
+        const point = getBlockSpinePoint(node, y);
+        const anchorX = getBranchAnchorX(node);
+        const d = makeBranchPath(anchorX, y, point);
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", d);
+        path.setAttribute("class", `wire branch-wire ${node.branchStyle || "solid"}`);
+        path.dataset.nodeId = node.id;
+        path.style.stroke = "rgba(242, 247, 245, 0.18)";
+        path.addEventListener("click", (event) => {
+          if (!EDIT_MODE || !event.ctrlKey) return;
+          event.stopPropagation();
+          cycleBranchStyle(node.id);
+        });
+        wiresRoot.appendChild(path);
+      });
+    }
+
+    function makeBranchPath(anchorX, spineY, point) {
+      const deltaY = Math.abs(point.y - spineY);
+      const bend = Math.min(130, Math.max(28, deltaY * 0.42));
+      const direction = point.y >= spineY ? 1 : -1;
+      const firstY = spineY + bend * direction;
+      const secondY = point.y - bend * direction;
+      return `M ${anchorX} ${spineY} C ${anchorX} ${firstY}, ${point.x} ${secondY}, ${point.x} ${point.y}`;
+    }
+
+    function getBranchAnchorX(node) {
+      return node.x + (node.width || 210) / 2 + (Number(node.spineOffset) || 0);
+    }
+
+    function getBlockSpinePoint(node, spineY) {
+      const width = node.width || 210;
+      const height = node.height || 110;
+      const x = node.x + width / 2;
+      const y = node.y >= spineY ? node.y : node.y + height;
+      return { x, y };
+    }
+
+    function renderBranchHandle(node) {
+      if (!EDIT_MODE) return;
+      const handle = document.createElement("button");
+      handle.type = "button";
+      handle.className = "branch-handle";
+      handle.dataset.nodeId = node.id;
+      handle.title = "Drag to bend this spine branch";
+      positionBranchHandle(handle, node);
+      branchHandlesRoot.appendChild(handle);
+    }
+
+    function positionBranchHandle(handle, node) {
+      const y = Number(activeGraph().spineY) || 252;
+      handle.style.left = `${getBranchAnchorX(node)}px`;
+      handle.style.top = `${y}px`;
+    }
+
+    function bindBranchHandles() {
+      if (!EDIT_MODE) return;
+      branchHandlesRoot.querySelectorAll(".branch-handle").forEach((handle) => {
+        handle.addEventListener("pointerdown", startBranchHandleDrag);
+      });
+    }
+
+    function startBranchHandleDrag(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const handle = event.currentTarget;
+      const node = activeGraph().nodes.find((item) => item.id === handle.dataset.nodeId);
+      if (!node) return;
+      const start = getCanvasPoint(event);
+      const startOffset = Number(node.spineOffset) || 0;
+      handle.setPointerCapture(event.pointerId);
+
+      function move(moveEvent) {
+        const point = getCanvasPoint(moveEvent);
+        node.spineOffset = Math.round(clamp(startOffset + point.x - start.x, -220, 220));
+        positionBranchHandle(handle, node);
+        drawWires();
+        updateJson();
+      }
+
+      function stop() {
+        handle.removeEventListener("pointermove", move);
+        handle.removeEventListener("pointerup", stop);
+        handle.removeEventListener("pointercancel", stop);
+      }
+
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", stop);
+      handle.addEventListener("pointercancel", stop);
+    }
+
+    function getPortPoint(nodeId, side) {
+      const dot = document.querySelector(`.node[data-id="${cssEscape(nodeId)}"] .port[data-port="${side}"] .port-dot`);
+      if (!dot) return null;
+      const dotRect = dot.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      return {
+        x: (dotRect.left - canvasRect.left + dotRect.width / 2) / zoom,
+        y: (dotRect.top - canvasRect.top + dotRect.height / 2) / zoom
+      };
+    }
+
+    function cssEscape(value) {
+      if (window.CSS && CSS.escape) return CSS.escape(value);
+      return String(value).replace(/"/g, '\\"');
+    }
+
+    function sizeCanvasToData() {
+      const maxX = Math.max(...activeGraph().nodes.map((node) => (Number(node.x) || 0) + (Number(node.width) || 210)));
+      const maxY = Math.max(...activeGraph().nodes.map((node) => (Number(node.y) || 0) + (Number(node.height) || 110)));
+      canvas.style.width = `${Math.max(1260, maxX + 280)}px`;
+      canvas.style.height = `${Math.max(470, maxY + 150)}px`;
+      canvas.parentElement.style.height = `${Math.min(Math.max(470, maxY + 150), 720)}px`;
+      applyZoom();
+    }
+
+    function addPath(d, link, ghost, linkIndex) {
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d);
+      path.setAttribute("class", ghost ? "wire ghost" : `wire link-wire ${link.style || "dots"} ${link.dim ? "dim" : ""}`);
+      if (!ghost) {
+        const stroke = createWireGradient(link);
+        const glow = getWireStroke(link);
+        path.style.stroke = stroke;
+        path.style.color = glow;
+        path.dataset.linkIndex = linkIndex;
+        path.addEventListener("click", (event) => {
+          if (!EDIT_MODE || !event.ctrlKey) return;
+          event.stopPropagation();
+          cycleLinkStyle(Number(path.dataset.linkIndex));
+        });
+      }
+      wiresRoot.appendChild(path);
+    }
+
+    function createWireGradient(link) {
+      const from = activeGraph().nodes.find((node) => node.id === link.from);
+      const to = activeGraph().nodes.find((node) => node.id === link.to);
+      const dotColor = colorMap[link.dotColor] || link.dotColor;
+      const start = dotColor || colorMap[from?.outPort?.color] || from?.outPort?.color || getWireStroke(link);
+      const end = dotColor || colorMap[to?.inPort?.color] || to?.inPort?.color || getWireStroke(link);
+      const id = `wire-gradient-${wireCounter++}`;
+      const gradient = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+      gradient.setAttribute("id", id);
+      gradient.setAttribute("gradientUnits", "userSpaceOnUse");
+      const startPoint = getPortPoint(link.from, "out");
+      const endPoint = getPortPoint(link.to, "in");
+      gradient.setAttribute("x1", startPoint?.x || 0);
+      gradient.setAttribute("y1", startPoint?.y || 0);
+      gradient.setAttribute("x2", endPoint?.x || 1);
+      gradient.setAttribute("y2", endPoint?.y || 1);
+      gradient.innerHTML = `<stop offset="0%" stop-color="${start}"/><stop offset="100%" stop-color="${end}"/>`;
+      wiresRoot.appendChild(gradient);
+      return `url(#${id})`;
+    }
+
+    function getWireStroke(link) {
+      const from = activeGraph().nodes.find((node) => node.id === link.from);
+      const to = activeGraph().nodes.find((node) => node.id === link.to);
+      const key = link.dotColor || link.color || from?.outPort?.color || to?.inPort?.color || "flow";
+      return colorMap[key] || key;
+    }
+
+    function cycleLinkStyle(index) {
+      const link = activeGraph().links[index];
+      if (!link) return;
+      link.style = nextLineStyle(link.style);
+      drawWires();
+      updateJson();
+      setEditorMessage(`Wire style: ${link.style}.`);
+    }
+
+    function cycleBranchStyle(nodeId) {
+      const node = activeGraph().nodes.find((item) => item.id === nodeId);
+      if (!node) return;
+      node.branchStyle = nextLineStyle(node.branchStyle || "solid");
+      drawWires();
+      updateJson();
+      setEditorMessage(`Grey branch style: ${node.branchStyle}.`);
+    }
+
+    function nextLineStyle(current) {
+      const index = lineStyles.indexOf(current || "dots");
+      return lineStyles[(index + 1) % lineStyles.length];
+    }
+
+    function bindDrag() {
+      document.querySelectorAll(".node").forEach((card) => {
+        if (EDIT_MODE) card.addEventListener("pointerdown", startDrag);
+        card.addEventListener("mouseenter", () => {
+          hoveredNodeId = card.dataset.id;
+          if (document.body.classList.contains("ctrl-down")) showGizmo(card.dataset.id);
+        });
+        card.addEventListener("mouseleave", () => {
+          hoveredNodeId = null;
+        });
+        card.addEventListener("contextmenu", (event) => {
+          if (!EDIT_MODE) {
+            event.preventDefault();
+            backLevel();
+            return;
+          }
+          event.preventDefault();
+          selectedNodeId = card.dataset.id;
+          openContextMenu(event, true);
+        });
+        card.addEventListener("click", (event) => {
+          if (event.target.closest(".port")) return;
+          if (EDIT_MODE && !event.target.closest(".dive-button")) return;
+          const node = activeGraph().nodes.find((item) => item.id === card.dataset.id);
+          if (node?.childLevel) openLevel(node.childLevel);
+        });
+        if (EDIT_MODE) {
+          card.querySelectorAll(".port").forEach((port) => {
+            port.addEventListener("mouseenter", () => {
+              hoveredPort = { nodeId: card.dataset.id, side: port.dataset.port };
+            });
+            port.addEventListener("mouseleave", () => {
+              hoveredPort = null;
+            });
+          });
+        }
+      });
+    }
+
+    function startDrag(event) {
+      if (event.ctrlKey || event.target.closest(".port") || event.target.closest(".dive-button")) return;
+      const card = event.currentTarget;
+      const node = activeGraph().nodes.find((item) => item.id === card.dataset.id);
+      if (!node) return;
+
+      const bounds = canvas.getBoundingClientRect();
+      const offsetX = (event.clientX - bounds.left) / zoom - node.x;
+      const offsetY = (event.clientY - bounds.top) / zoom - node.y;
+      card.setPointerCapture(event.pointerId);
+
+      function move(moveEvent) {
+        node.x = clamp((moveEvent.clientX - bounds.left) / zoom - offsetX, 18, 5000);
+        node.y = clamp((moveEvent.clientY - bounds.top) / zoom - offsetY, 18, 1800);
+        card.style.left = `${node.x}px`;
+        card.style.top = `${node.y}px`;
+        sizeCanvasToData();
+        const handle = branchHandlesRoot.querySelector(`.branch-handle[data-node-id="${cssEscape(node.id)}"]`);
+        if (handle) positionBranchHandle(handle, node);
+        drawWires();
+        updateJson();
+      }
+
+      function stop() {
+        card.removeEventListener("pointermove", move);
+        card.removeEventListener("pointerup", stop);
+        card.removeEventListener("pointercancel", stop);
+      }
+
+      card.addEventListener("pointermove", move);
+      card.addEventListener("pointerup", stop);
+      card.addEventListener("pointercancel", stop);
+    }
+
+    function updateJson() {
+      jsonOutput.value = JSON.stringify(roadmapData, null, 2);
+    }
+
+    function openLevel(levelId) {
+      if (!roadmapData.levels?.[levelId]) return;
+      beginZoomTransition("zooming-in");
+      levelStack.push(currentLevel);
+      currentLevel = levelId;
+      selectedNodeId = null;
+      hoveredNodeId = null;
+      hoveredPort = null;
+      zoom = 1;
+      canvas.parentElement.scrollLeft = 0;
+      canvas.parentElement.scrollTop = 0;
+      render();
+      setEditorMessage(`Opened ${activeGraph().title || levelId}. Click pulsing arrows to go deeper, or right-click to go back.`);
+    }
+
+    function backLevel() {
+      if (!levelStack.length) return;
+      beginZoomTransition("zooming-out");
+      currentLevel = levelStack.pop();
+      selectedNodeId = null;
+      zoom = 1;
+      canvas.parentElement.scrollLeft = 0;
+      canvas.parentElement.scrollTop = 0;
+      render();
+      setEditorMessage(currentLevel === "main" ? "Back to top-level roadmap." : `Back to ${activeGraph().title || currentLevel}.`);
+    }
+
+    function beginZoomTransition(className) {
+      if (EDIT_MODE) return;
+      document.body.classList.add(className);
+      window.setTimeout(() => {
+        document.body.classList.remove(className);
+        applyZoom();
+      }, 340);
+    }
+
+    function updateDepthClass() {
+      document.body.classList.remove("depth-0", "depth-1", "depth-2", "depth-3");
+      document.body.classList.add(`depth-${Math.min(levelStack.length, 3)}`);
+    }
+
+    function renderGallery(images) {
+      if (!Array.isArray(images) || images.length === 0) return "";
+      const imageItems = [...images, ...images].map((image) => {
+        const src = typeof image === "string" ? image : image.src;
+        const alt = typeof image === "string" ? "" : image.alt || "";
+        if (!src) return "";
+        return `<img src="${escapeAttr(src)}" alt="${escapeAttr(alt)}" loading="lazy">`;
+      }).join("");
+      return `<div class="node-gallery"><div class="node-gallery-track">${imageItems}</div></div>`;
+    }
+
+    function renderProgress(node) {
+      if (node.progress === undefined) return "";
+      const value = clamp(Number(node.progress) || 0, 0, 100);
+      return `<div class="node-progress" aria-label="${value}% complete"><span style="--progress: ${value}%"></span></div>`;
+    }
+
+    function getCanvasPoint(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: Math.round((event.clientX - rect.left) / zoom),
+        y: Math.round((event.clientY - rect.top) / zoom)
+      };
+    }
+
+    function applyZoom() {
+      canvas.style.transform = `scale(${zoom})`;
+      const baseWidth = Number.parseFloat(canvas.style.width) || canvas.offsetWidth;
+      const baseHeight = Number.parseFloat(canvas.style.height) || canvas.offsetHeight;
+      canvas.parentElement.style.setProperty("--scaled-width", `${baseWidth * zoom}px`);
+      canvas.parentElement.style.setProperty("--scaled-height", `${baseHeight * zoom}px`);
+    }
+
+    function zoomAt(event) {
+      const wrap = canvas.parentElement;
+      const before = getCanvasPoint(event);
+      const nextZoom = clamp(zoom * (event.deltaY < 0 ? 1.1 : 0.9), 0.35, 2.4);
+      if (nextZoom === zoom) return;
+      zoom = nextZoom;
+      applyZoom();
+      wrap.scrollLeft = before.x * zoom - (event.clientX - wrap.getBoundingClientRect().left);
+      wrap.scrollTop = before.y * zoom - (event.clientY - wrap.getBoundingClientRect().top);
+      setEditorMessage(`Zoom ${Math.round(zoom * 100)}%.`);
+    }
+
+    function openContextMenu(event, onNode = false) {
+      lastCanvasPoint = getCanvasPoint(event);
+      contextMenu.style.left = `${lastCanvasPoint.x}px`;
+      contextMenu.style.top = `${lastCanvasPoint.y}px`;
+      contextMenu.classList.add("open");
+      contextMenu.querySelector('[data-action="edit"]').disabled = !onNode && !selectedNodeId;
+      contextMenu.querySelector('[data-action="linked"]').disabled = !onNode && !selectedNodeId;
+    }
+
+    function closeFloatingTools() {
+      contextMenu.classList.remove("open");
+      colorPopover.classList.remove("open");
+      if (!document.body.classList.contains("ctrl-down")) gizmo.classList.remove("open");
+    }
+
+    function addNodeAt(point, options = {}) {
+      const title = options.title || prompt("Name this roadmap node");
+      if (!title) return null;
+      const id = uniqueId(title);
+      const node = {
+        id,
+        x: clamp(Math.round(point.x), 18, 5000),
+        y: clamp(Math.round(point.y), 18, 1800),
+        title,
+        body: options.body || "New roadmap branch.",
+        status: options.status || "complete",
+        inPort: { label: options.inLabel || "In", color: options.inColor || "mint" },
+        outPort: { label: options.outLabel || "Out", color: options.outColor || "cyan" }
+      };
+      activeGraph().nodes.push(node);
+      if (options.from) {
+        activeGraph().links.push({ from: options.from, to: id, color: options.color || node.inPort.color });
+      }
+      selectedNodeId = id;
+      render();
+      setEditorMessage(`Added ${title}.`);
+      return node;
+    }
+
+    function editNode(nodeId) {
+      const node = activeGraph().nodes.find((item) => item.id === nodeId);
+      if (!node) return;
+      const title = prompt("Node title", node.title);
+      if (title === null) return;
+      const body = prompt("Node body", node.body);
+      if (body === null) return;
+      const inLabel = prompt("Input port label", node.inPort.label);
+      if (inLabel === null) return;
+      const outLabel = prompt("Output port label", node.outPort.label);
+      if (outLabel === null) return;
+      const images = prompt("Image URLs for this block, comma separated", Array.isArray(node.images) ? node.images.map((image) => typeof image === "string" ? image : image.src).join(", ") : "");
+      if (images === null) return;
+      node.title = title;
+      node.body = body;
+      node.inPort.label = inLabel;
+      node.outPort.label = outLabel;
+      node.images = images.split(",").map((item) => item.trim()).filter(Boolean);
+      render();
+      setEditorMessage(`Updated ${title}.`);
+    }
+
+    function splitNearestWire(point) {
+      if (!activeGraph().links.length) return;
+      let bestIndex = 0;
+      let bestScore = Infinity;
+      const nodeById = Object.fromEntries(activeGraph().nodes.map((node) => [node.id, node]));
+      activeGraph().links.forEach((link, index) => {
+        const from = nodeById[link.from];
+        const to = nodeById[link.to];
+        if (!from || !to) return;
+        const midX = ((from.x + (from.width || 210)) + to.x) / 2;
+        const midY = (from.y + to.y) / 2 + 42;
+        const score = Math.hypot(point.x - midX, point.y - midY);
+        if (score < bestScore) {
+          bestScore = score;
+          bestIndex = index;
+        }
+      });
+      const oldLink = activeGraph().links[bestIndex];
+      const title = prompt("Name the split node");
+      if (!title) return;
+      const node = addNodeAt(point, { title, body: "Inserted branch point." });
+      if (!node) return;
+      activeGraph().links.splice(bestIndex, 1, { from: oldLink.from, to: node.id, color: oldLink.color }, { from: node.id, to: oldLink.to, color: oldLink.color, dim: oldLink.dim });
+      render();
+      setEditorMessage("Split wire with a new node.");
+    }
+
+    function uniqueId(title) {
+      const base = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "node";
+      let id = base;
+      let index = 2;
+      while (activeGraph().nodes.some((node) => node.id === id)) {
+        id = `${base}-${index}`;
+        index += 1;
+      }
+      return id;
+    }
+
+    function showGizmo(nodeId) {
+      const card = document.querySelector(`.node[data-id="${cssEscape(nodeId)}"]`);
+      if (!card) return;
+      const node = activeGraph().nodes.find((item) => item.id === nodeId);
+      if (!node) return;
+      const left = node.x + (node.width || 210) + 14;
+      const top = node.y;
+      gizmo.style.left = `${left}px`;
+      gizmo.style.top = `${top}px`;
+      gizmo.classList.add("open");
+      selectedNodeId = nodeId;
+    }
+
+    function openColorPopover(target, point) {
+      colorTarget = target;
+      const current = getTargetColor(target);
+      colorInput.value = normalizeColor(current);
+      colorLabel.textContent = target.type === "node" ? "Block Color" : target.type === "port" ? "Port Color" : "Wire Dots";
+      colorPopover.style.left = `${point.x + 10}px`;
+      colorPopover.style.top = `${point.y + 10}px`;
+      colorPopover.classList.add("open");
+    }
+
+    function getTargetColor(target) {
+      if (target.type === "node") {
+        return activeGraph().nodes.find((node) => node.id === target.nodeId)?.color || "#78ecff";
+      }
+      if (target.type === "port") {
+        const node = activeGraph().nodes.find((item) => item.id === target.nodeId);
+        return node?.[`${target.side}Port`]?.color || "#78ecff";
+      }
+      if (target.type === "wire") {
+        return activeGraph().links[target.index]?.dotColor || activeGraph().links[target.index]?.color || "#78ecff";
+      }
+      return "#78ecff";
+    }
+
+    function normalizeColor(value) {
+      const resolved = colorMap[value] || value || "#78ecff";
+      if (resolved.startsWith("#")) return resolved;
+      if (resolved.includes("mint")) return "#9cff58";
+      if (resolved.includes("cyan")) return "#78ecff";
+      return "#f2f7f5";
+    }
+
+    function applyColorToTarget(value) {
+      if (!colorTarget) return;
+      if (colorTarget.type === "node") {
+        const node = activeGraph().nodes.find((item) => item.id === colorTarget.nodeId);
+        if (node) node.color = value;
+      }
+      if (colorTarget.type === "port") {
+        const node = activeGraph().nodes.find((item) => item.id === colorTarget.nodeId);
+        if (node) node[`${colorTarget.side}Port`].color = value;
+        activeGraph().links.forEach((link) => {
+          if (colorTarget.side === "out" && link.from === colorTarget.nodeId) link.color = value;
+          if (colorTarget.side === "in" && link.to === colorTarget.nodeId) link.color = value;
+        });
+      }
+      if (colorTarget.type === "wire") {
+        const link = activeGraph().links[colorTarget.index];
+        if (link) link.dotColor = value;
+      }
+      render();
+      setEditorMessage("Color updated.");
+    }
+
+    function parseRoadmapJson(value) {
+      const withoutLineComments = value
+        .split("\n")
+        .filter((line) => !line.trim().startsWith("//"))
+        .join("\n");
+      return JSON.parse(withoutLineComments);
+    }
+
+    function setEditorMessage(message, isError = false) {
+      editorMessage.textContent = message;
+      editorMessage.classList.toggle("error", isError);
+    }
+
+    function portClass(color) {
+      return colorMap[color] ? `${color}-port` : "custom-port";
+    }
+
+    function applyPortColor(port, color) {
+      if (!port) return;
+      const resolved = colorMap[color] || color;
+      if (resolved) port.style.color = resolved;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    document.getElementById("exportJson").addEventListener("click", () => {
+      updateJson();
+      jsonOutput.focus();
+      jsonOutput.select();
+      setEditorMessage("JSON selected. Copy it when you are happy with the layout.");
+    });
+
+    document.getElementById("backLevel").addEventListener("click", backLevel);
+    graphBackLevel.addEventListener("click", backLevel);
+
+    document.getElementById("applyJson").addEventListener("click", () => {
+      try {
+        const next = parseRoadmapJson(jsonOutput.value);
+        if ((!Array.isArray(next.nodes) || !Array.isArray(next.links)) && !next.levels) {
+          setEditorMessage("JSON must include nodes/links or a levels object.", true);
+          return;
+        }
+        roadmapData = next;
+        currentLevel = "main";
+        levelStack.length = 0;
+        render();
+        setEditorMessage(`Applied ${activeGraph().nodes.length} nodes and ${activeGraph().links.length} links.`);
+      } catch (error) {
+        setEditorMessage(`Could not apply JSON: ${error.message}`, true);
+        jsonOutput.focus();
+      }
+    });
+
+    canvas.addEventListener("contextmenu", (event) => {
+      if (!EDIT_MODE) {
+        event.preventDefault();
+        backLevel();
+        return;
+      }
+      if (event.target.closest(".node")) return;
+      event.preventDefault();
+      selectedNodeId = null;
+      openContextMenu(event, false);
+    });
+
+    canvas.parentElement.addEventListener("wheel", (event) => {
+      if (!EDIT_MODE || !event.ctrlKey) return;
+      event.preventDefault();
+      zoomAt(event);
+    }, { passive: false });
+
+    canvas.addEventListener("pointermove", (event) => {
+      lastCanvasPoint = getCanvasPoint(event);
+      branchCursor.style.left = `${lastCanvasPoint.x}px`;
+      branchCursor.style.top = `${lastCanvasPoint.y}px`;
+      if (event.altKey && EDIT_MODE) {
+        if (hoveredPort) {
+          openColorPopover({ type: "port", ...hoveredPort }, lastCanvasPoint);
+        } else if (hoveredNodeId) {
+          openColorPopover({ type: "node", nodeId: hoveredNodeId }, lastCanvasPoint);
+        }
+      }
+    });
+
+    canvas.addEventListener("click", (event) => {
+      if (!EDIT_MODE) return;
+      if (event.ctrlKey && !event.target.closest(".node") && !event.target.closest(".context-menu") && !event.target.closest(".gizmo")) {
+        const from = selectedNodeId || nearestNodeId(lastCanvasPoint);
+        const title = prompt("Name this branch");
+        if (title) addNodeAt(lastCanvasPoint, { from, title });
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".context-menu") && !event.target.closest(".color-popover") && !event.target.closest(".gizmo")) {
+        closeFloatingTools();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Control") {
+        document.body.classList.add("ctrl-down");
+        if (hoveredNodeId) showGizmo(hoveredNodeId);
+      }
+      if (event.key === "Escape") {
+        closeFloatingTools();
+      }
+    });
+
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "Control") {
+        document.body.classList.remove("ctrl-down");
+        gizmo.classList.remove("open");
+      }
+      if (event.key === "Alt") {
+        colorPopover.classList.remove("open");
+      }
+    });
+
+    contextMenu.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      const action = button.dataset.action;
+      contextMenu.classList.remove("open");
+      if (action === "add") addNodeAt(lastCanvasPoint);
+      if (action === "edit") editNode(selectedNodeId);
+      if (action === "linked") addNodeAt({ x: lastCanvasPoint.x + 80, y: lastCanvasPoint.y }, { from: selectedNodeId });
+      if (action === "split") splitNearestWire(lastCanvasPoint);
+      if (action === "wirecolor") openColorPopover({ type: "wire", index: nearestLinkIndex(lastCanvasPoint) }, lastCanvasPoint);
+    });
+
+    colorInput.addEventListener("input", () => {
+      applyColorToTarget(colorInput.value);
+    });
+
+    gizmo.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-status]");
+      if (!button || !selectedNodeId) return;
+      const node = activeGraph().nodes.find((item) => item.id === selectedNodeId);
+      if (!node) return;
+      node.status = button.dataset.status;
+      render();
+      setEditorMessage(`${node.title} marked ${node.status}.`);
+    });
+
+    resizeHandle.addEventListener("pointerdown", (event) => {
+      if (!selectedNodeId) return;
+      event.preventDefault();
+      const node = activeGraph().nodes.find((item) => item.id === selectedNodeId);
+      if (!node) return;
+      const start = { x: event.clientX, y: event.clientY, width: node.width || 210, height: node.height || 110 };
+      resizeHandle.setPointerCapture(event.pointerId);
+      function move(moveEvent) {
+        node.width = clamp(start.width + moveEvent.clientX - start.x, 160, 420);
+        node.height = clamp(start.height + moveEvent.clientY - start.y, 84, 260);
+        render();
+      }
+      function stop() {
+        resizeHandle.removeEventListener("pointermove", move);
+        resizeHandle.removeEventListener("pointerup", stop);
+        resizeHandle.removeEventListener("pointercancel", stop);
+        updateJson();
+      }
+      resizeHandle.addEventListener("pointermove", move);
+      resizeHandle.addEventListener("pointerup", stop);
+      resizeHandle.addEventListener("pointercancel", stop);
+    });
+
+    function nearestNodeId(point) {
+      let winner = activeGraph().nodes[0]?.id;
+      let best = Infinity;
+      activeGraph().nodes.forEach((node) => {
+        const cx = node.x + (node.width || 210) / 2;
+        const cy = node.y + (node.height || 110) / 2;
+        const score = Math.hypot(point.x - cx, point.y - cy);
+        if (score < best) {
+          best = score;
+          winner = node.id;
+        }
+      });
+      return winner;
+    }
+
+    function nearestLinkIndex(point) {
+      let bestIndex = 0;
+      let bestScore = Infinity;
+      const nodeById = Object.fromEntries(activeGraph().nodes.map((node) => [node.id, node]));
+      activeGraph().links.forEach((link, index) => {
+        const from = nodeById[link.from];
+        const to = nodeById[link.to];
+        if (!from || !to) return;
+        const midX = ((from.x + (from.width || 210)) + to.x) / 2;
+        const midY = (from.y + to.y) / 2 + 42;
+        const score = Math.hypot(point.x - midX, point.y - midY);
+        if (score < bestScore) {
+          bestScore = score;
+          bestIndex = index;
+        }
+      });
+      return bestIndex;
+    }
+
+    render();
+  </script>
+</body>
+</html>
+

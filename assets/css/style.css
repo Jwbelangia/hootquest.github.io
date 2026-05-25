@@ -1675,13 +1675,16 @@ body {
   overflow: hidden;
   border-style: solid;
   background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.08), hsla(0, 0%, 100%, 0.03));
+  min-height: 220px;
 }
 
 .campaign-story-video {
   width: 100%;
-  min-height: 220px;
+  height: 220px;
   display: block;
+  object-fit: cover;
   background-color: hsl(280, 18%, 10%);
+  border-radius: inherit;
 }
 
 .campaign-story-logo-image {

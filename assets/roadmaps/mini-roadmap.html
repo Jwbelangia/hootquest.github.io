@@ -90,12 +90,45 @@
     }
 
     .brand-text {
+      display: inline-flex;
+      align-items: center;
       min-width: 0;
       color: var(--ink);
       font-size: clamp(1.05rem, 3.5vw, 1.65rem);
       font-weight: 900;
       letter-spacing: 0;
       text-shadow: 0 0 18px rgba(120, 236, 255, 0.25);
+      transition:
+        transform 260ms cubic-bezier(.22, .75, .18, 1),
+        opacity 220ms ease,
+        filter 260ms ease;
+      will-change: transform, opacity, filter;
+    }
+
+    .brand-text.is-leaving {
+      opacity: 0;
+      filter: blur(5px);
+      transform: translateX(-18px) translateY(-3px) scale(0.98);
+    }
+
+    .brand-text.is-enter-prep {
+      opacity: 0;
+      filter: blur(7px);
+      transform: translateX(28px) translateY(4px) scale(1.02);
+    }
+
+    .brand-mark {
+      transition:
+        transform 280ms cubic-bezier(.22, .75, .18, 1),
+        box-shadow 280ms ease,
+        border-color 280ms ease,
+        background-color 280ms ease;
+      will-change: transform, box-shadow;
+    }
+
+    .brand-mark.is-morphing {
+      transform: translateY(-2px) scale(1.08);
+      box-shadow: 0 0 28px rgba(156, 255, 88, 0.5);
     }
 
     .typed-word {
@@ -363,25 +396,48 @@
 
     function typeConcept() {
       brandMark.textContent = "PE";
-      brandText.textContent = "Playforge Entertainment";
+      brandText.innerHTML = "Playforge Entertainment";
       window.setTimeout(() => {
-        brandText.textContent = "PE";
+        animateBrandLabel("PE");
       }, 700);
       window.setTimeout(() => {
-        brandText.textContent = "HootQuest";
+        animateBrandLabel("HootQuest");
       }, 1250);
       window.setTimeout(() => {
-        brandText.innerHTML = "HootQuest <span class='typed-word'>Concept</span>";
+        animateBrandLabel("HootQuest <span class='typed-word'>Concept</span>");
         index = 0;
         setFocus(index);
       }, 1850);
     }
 
     function finishLoop() {
-      brandText.textContent = "PE";
+      animateBrandLabel("PE");
       window.setTimeout(() => {
-        brandText.textContent = "Playforge Entertainment";
+        animateBrandLabel("Playforge Entertainment");
       }, 700);
+    }
+
+    function animateBrandLabel(nextMarkup) {
+      brandMark.classList.remove("is-morphing");
+      void brandMark.offsetWidth;
+      brandMark.classList.add("is-morphing");
+
+      brandText.classList.remove("is-enter-prep");
+      brandText.classList.add("is-leaving");
+
+      window.setTimeout(() => {
+        brandText.innerHTML = nextMarkup;
+        brandText.classList.remove("is-leaving");
+        brandText.classList.add("is-enter-prep");
+
+        requestAnimationFrame(() => {
+          brandText.classList.remove("is-enter-prep");
+        });
+      }, 170);
+
+      window.setTimeout(() => {
+        brandMark.classList.remove("is-morphing");
+      }, 320);
     }
 
     function tick() {

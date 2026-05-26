@@ -5,6 +5,7 @@
 - Use the middle-page signup area as the highlighted signup target instead of the footer signup; do not add extra explanatory copy there.
 - For homepage SEO copy, keep the main hero text short; move alternate-name explanatory copy into a small, discreet memo-style note at the bottom-right instead of the main bubble. Avoid mentioning weekdays or event-specific wording (e.g., "Monday"); signal the site is still being built using neutral, non-event phrasing.
 - For the Owl/Rat deck switch, place the controls lower below the art, with a single center slider cap that moves to the hovered tab, changes to that tab's color, and visually completes the top of the button.
+- Do not change visitor-facing visuals or interaction flow when improving tracking or SEO; only add tracking/SEO metadata and hooks.
 
 ### Embedded Game
 - Prefer adjusting how the site presents the game (e.g., container sizing, CSS wrappers, or modal presentation) rather than modifying embedded game files for modal sizing.

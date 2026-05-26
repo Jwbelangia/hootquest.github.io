@@ -22,11 +22,16 @@
       box-sizing: border-box;
     }
 
+    html,
+    body {
+      height: 100%;
+    }
+
     body {
       margin: 0;
       min-width: 320px;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      min-height: 100%;
       overflow: hidden;
       background: var(--bg);
       color: var(--ink);
@@ -36,11 +41,12 @@
     .mini-roadmap {
       position: relative;
       overflow: hidden;
-      display: grid;
-      grid-template-rows: auto auto;
-      align-content: center;
-      width: 100vw;
-      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      height: 100%;
       min-height: 0;
       padding: 18px;
       background:
@@ -147,8 +153,8 @@
     }
 
     .mini-shell {
-      width: 1120px;
-      transform-origin: top left;
+      width: min(1120px, 100%);
+      transform-origin: left center;
       margin: 0;
     }
 
@@ -288,12 +294,27 @@
 
     @media (max-width: 640px) {
       .mini-roadmap {
-        padding: 14px;
+        padding: 12px;
       }
 
-      .brand-stage,
       .viewport {
-        width: 1120px;
+        width: 100%;
+      }
+
+      .brand-stage {
+        width: 100%;
+        gap: 10px;
+        min-height: 38px;
+        margin: 0 0 10px;
+      }
+
+      .brand-mark {
+        width: 38px;
+        height: 38px;
+      }
+
+      .viewport {
+        height: 236px;
       }
     }
   </style>
@@ -385,13 +406,12 @@
     }
 
     function fitToFrame() {
-      const availableWidth = window.innerWidth - 28;
-      const availableHeight = window.innerHeight - 24;
-      const naturalWidth = 1120;
-      const naturalHeight = 310;
-      shellScale = Math.min(1, availableWidth / naturalWidth, availableHeight / naturalHeight);
-      miniShell.style.transform = `scale(${shellScale})`;
-      miniShell.style.height = `${naturalHeight}px`;
+      const compactMode = window.innerWidth <= 640;
+      const availableHeight = window.innerHeight - (compactMode ? 16 : 24);
+      const naturalHeight = compactMode ? 284 : 310;
+      shellScale = Math.min(1, availableHeight / naturalHeight);
+      miniShell.style.transform = shellScale < 0.999 ? `scale(${shellScale})` : "";
+      miniShell.style.height = `${naturalHeight * shellScale}px`;
     }
 
     function typeConcept() {

@@ -2149,15 +2149,19 @@ body {
 
 .newsletter-bot-guard {
   position: absolute;
+  left: -9999px;
+  top: auto;
   width: 1px;
   height: 1px;
   padding: 0;
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
   pointer-events: none;
+  opacity: 0;
 }
 
 .newsletter-status {

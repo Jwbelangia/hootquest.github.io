@@ -59,6 +59,12 @@ const newsletterFrame = document.querySelector('iframe[name="newsletter-submit-f
 const liveRoadmap = document.querySelector("[data-roadmap-reveal]");
 let activeNewsletterForm = null;
 const newsletterMinimumSubmitDelayMs = 3000;
+const newsletterTokenDelayMs = 2000;
+const newsletterPageLoadedAt = Date.now();
+let newsletterTokenIssuedAt = 0;
+let newsletterPageToken = "";
+let newsletterInteractionCount = 0;
+let newsletterFirstInteractionAt = 0;
 
 function isAnalyticsAvailable() {
   return typeof window.gtag === "function";
@@ -152,16 +158,94 @@ function setNewsletterSubmitState(form, disabled) {
   }
 }
 
-function markNewsletterFormsReady() {
-  const loadedAt = String(Date.now());
+function generateTelemetryId() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  return `hq-${Date.now()}-${Math.random().toString(16).slice(2)}-${Math.random().toString(16).slice(2)}`;
+}
+
+function setNewsletterFieldValue(form, selector, value) {
+  const field = form?.querySelector(selector);
+
+  if (field) {
+    field.value = value;
+  }
+}
+
+function getNewsletterFocusStartedAt(form) {
+  const value = Number(form?.dataset.focusStartedAt || 0);
+  return value > 0 ? value : 0;
+}
+
+function setNewsletterTelemetryBase(form) {
+  const browserInfo = navigator.userAgent || "";
+  const screenInfo = `${window.screen?.width || 0}x${window.screen?.height || 0}@${window.devicePixelRatio || 1}`;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  const referrer = document.referrer || "";
+  const landingPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
+  setNewsletterFieldValue(form, "[data-newsletter-start]", String(newsletterPageLoadedAt));
+  setNewsletterFieldValue(form, "[data-newsletter-page-loaded-at]", String(newsletterPageLoadedAt));
+  setNewsletterFieldValue(form, "[data-newsletter-form-source]", form.querySelector("[data-newsletter-form-source]")?.value || "");
+  setNewsletterFieldValue(form, "[data-newsletter-browser-info]", browserInfo);
+  setNewsletterFieldValue(form, "[data-newsletter-screen-info]", screenInfo);
+  setNewsletterFieldValue(form, "[data-newsletter-timezone]", timezone);
+  setNewsletterFieldValue(form, "[data-newsletter-referrer]", referrer);
+  setNewsletterFieldValue(form, "[data-newsletter-landing-path]", landingPath);
+  setNewsletterFieldValue(form, "[data-newsletter-interaction-count]", String(newsletterInteractionCount));
+  setNewsletterFieldValue(form, "[data-newsletter-first-interaction-at]", newsletterFirstInteractionAt ? String(newsletterFirstInteractionAt) : "");
+  setNewsletterFieldValue(form, "[data-newsletter-token-issued-at]", newsletterTokenIssuedAt ? String(newsletterTokenIssuedAt) : "");
+  setNewsletterFieldValue(form, "[data-newsletter-page-token]", newsletterPageToken);
+}
+
+function updateNewsletterTelemetry(form) {
+  const now = Date.now();
+  const focusStartedAt = getNewsletterFocusStartedAt(form);
+
+  setNewsletterTelemetryBase(form);
+  setNewsletterFieldValue(form, "[data-newsletter-page-dwell]", String(Math.max(0, now - newsletterPageLoadedAt)));
+  setNewsletterFieldValue(form, "[data-newsletter-form-dwell]", focusStartedAt ? String(Math.max(0, now - focusStartedAt)) : "0");
+  setNewsletterFieldValue(form, "[data-newsletter-submission-id]", generateTelemetryId());
+}
+
+function issueNewsletterToken() {
+  newsletterTokenIssuedAt = Date.now();
+  newsletterPageToken = generateTelemetryId();
 
   for (let i = 0; i < newsletterForms.length; i++) {
-    const startField = newsletterForms[i].querySelector("[data-newsletter-start]");
-
-    if (startField) {
-      startField.value = loadedAt;
-    }
+    setNewsletterTelemetryBase(newsletterForms[i]);
   }
+}
+
+function recordNewsletterInteraction() {
+  newsletterInteractionCount += 1;
+
+  if (!newsletterFirstInteractionAt) {
+    newsletterFirstInteractionAt = Date.now();
+  }
+
+  for (let i = 0; i < newsletterForms.length; i++) {
+    setNewsletterFieldValue(newsletterForms[i], "[data-newsletter-interaction-count]", String(newsletterInteractionCount));
+    setNewsletterFieldValue(newsletterForms[i], "[data-newsletter-first-interaction-at]", String(newsletterFirstInteractionAt));
+  }
+}
+
+function markNewsletterFormsReady() {
+  for (let i = 0; i < newsletterForms.length; i++) {
+    setNewsletterTelemetryBase(newsletterForms[i]);
+
+    const emailField = newsletterForms[i].querySelector('input[type="email"]');
+
+    emailField?.addEventListener("focus", function () {
+      if (!newsletterForms[i].dataset.focusStartedAt) {
+        newsletterForms[i].dataset.focusStartedAt = String(Date.now());
+      }
+    }, { once: true });
+  }
+
+  window.setTimeout(issueNewsletterToken, newsletterTokenDelayMs);
 }
 
 function getNewsletterBotGuardResult(form) {
@@ -202,6 +286,8 @@ document.addEventListener("click", function (event) {
 
 for (let i = 0; i < newsletterForms.length; i++) {
   newsletterForms[i].addEventListener("submit", function (event) {
+    updateNewsletterTelemetry(this);
+
     const guardResult = getNewsletterBotGuardResult(this);
 
     if (guardResult.blocked) {
@@ -222,6 +308,10 @@ for (let i = 0; i < newsletterForms.length; i++) {
 }
 
 markNewsletterFormsReady();
+
+["pointerdown", "keydown", "touchstart", "scroll"].forEach(function (eventName) {
+  window.addEventListener(eventName, recordNewsletterInteraction, { passive: true });
+});
 
 if (liveRoadmap) {
   const liveRoadmapObserver = new IntersectionObserver(function (entries) {
@@ -261,12 +351,15 @@ if (newsletterFrame) {
 
     activeNewsletterForm.reset();
     setNewsletterSubmitState(activeNewsletterForm, false);
+    delete activeNewsletterForm.dataset.focusStartedAt;
 
     const startField = activeNewsletterForm.querySelector("[data-newsletter-start]");
 
     if (startField) {
-      startField.value = String(Date.now());
+      startField.value = String(newsletterPageLoadedAt);
     }
+
+    setNewsletterTelemetryBase(activeNewsletterForm);
 
     trackNewsletterEvent(activeNewsletterForm, "success");
 

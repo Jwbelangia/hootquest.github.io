@@ -58,6 +58,7 @@ const newsletterForms = document.querySelectorAll("[data-newsletter-form]");
 const newsletterFrame = document.querySelector('iframe[name="newsletter-submit-frame"]');
 const liveRoadmap = document.querySelector("[data-roadmap-reveal]");
 let activeNewsletterForm = null;
+const newsletterMinimumSubmitDelayMs = 3000;
 
 function isAnalyticsAvailable() {
   return typeof window.gtag === "function";
@@ -135,6 +136,60 @@ function trackNewsletterEvent(form, status) {
   });
 }
 
+function setNewsletterStatus(form, message) {
+  const status = form?.nextElementSibling;
+
+  if (status?.hasAttribute("data-newsletter-status")) {
+    status.textContent = message;
+  }
+}
+
+function setNewsletterSubmitState(form, disabled) {
+  const button = form?.querySelector('button[type="submit"]');
+
+  if (button) {
+    button.disabled = disabled;
+  }
+}
+
+function markNewsletterFormsReady() {
+  const loadedAt = String(Date.now());
+
+  for (let i = 0; i < newsletterForms.length; i++) {
+    const startField = newsletterForms[i].querySelector("[data-newsletter-start]");
+
+    if (startField) {
+      startField.value = loadedAt;
+    }
+  }
+}
+
+function getNewsletterBotGuardResult(form) {
+  const honeypotField = form?.querySelector("[data-newsletter-honeypot]");
+  const startField = form?.querySelector("[data-newsletter-start]");
+  const startedAt = Number(startField?.value || 0);
+  const elapsedMs = Date.now() - startedAt;
+
+  if (honeypotField && honeypotField.value.trim() !== "") {
+    return {
+      blocked: true,
+      reason: "honeypot"
+    };
+  }
+
+  if (!startedAt || elapsedMs < newsletterMinimumSubmitDelayMs) {
+    return {
+      blocked: true,
+      reason: "timing"
+    };
+  }
+
+  return {
+    blocked: false,
+    reason: "ok"
+  };
+}
+
 document.addEventListener("click", function (event) {
   const trackedElement = event.target.closest("[data-analytics-event]");
 
@@ -146,23 +201,27 @@ document.addEventListener("click", function (event) {
 });
 
 for (let i = 0; i < newsletterForms.length; i++) {
-  newsletterForms[i].addEventListener("submit", function () {
-    const status = this.nextElementSibling;
-    const button = this.querySelector('button[type="submit"]');
+  newsletterForms[i].addEventListener("submit", function (event) {
+    const guardResult = getNewsletterBotGuardResult(this);
+
+    if (guardResult.blocked) {
+      event.preventDefault();
+      setNewsletterSubmitState(this, false);
+      setNewsletterStatus(this, "Please wait a moment and try again.");
+      trackNewsletterEvent(this, `blocked_${guardResult.reason}`);
+      return;
+    }
 
     activeNewsletterForm = this;
 
-    if (status?.hasAttribute("data-newsletter-status")) {
-      status.textContent = "Submitting...";
-    }
-
-    if (button) {
-      button.disabled = true;
-    }
+    setNewsletterStatus(this, "Submitting...");
+    setNewsletterSubmitState(this, true);
 
     trackNewsletterEvent(this, "submit");
   });
 }
+
+markNewsletterFormsReady();
 
 if (liveRoadmap) {
   const liveRoadmapObserver = new IntersectionObserver(function (entries) {
@@ -195,16 +254,18 @@ if (newsletterFrame) {
     }
 
     const status = activeNewsletterForm.nextElementSibling;
-    const button = activeNewsletterForm.querySelector('button[type="submit"]');
 
     if (status?.hasAttribute("data-newsletter-status")) {
       status.textContent = "Thanks for subscribing!";
     }
 
     activeNewsletterForm.reset();
+    setNewsletterSubmitState(activeNewsletterForm, false);
 
-    if (button) {
-      button.disabled = false;
+    const startField = activeNewsletterForm.querySelector("[data-newsletter-start]");
+
+    if (startField) {
+      startField.value = String(Date.now());
     }
 
     trackNewsletterEvent(activeNewsletterForm, "success");

@@ -816,6 +816,14 @@
 
                         <form action="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec" method="post" target="newsletter-submit-frame" class="newsletter-form" data-newsletter-form data-analytics-form="kickstarter_tune_in_main" data-analytics-section="kickstarter_tune_in">
 
+                            <div class="newsletter-bot-guard" aria-hidden="true">
+                                <label>
+                                    Leave this field empty
+                                    <input type="text" name="company_name" tabindex="-1" autocomplete="off" data-newsletter-honeypot>
+                                </label>
+                                <input type="hidden" name="form_loaded_at" value="" data-newsletter-start>
+                            </div>
+
                             <div class="input-wrapper skewBg">
                                 <input type="email" name="email_address" aria-label="email" placeholder="Enter your email..." required
                                        class="email-field">
@@ -1113,6 +1121,14 @@
                         <p class="footer-list-title">Kickstarter Tune-In</p>
 
                         <form action="https://script.google.com/macros/s/AKfycbyIOXNvkzP6c3niWzze1ouPq1OvoCsZdx_RGNucoPLsGmUuWCr1UQqZ3qxL3w4KmZedWg/exec" method="post" target="newsletter-submit-frame" class="footer-newsletter" data-newsletter-form data-analytics-form="kickstarter_tune_in_footer" data-analytics-section="footer_signup">
+                            <div class="newsletter-bot-guard" aria-hidden="true">
+                                <label>
+                                    Leave this field empty
+                                    <input type="text" name="company_name" tabindex="-1" autocomplete="off" data-newsletter-honeypot>
+                                </label>
+                                <input type="hidden" name="form_loaded_at" value="" data-newsletter-start>
+                            </div>
+
                             <input type="email" name="email_address" aria-label="email" placeholder="Enter your email" required data-contact-email
                                    class="email-field">
 

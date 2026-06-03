@@ -3,6 +3,7 @@ const APP_CONFIG = {
   newsletterSheetName: "Email Collection",
   productRequestSheetName: "ProductRequest",
   emailQueueSheetName: "EmailQueue",
+	paymentSyncSharedSecret: "replace-with-your-worker-shared-secret",
   emailFromAlias: "replace-with-your-alias@hootquest.com",
   adminNotificationEmail: "replace-with-your-inbox@hootquest.com",
   senderName: "HootQuest",
@@ -46,6 +47,10 @@ function doGet(e) {
 
 function doPost(e) {
   const payload = parsePayload_(e);
+
+	if (payload.action === "markPaymentPaid") {
+	return markProductRequestPaid_(payload);
+  }
 
   if (payload.action === "createOrder") {
 	return createProductRequest_(payload);
@@ -178,6 +183,71 @@ function createProductRequest_(payload) {
 	ok: true,
 	invoiceNumber: invoiceNumber,
 	buildStatus: nextStatus
+  });
+}
+
+function markProductRequestPaid_(payload) {
+  if (!isAuthorizedPaymentSync_(payload.sharedSecret)) {
+	return json_({ ok: false, message: "Unauthorized payment sync request." });
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(APP_CONFIG.productRequestSheetName);
+
+  if (!sheet) {
+	return json_({ ok: false, message: `${APP_CONFIG.productRequestSheetName} sheet not found.` });
+  }
+
+  const invoiceNumber = String(payload.invoiceNumber || "").trim();
+
+  if (!invoiceNumber) {
+	return json_({ ok: false, message: "Invoice number is required for payment sync." });
+  }
+
+  const rowNumber = findProductRequestRow_(sheet, invoiceNumber);
+
+  if (!rowNumber) {
+	return json_({ ok: false, message: "Matching invoice was not found." });
+  }
+
+  const headers = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 10)).getValues()[0];
+  const paymentStatusCol = headers.indexOf("paymentStatus") + 1 || 9;
+  let stripeSessionCol = headers.indexOf("Stripe Session ID") + 1;
+  let stripePaymentIntentCol = headers.indexOf("Stripe Payment Intent ID") + 1;
+  let paidAtCol = headers.indexOf("Paid At") + 1;
+  let paymentAmountCol = headers.indexOf("Payment Amount") + 1;
+  let paymentCurrencyCol = headers.indexOf("Payment Currency") + 1;
+  let paymentMethodCol = headers.indexOf("Payment Method Detail") + 1;
+  let webhookEventCol = headers.indexOf("Stripe Event ID") + 1;
+  let figurineMemoCol = headers.indexOf("Figurine Memo") + 1;
+  let siteCartIdsCol = headers.indexOf("Site Cart IDs") + 1;
+
+  stripeSessionCol = ensureSheetColumn_(sheet, stripeSessionCol, "Stripe Session ID");
+  stripePaymentIntentCol = ensureSheetColumn_(sheet, stripePaymentIntentCol, "Stripe Payment Intent ID");
+  paidAtCol = ensureSheetColumn_(sheet, paidAtCol, "Paid At");
+  paymentAmountCol = ensureSheetColumn_(sheet, paymentAmountCol, "Payment Amount");
+  paymentCurrencyCol = ensureSheetColumn_(sheet, paymentCurrencyCol, "Payment Currency");
+  paymentMethodCol = ensureSheetColumn_(sheet, paymentMethodCol, "Payment Method Detail");
+  webhookEventCol = ensureSheetColumn_(sheet, webhookEventCol, "Stripe Event ID");
+  figurineMemoCol = ensureSheetColumn_(sheet, figurineMemoCol, "Figurine Memo");
+  siteCartIdsCol = ensureSheetColumn_(sheet, siteCartIdsCol, "Site Cart IDs");
+
+  sheet.getRange(rowNumber, paymentStatusCol).setValue(String(payload.paymentStatus || "Paid"));
+  sheet.getRange(rowNumber, stripeSessionCol).setValue(String(payload.stripeSessionId || ""));
+  sheet.getRange(rowNumber, stripePaymentIntentCol).setValue(String(payload.stripePaymentIntentId || ""));
+  sheet.getRange(rowNumber, paidAtCol).setValue(new Date());
+  sheet.getRange(rowNumber, paymentAmountCol).setValue(formatStripeAmount_(payload.amountTotal));
+  sheet.getRange(rowNumber, paymentCurrencyCol).setValue(String(payload.currency || "").toUpperCase());
+  sheet.getRange(rowNumber, paymentMethodCol).setValue(String(payload.paymentMethod || "Stripe"));
+  sheet.getRange(rowNumber, webhookEventCol).setValue(String(payload.stripeEventId || ""));
+  sheet.getRange(rowNumber, figurineMemoCol).setValue(String(payload.figurineMemo || ""));
+  sheet.getRange(rowNumber, siteCartIdsCol).setValue(String(payload.siteCartIds || ""));
+
+  markProductRequestChanged_(sheet, rowNumber);
+
+  return json_({
+	ok: true,
+	invoiceNumber: invoiceNumber,
+	paymentStatus: String(payload.paymentStatus || "Paid")
   });
 }
 
@@ -453,6 +523,17 @@ function validateNewsletterBotGuard_(payload) {
   return { blocked: false, reason: "ok" };
 }
 
+function isAuthorizedPaymentSync_(sharedSecret) {
+  const expectedSecret = String(APP_CONFIG.paymentSyncSharedSecret || "").trim();
+  const providedSecret = String(sharedSecret || "").trim();
+
+  if (!expectedSecret || expectedSecret.indexOf("replace-with-") === 0) {
+	return false;
+  }
+
+  return expectedSecret === providedSecret;
+}
+
 function findProductRequestRow_(sheet, invoiceNumber) {
   const data = sheet.getDataRange().getValues();
 
@@ -460,6 +541,26 @@ function findProductRequestRow_(sheet, invoiceNumber) {
 	if (String(data[i][9]).trim() === invoiceNumber) {
 	  return i + 1;
 	}
+
+function ensureSheetColumn_(sheet, existingCol, headerLabel) {
+  if (existingCol) {
+	return existingCol;
+  }
+
+  const nextCol = sheet.getLastColumn() + 1;
+  sheet.getRange(1, nextCol).setValue(headerLabel);
+  return nextCol;
+}
+
+function formatStripeAmount_(value) {
+  const amount = Number(value || 0);
+
+  if (!Number.isFinite(amount)) {
+	return "";
+  }
+
+  return (amount / 100).toFixed(2);
+}
   }
 
   return 0;

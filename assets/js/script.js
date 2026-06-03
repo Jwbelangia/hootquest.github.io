@@ -406,6 +406,7 @@ const figurineAdjustButtons = document.querySelectorAll("[data-figurine-adjust]"
 const figurineQuantityDisplays = document.querySelectorAll("[data-figurine-quantity]");
 const figurineSubmitButton = document.querySelector("[data-figurine-submit]");
 const orderEndpoint = orderHub?.dataset.orderEndpoint || "";
+const stripeCheckoutEndpoint = orderHub?.dataset.stripeEndpoint || "";
 const orderDraftKey = "hootquest-order-draft";
 const orderDraftIdKey = "hootquest-order-draft-id";
 const orderInvoiceCookieKey = "hootquest-last-invoice";
@@ -413,6 +414,7 @@ const abandonedCartDelayMs = 5 * 60 * 1000;
 let abandonedCartTimerId = null;
 let draftHoldSent = false;
 let lastDraftHash = "";
+let stripeRedirectInProgress = false;
 let activeHeroProductId = "";
 let activeHeroTransition = null;
 let activeHeroRevealToken = 0;
@@ -887,9 +889,27 @@ if (orderHub && orderForm) {
     const formData = new FormData(orderForm);
     const payload = Object.fromEntries(formData.entries());
     payload.invoiceNumber = ensureDraftInvoiceNumber();
+    const normalizedPaymentMethod = String(payload.paymentMethod || "").toLowerCase();
+    const stripeCheckoutPayload = normalizedPaymentMethod === "stripe"
+      ? buildStripeCheckoutPayload({
+        invoiceNumber: payload.invoiceNumber,
+        email: emailField.value.trim(),
+        packageSummary: packageField.value
+      })
+      : null;
 
     if (!payload.package) {
       orderStatus.textContent = "Please add at least one package item before submitting.";
+      return;
+    }
+
+    if (normalizedPaymentMethod === "stripe" && !stripeCheckoutEndpoint) {
+      orderStatus.textContent = "Stripe checkout is not configured yet.";
+      return;
+    }
+
+    if (normalizedPaymentMethod === "stripe" && (!stripeCheckoutPayload || !stripeCheckoutPayload.items.length)) {
+      orderStatus.textContent = "Add a Stripe-supported item to continue to secure checkout.";
       return;
     }
 
@@ -911,6 +931,27 @@ if (orderHub && orderForm) {
         orderStatusInvoiceInput.value = payload.invoiceNumber;
       }
 
+      if (normalizedPaymentMethod === "stripe") {
+        orderStatus.textContent = "Redirecting to secure Stripe checkout...";
+        stripeRedirectInProgress = true;
+
+        const checkoutSession = await createStripeCheckoutSession(stripeCheckoutPayload);
+
+        if (!checkoutSession.checkoutUrl) {
+          throw new Error("Stripe checkout URL was not returned.");
+        }
+
+        trackAnalyticsEvent("checkout_redirect", {
+          event_category: "stripe_checkout",
+          event_label: payload.invoiceNumber,
+          invoice_number: payload.invoiceNumber,
+          destination: "stripe_checkout"
+        });
+
+        window.location.assign(checkoutSession.checkoutUrl);
+        return;
+      }
+
       orderStatus.textContent = "Request received. Save your invoice number below.";
       invoiceCard.hidden = false;
       handlePaymentWorkflow(payload.paymentMethod, {
@@ -929,6 +970,7 @@ if (orderHub && orderForm) {
       syncOrderSummary();
       refreshCartState();
     } catch (error) {
+      stripeRedirectInProgress = false;
       orderStatus.textContent = error.message || "Unable to submit order request.";
     } finally {
       if (submitButton) {
@@ -938,6 +980,10 @@ if (orderHub && orderForm) {
   });
 
   window.addEventListener("beforeunload", function (event) {
+    if (stripeRedirectInProgress) {
+      return;
+    }
+
     if (!hasDraftCart()) {
       return;
     }
@@ -1263,6 +1309,72 @@ if (orderHub && orderForm) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
   }
 
+  function buildStripeCheckoutPayload(details) {
+    const items = [];
+    const quantityFields = orderForm.querySelectorAll("[data-package-quantity]");
+
+    for (let i = 0; i < quantityFields.length; i++) {
+      const quantity = Number(quantityFields[i].value || 0);
+      const packageId = quantityFields[i].dataset.packageId;
+
+      if (quantity > 0 && packageId === "core-game") {
+        items.push({
+          id: packageId,
+          quantity: quantity
+        });
+      }
+    }
+
+    const combinedFigurineSelections = buildCombinedFigurineSelections();
+    const figurineQuantity = Object.keys(combinedFigurineSelections).reduce(function (total, key) {
+      return total + Number(combinedFigurineSelections[key] || 0);
+    }, 0);
+
+    if (figurineQuantity > 0) {
+      items.push({
+        id: "owlcrest-collectible",
+        quantity: figurineQuantity
+      });
+    }
+
+    return {
+      invoiceNumber: details.invoiceNumber,
+      email: details.email,
+      source: "hootquest_site",
+      packageSummary: details.packageSummary,
+      figurineSelections: combinedFigurineSelections,
+      items: items
+    };
+  }
+
+  function buildCombinedFigurineSelections() {
+    const combined = {};
+
+    mergeSelectionMap(figurineCartSelections, combined);
+    mergeSelectionMap(heroCartSelections, combined);
+
+    return combined;
+  }
+
+  function mergeSelectionMap(sourceSelections, targetSelections) {
+    const selectionIds = Object.keys(sourceSelections || {});
+
+    for (let i = 0; i < selectionIds.length; i++) {
+      const productId = selectionIds[i];
+      const quantity = Number(sourceSelections[productId] || 0);
+      const product = packageCatalog.find(function (item) {
+        return item.id === productId;
+      });
+      const memoKey = String(product?.figurineName || product?.heroName || productId || "").trim().toLowerCase();
+
+      if (!memoKey || quantity <= 0) {
+        continue;
+      }
+
+      targetSelections[memoKey] = Number(targetSelections[memoKey] || 0) + quantity;
+    }
+  }
+
   function ensureDraftInvoiceNumber() {
     let invoiceNumber = invoiceField.value || localStorage.getItem(orderDraftIdKey) || "";
 
@@ -1432,6 +1544,24 @@ async function submitOrderPayload(payload) {
     },
     body: JSON.stringify(payload)
   });
+}
+
+async function createStripeCheckoutSession(payload) {
+  const response = await fetch(stripeCheckoutEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.ok) {
+    throw new Error(result.message || "Unable to start secure Stripe checkout.");
+  }
+
+  return result;
 }
 
 function getOrderStatusPayload(invoiceNumber) {

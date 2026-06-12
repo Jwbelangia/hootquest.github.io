@@ -818,6 +818,9 @@ document.addEventListener("keydown", function (event) {
 });
 
 if (orderHub && orderForm) {
+  const orderShell = orderHub.querySelector("[data-order-shell]");
+  const orderExpandButtons = orderHub.querySelectorAll("[data-order-expand]");
+  const orderCollapseButtons = orderHub.querySelectorAll("[data-order-collapse]");
   const packageList = orderForm.querySelector("[data-package-list]");
   const packageField = orderForm.querySelector("[data-package-field]");
   const pretaxField = orderForm.querySelector("[data-pretax-field]");
@@ -1097,6 +1100,7 @@ if (orderHub && orderForm) {
 
     if (hasDraftCart()) {
       ensureDraftInvoiceNumber();
+      expandOrderShell(false);
     }
 
     scheduleAbandonedCartHold();
@@ -1210,6 +1214,54 @@ if (orderHub && orderForm) {
     clearTimeout(abandonedCartTimerId);
     clearHeroSelections();
     clearFigurineSelections();
+  }
+
+  function expandOrderShell(shouldFocusFirstField) {
+    if (!orderShell) {
+      return;
+    }
+
+    orderShell.classList.remove("is-collapsed");
+
+    if (shouldFocusFirstField) {
+      window.setTimeout(function () {
+        emailField?.focus();
+      }, 220);
+    }
+  }
+
+  function collapseOrderShell() {
+    if (!orderShell) {
+      return;
+    }
+
+    if (hasDraftCart()) {
+      return;
+    }
+
+    orderShell.classList.add("is-collapsed");
+  }
+
+  function resetOrderFormAfterCheckoutSuccess() {
+    stripeRedirectInProgress = false;
+    orderForm.reset();
+    clearOrderDraft();
+    invoiceField.value = "";
+    packageField.value = "";
+    pretaxField.value = "0.00";
+    pretaxDisplay.value = "$0.00";
+    packageSummary.textContent = "No items selected yet.";
+    heroCartList.innerHTML = "";
+    heroCartSummary.hidden = true;
+    invoiceCard.hidden = true;
+    orderStatus.textContent = "Stripe payment started successfully. Use your invoice number in Stripe or email records if you need support.";
+    syncOrderSummary();
+    collapseOrderShell();
+
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.delete("checkout");
+    currentUrl.searchParams.delete("session_id");
+    window.history.replaceState({}, document.title, currentUrl.toString());
   }
 
   function hasDraftCart() {

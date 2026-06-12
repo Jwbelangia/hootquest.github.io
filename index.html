@@ -650,7 +650,7 @@
                             <div class="featured-game-card" data-release-status="pending">
 
                                 <figure class="card-banner img-holder" style="--width: 450; --height: 600;">
-                                    <img src="./assets/images/RattledFang.jpg" width="450" height="600" loading="lazy"
+                                    <img src="./assets/images/futureRelease.png" width="450" height="600" loading="lazy"
                                          alt="RattledFang" class="img-cover">
                                 </figure>
 
@@ -871,85 +871,110 @@
 
                     <div class="order-hub-grid">
 
-                        <form class="order-card order-form-panel" data-order-form>
-                            <input type="hidden" name="action" value="createOrder">
-                            <input type="hidden" name="package" value="" data-package-field>
-                            <input type="hidden" name="pretaxSales" value="0.00" data-pretax-field>
-                            <input type="hidden" name="buildStatus" value="Build Prep Request">
-                            <input type="hidden" name="shippingLabel" value="">
-                            <input type="hidden" name="paymentStatus" value="">
-                            <input type="hidden" name="invoiceNumber" value="" data-invoice-field>
-
-                            <div class="order-card-header">
-                                <h3 class="h3">Place an Order Request</h3>
-                                <p class="order-card-copy">Build out the request below and we will send it into the order sheet for review.</p>
-                            </div>
-
-                            <div class="order-field-grid">
-                                <label class="order-field">
-                                    <span class="order-label">Email</span>
-                                    <input type="email" name="email" placeholder="Enter your email address" required>
-                                </label>
-
-                                <label class="order-field order-field-full">
-                                    <span class="order-label">Address</span>
-                                    <textarea name="address" placeholder="Street, city, state, zip" required></textarea>
-                                </label>
-
-                                <label class="order-field">
-                                    <span class="order-label">Contact</span>
-                                    <input type="tel" name="contact" placeholder="Best phone number" required>
-                                </label>
-
-                                <label class="order-field">
-                                    <span class="order-label">Payment Method</span>
-                                    <select name="paymentMethod" required>
-                                        <option value="Stripe" selected>Stripe</option>
-                                    </select>
-                                </label>
-                            </div>
-
-                            <div class="order-package-builder">
-                                <div class="order-package-heading">
-                                    <div>
-                                        <p class="order-label">Package</p>
-                                        <p class="order-card-copy">Choose items and quantities. Pretax sales updates automatically.</p>
-                                    </div>
+                        <div class="order-card order-form-shell is-collapsed" data-order-shell>
+                            <div class="order-card order-cta-panel" data-order-cta-panel>
+                                <div class="order-cta-visual">
+                                    <img src="./assets/images/HootquestBox.png" width="640" height="640" loading="lazy" alt="HootQuest boxed game" class="order-cta-box-image">
                                 </div>
 
-                                <div class="package-list" data-package-list></div>
+                                <div class="order-cta-copy">
+                                    <p class="order-label">Ready to enter Owlcrest?</p>
+                                    <h3 class="h3">Start Your HootQuest Purchase</h3>
+                                    <p class="order-card-copy">Open the secure purchase form, choose your core game and figurines, and continue to Stripe checkout.</p>
 
-                                <div class="order-summary-box">
+                                    <button type="button" class="btn skewBg order-submit-btn order-cta-button" data-order-expand>
+                                        <span class="span">Buy HootQuest</span>
+                                        <ion-icon name="arrow-forward-circle" aria-hidden="true"></ion-icon>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <form class="order-card order-form-panel" data-order-form>
+                                <input type="hidden" name="action" value="createOrder">
+                                <input type="hidden" name="package" value="" data-package-field>
+                                <input type="hidden" name="pretaxSales" value="0.00" data-pretax-field>
+                                <input type="hidden" name="buildStatus" value="Build Prep Request">
+                                <input type="hidden" name="shippingLabel" value="">
+                                <input type="hidden" name="paymentStatus" value="">
+                                <input type="hidden" name="invoiceNumber" value="" data-invoice-field>
+
+                                <div class="order-card-header order-card-header--form">
                                     <div>
-                                        <p class="order-label">Selected Package</p>
-                                        <p class="order-summary-text" data-package-summary>No items selected yet.</p>
+                                        <h3 class="h3">Place an Order Request</h3>
+                                        <p class="order-card-copy">Build out the request below and we will send it into the order sheet for review before secure Stripe checkout.</p>
                                     </div>
 
-                                    <div class="hero-cart-summary" data-hero-cart-summary hidden>
-                                        <p class="order-label">Hero Figurines</p>
-                                        <ul class="hero-cart-list" data-hero-cart-list></ul>
-                                    </div>
+                                    <button type="button" class="order-collapse-btn" data-order-collapse aria-label="Collapse purchase form">
+                                        <ion-icon name="chevron-down"></ion-icon>
+                                    </button>
+                                </div>
+
+                                <div class="order-field-grid">
+                                    <label class="order-field">
+                                        <span class="order-label">Email</span>
+                                        <input type="email" name="email" placeholder="Enter your email address" required>
+                                    </label>
+
+                                    <label class="order-field order-field-full">
+                                        <span class="order-label">Address</span>
+                                        <textarea name="address" placeholder="Street, city, state, zip" required></textarea>
+                                    </label>
 
                                     <label class="order-field">
-                                        <span class="order-label">Pretax Sales</span>
-                                        <input type="text" value="$0.00" readonly data-pretax-display>
+                                        <span class="order-label">Contact</span>
+                                        <input type="tel" name="contact" placeholder="Best phone number" required>
+                                    </label>
+
+                                    <label class="order-field">
+                                        <span class="order-label">Payment Method</span>
+                                        <select name="paymentMethod" required>
+                                            <option value="Stripe" selected>Stripe</option>
+                                        </select>
                                     </label>
                                 </div>
-                            </div>
 
-                            <button type="submit" class="btn skewBg order-submit-btn">
-                                <span class="span">Submit Request</span>
-                                <ion-icon name="document-text" aria-hidden="true"></ion-icon>
-                            </button>
+                                <div class="order-package-builder">
+                                    <div class="order-package-heading">
+                                        <div>
+                                            <p class="order-label">Package</p>
+                                            <p class="order-card-copy">Choose items and quantities. Pretax sales updates automatically.</p>
+                                        </div>
+                                    </div>
 
-                            <p class="order-form-status" data-order-form-status aria-live="polite"></p>
+                                    <div class="package-list" data-package-list></div>
 
-                            <div class="order-invoice-card" data-order-invoice-card hidden>
-                                <p class="order-label">Order Invoice Number</p>
-                                <p class="order-invoice-value" data-order-invoice-value></p>
-                                <p class="order-card-copy">Save this invoice number to check your build status later.</p>
-                            </div>
-                        </form>
+                                    <div class="order-summary-box">
+                                        <div>
+                                            <p class="order-label">Selected Package</p>
+                                            <p class="order-summary-text" data-package-summary>No items selected yet.</p>
+                                        </div>
+
+                                        <div class="hero-cart-summary" data-hero-cart-summary hidden>
+                                            <p class="order-label">Hero Figurines</p>
+                                            <ul class="hero-cart-list" data-hero-cart-list></ul>
+                                        </div>
+
+                                        <label class="order-field">
+                                            <span class="order-label">Pretax Sales</span>
+                                            <input type="text" value="$0.00" readonly data-pretax-display>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn skewBg order-submit-btn">
+                                    <span class="span">Submit Request</span>
+                                    <ion-icon name="document-text" aria-hidden="true"></ion-icon>
+                                </button>
+
+                                <p class="order-form-status" data-order-form-status aria-live="polite"></p>
+
+                                <div class="order-invoice-card" data-order-invoice-card hidden>
+                                    <p class="order-label">Order Invoice Number</p>
+                                    <p class="order-invoice-value" data-order-invoice-value></p>
+                                    <p class="order-card-copy">Save this invoice number to check your build status later.</p>
+                                </div>
+                            </form>
+                        </div>
 
                         <div class="order-card order-status-panel">
                             <div class="order-card-header">

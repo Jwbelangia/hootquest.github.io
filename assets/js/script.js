@@ -382,7 +382,7 @@ const cardShowcase = document.querySelector("[data-card-showcase]");
 const latestGameControls = document.querySelector(".latest-game-controls");
 const heroModal = document.querySelector("[data-hero-modal]");
 const heroModalTitle = document.querySelector("[data-hero-modal-title]");
-const heroModalViewer = document.querySelector("[data-hero-model-viewer]");
+const heroModelHost = document.querySelector("[data-hero-model-host]");
 const heroModalFallback = document.querySelector("[data-hero-model-fallback]");
 const heroFormatNote = document.querySelector("[data-hero-format-note]");
 const heroAddToCartButton = document.querySelector("[data-hero-add-to-cart]");
@@ -418,6 +418,7 @@ let stripeRedirectInProgress = false;
 let activeHeroProductId = "";
 let activeHeroTransition = null;
 let activeHeroRevealToken = 0;
+let heroModalViewer = null;
 const heroCartSelections = {};
 const figurineCartSelections = {};
 
@@ -556,6 +557,7 @@ function setActiveDeck(deckName) {
 
   const normalizedDeck = deckName === "rats" ? "rats" : "owls";
   cardShowcase.dataset.activeDeck = normalizedDeck;
+  loadCardShowcaseDeck(normalizedDeck);
 
   for (let i = 0; i < deckTabs.length; i++) {
     const isActive = deckTabs[i].dataset.deckTab === normalizedDeck;
@@ -607,6 +609,38 @@ function setCardShowcaseHover(card) {
   card.classList.add("is-hovered");
 }
 
+function hydrateCardShowcaseImage(image) {
+  if (!image || !image.dataset.cardSrc) {
+    return;
+  }
+
+  image.src = image.dataset.cardSrc;
+
+  if (image.dataset.cardSrcset) {
+    image.srcset = image.dataset.cardSrcset;
+  }
+
+  if (image.dataset.cardSizes) {
+    image.sizes = image.dataset.cardSizes;
+  }
+
+  image.removeAttribute("data-card-src");
+  image.removeAttribute("data-card-srcset");
+  image.removeAttribute("data-card-sizes");
+}
+
+function loadCardShowcaseDeck(deckName) {
+  if (!cardShowcase) {
+    return;
+  }
+
+  const deckImages = cardShowcase.querySelectorAll(`.showcase-card[data-deck="${deckName}"] img[data-card-src]`);
+
+  for (let i = 0; i < deckImages.length; i++) {
+    hydrateCardShowcaseImage(deckImages[i]);
+  }
+}
+
 if (contactScrollLinks.length && contactSignupSection) {
   for (let i = 0; i < contactScrollLinks.length; i++) {
     contactScrollLinks[i].addEventListener("click", function (event) {
@@ -656,6 +690,8 @@ if (deckTabs.length && cardShowcase) {
   if (latestGameControls) {
     latestGameControls.dataset.capTarget = "center";
   }
+
+  loadCardShowcaseDeck(cardShowcase.dataset.activeDeck || "owls");
 
   for (let i = 0; i < deckTabs.length; i++) {
     deckTabs[i].addEventListener("click", function () {
@@ -1846,14 +1882,22 @@ function openHeroModal(product, title, image, sourceImage) {
   heroModalTitle.textContent = title;
   heroModal.classList.add("is-entering");
 
-  if (heroModalViewer) {
+  if (heroModelHost) {
     if (product.modelSrc) {
+      heroModalViewer = ensureHeroModalViewer();
+
+      if (!heroModalViewer) {
+        heroFormatNote.hidden = false;
+        markHeroModelReady(revealToken);
+      }
+
       heroModalViewer.hidden = true;
       heroModalViewer.removeAttribute("src");
       heroModalViewer.src = product.modelSrc;
       heroModalViewer.poster = image || product.fallbackImage || "";
       heroModalViewer.removeAttribute("camera-controls");
       heroFormatNote.hidden = true;
+      heroModelHost.hidden = false;
 
       const handleModelLoad = function () {
         heroModalViewer.removeEventListener("load", handleModelLoad);
@@ -1868,8 +1912,12 @@ function openHeroModal(product, title, image, sourceImage) {
 
       heroModalViewer.addEventListener("load", handleModelLoad, { once: true });
     } else {
-      heroModalViewer.removeAttribute("src");
-      heroModalViewer.hidden = true;
+      if (heroModalViewer) {
+        heroModalViewer.removeAttribute("src");
+        heroModalViewer.hidden = true;
+      }
+
+      heroModelHost.hidden = true;
       heroFormatNote.hidden = false;
       markHeroModelReady(revealToken);
     }
@@ -1900,9 +1948,40 @@ function closeHeroModal() {
   cleanupHeroTransition();
   heroModal.hidden = true;
   heroModal.classList.remove("is-entering");
+
+  if (heroModalViewer) {
+    heroModalViewer.removeAttribute("src");
+    heroModalViewer.hidden = true;
+  }
+
+  if (heroModelHost) {
+    heroModelHost.hidden = true;
+  }
+
   unlockBodyScroll();
   activeHeroProductId = "";
   activeHeroRevealToken += 1;
+}
+
+function ensureHeroModalViewer() {
+  if (!heroModelHost) {
+    return null;
+  }
+
+  if (heroModalViewer) {
+    return heroModalViewer;
+  }
+
+  heroModalViewer = document.createElement("model-viewer");
+  heroModalViewer.setAttribute("data-hero-model-viewer", "");
+  heroModalViewer.setAttribute("auto-rotate", "");
+  heroModalViewer.setAttribute("rotation-per-second", "6deg");
+  heroModalViewer.setAttribute("shadow-intensity", "1");
+  heroModalViewer.setAttribute("exposure", "1");
+  heroModalViewer.setAttribute("interaction-prompt", "none");
+  heroModalViewer.hidden = true;
+  heroModelHost.replaceChildren(heroModalViewer);
+  return heroModalViewer;
 }
 
 function openCampaignStoryModal() {

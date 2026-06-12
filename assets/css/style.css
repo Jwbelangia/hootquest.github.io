@@ -1272,12 +1272,20 @@ body {
   z-index: 0;
 }
 
+.hero-modal-model-host,
 .hero-modal-media model-viewer,
 .hero-modal-fallback {
   width: min(100%, 320px);
   max-width: 100%;
   aspect-ratio: 5 / 7;
   max-height: min(64vh, 700px);
+}
+
+.hero-modal-model-host {
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-modal-media model-viewer {

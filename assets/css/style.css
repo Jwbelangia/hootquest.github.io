@@ -432,6 +432,7 @@ body {
   display: grid;
   gap: 18px;
   align-content: center;
+  min-height: 100%;
 }
 
 .order-cta-visual {
@@ -490,7 +491,7 @@ body {
   opacity: 0;
   visibility: hidden;
   overflow: hidden;
-  padding: 0 24px;
+  padding: 0;
   margin: 0;
   border-width: 0;
 }
@@ -510,7 +511,7 @@ body {
   opacity: 0;
   visibility: hidden;
   overflow: hidden;
-  padding: 0 24px;
+  padding: 0;
   margin: 0;
   border-width: 0;
   transform: translateY(-10px);
@@ -523,6 +524,10 @@ body {
 .order-form-shell:not(.is-collapsed) .order-form-panel {
   opacity: 1;
   visibility: visible;
+}
+
+.order-form-panel {
+  display: grid;
 }
 
 .navbar.active {

@@ -843,6 +843,26 @@ if (orderHub && orderForm) {
   syncOrderSummary();
   refreshCartState();
 
+  if (orderShell && hasDraftCart()) {
+    expandOrderShell(false);
+  }
+
+  for (let i = 0; i < orderExpandButtons.length; i++) {
+    orderExpandButtons[i].addEventListener("click", function () {
+      expandOrderShell(true);
+    });
+  }
+
+  for (let i = 0; i < orderCollapseButtons.length; i++) {
+    orderCollapseButtons[i].addEventListener("click", function () {
+      collapseOrderShell();
+    });
+  }
+
+  if (window.location.search.includes("checkout=success")) {
+    resetOrderFormAfterCheckoutSuccess();
+  }
+
   packageList?.addEventListener("input", function (event) {
     if (event.target.matches("[data-package-quantity]")) {
       syncOrderSummary();
